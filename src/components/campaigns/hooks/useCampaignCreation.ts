@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData, defaultStages } from '../types/campaignTypes';
+import { campaignData } from '../campaignData';
 
 export const useCampaignCreation = (onClose: () => void) => {
   const navigate = useNavigate();
@@ -53,8 +54,24 @@ export const useCampaignCreation = (onClose: () => void) => {
 
   // Handle form submission
   const handleSubmit = () => {
-    // In a real app, you would send this data to your backend
-    console.log('Campaign created:', formData);
+    // Create a new campaign object for the campaign list
+    const newCampaign = {
+      id: campaignData.length + 1,
+      name: formData.name,
+      status: 'Active',
+      type: 'Email', // Default type or could be derived from formData
+      channels: formData.channels,
+      leads: formData.leads.length,
+      responses: 0,
+      positive: 0,
+      negative: 0,
+      conversion: '0%',
+      teamMembers: Object.values(formData.teamAssignments).flat(),
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+
+    // Add it to the campaigns data
+    campaignData.unshift(newCampaign);
     
     // Show success notification
     toast({

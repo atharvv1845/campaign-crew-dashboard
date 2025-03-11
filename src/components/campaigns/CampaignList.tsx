@@ -19,7 +19,7 @@ const CampaignList: React.FC = () => {
   });
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full flex flex-col">
       {/* Header and actions */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <CampaignFilters 
@@ -34,8 +34,10 @@ const CampaignList: React.FC = () => {
         </div>
       </div>
       
-      {/* Campaigns table */}
-      <CampaignTable campaigns={filteredCampaigns} />
+      {/* Campaigns table with scrolling */}
+      <div className="flex-1 overflow-auto min-h-[400px]">
+        <CampaignTable campaigns={filteredCampaigns} />
+      </div>
       
       {/* Create Campaign Modal */}
       {showCreateModal && (

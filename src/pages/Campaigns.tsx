@@ -4,7 +4,7 @@ import CampaignList from '@/components/campaigns/CampaignList';
 
 const Campaigns: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="h-[calc(100vh-6rem)]">
       <CampaignList />
     </div>
   );

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import CampaignDetail from '@/components/campaigns/CampaignDetail';
+import CampaignDetail from '@/components/campaigns/campaignDetail';
 
 const CampaignDetailPage: React.FC = () => {
   return (

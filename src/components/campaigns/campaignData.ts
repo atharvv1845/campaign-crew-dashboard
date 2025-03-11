@@ -1,3 +1,4 @@
+
 export interface CampaignData {
   id: number;
   name: string;
@@ -11,6 +12,7 @@ export interface CampaignData {
   conversion: string;
   teamMembers: string[];
   createdAt: string;
+  description?: string; // Added description field
 }
 
 // Update available channels for outreach

@@ -1,3 +1,3 @@
 
 // This file is now just a re-export for backward compatibility
-export { default } from './LeadImport';
+export { default } from './LeadImport/index';

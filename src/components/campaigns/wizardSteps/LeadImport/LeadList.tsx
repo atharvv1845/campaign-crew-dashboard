@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trash2, Save, X } from 'lucide-react';
+import { Trash2, Save, X, Bookmark } from 'lucide-react';
 import { LeadData } from '../../types/campaignTypes';
 
 interface LeadListProps {
@@ -31,7 +31,7 @@ const LeadList: React.FC<LeadListProps> = ({
             onClick={() => setSaveListMode(true)}
             className="flex items-center gap-1 text-xs font-medium text-primary"
           >
-            <Save className="h-3.5 w-3.5" />
+            <Bookmark className="h-3.5 w-3.5" />
             Save as Lead List
           </button>
         ) : (
@@ -46,20 +46,25 @@ const LeadList: React.FC<LeadListProps> = ({
       </div>
       
       {saveListMode && (
-        <div className="flex items-center gap-2 mb-2">
-          <input
-            type="text"
-            value={listName}
-            onChange={(e) => setListName(e.target.value)}
-            placeholder="Enter lead list name"
-            className="flex-1 px-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-          />
+        <div className="flex items-center gap-2 mb-4 p-3 rounded-lg border border-primary/20 bg-primary/5">
+          <div className="flex-1">
+            <label className="block text-xs font-medium mb-1 text-primary">Lead List Name</label>
+            <input
+              type="text"
+              value={listName}
+              onChange={(e) => setListName(e.target.value)}
+              placeholder="Enter a name for this lead list"
+              className="w-full px-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+              autoFocus
+            />
+          </div>
           <button
             onClick={onSaveList}
             disabled={!listName}
-            className="px-3 py-1.5 bg-primary text-primary-foreground text-sm rounded-md disabled:opacity-50"
+            className="px-3 py-1.5 h-[34px] mt-5 bg-primary text-primary-foreground text-sm rounded-md disabled:opacity-50 flex items-center gap-1"
           >
-            Save List
+            <Save className="h-3.5 w-3.5" />
+            Save
           </button>
         </div>
       )}
@@ -71,6 +76,7 @@ const LeadList: React.FC<LeadListProps> = ({
               <tr>
                 <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">Phone</th>
                 <th className="px-4 py-2 text-left">Company</th>
                 <th className="px-4 py-2 text-right">Actions</th>
               </tr>
@@ -82,6 +88,7 @@ const LeadList: React.FC<LeadListProps> = ({
                     {lead.firstName} {lead.lastName}
                   </td>
                   <td className="px-4 py-2">{lead.email}</td>
+                  <td className="px-4 py-2">{lead.phone || '-'}</td>
                   <td className="px-4 py-2">{lead.company || '-'}</td>
                   <td className="px-4 py-2 text-right">
                     <button 

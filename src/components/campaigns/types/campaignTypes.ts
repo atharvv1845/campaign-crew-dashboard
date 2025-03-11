@@ -40,15 +40,23 @@ export interface StageData {
   name: string;
   description: string;
   color: string;
+  order?: number; // Add order property
 }
 
 // Message step data
 export interface MessageStepData {
   id: string;
-  type: 'message';
-  channel: string;
-  template: string;
-  content: string;
+  type: 'message' | 'delay' | 'condition';
+  channel?: string;
+  template?: string;
+  content?: string;
+  duration?: number;
+  unit?: 'minutes' | 'hours' | 'days';
+  field?: string;
+  operator?: string;
+  value?: string;
+  order?: number;
+  data?: any; // Add data property for reactflow compatibility
 }
 
 // Delay step data
@@ -57,6 +65,7 @@ export interface DelayStepData {
   type: 'delay';
   duration: number;
   unit: 'minutes' | 'hours' | 'days';
+  order?: number;
 }
 
 // Condition step data
@@ -66,6 +75,7 @@ export interface ConditionStepData {
   field: string;
   operator: string;
   value: string;
+  order?: number;
 }
 
 // Flow data structure
@@ -81,42 +91,49 @@ export const defaultStages: StageData[] = [
     name: 'New',
     description: 'Lead has been added to the campaign',
     color: 'bg-blue-500',
+    order: 1,
   },
   {
     id: 'contacted',
     name: 'Contacted',
     description: 'Initial contact has been made',
     color: 'bg-purple-500',
+    order: 2,
   },
   {
     id: 'interested',
     name: 'Interested',
     description: 'Lead has shown interest',
     color: 'bg-green-500',
+    order: 3,
   },
   {
     id: 'qualified',
     name: 'Qualified',
     description: 'Lead has been qualified as a good fit',
     color: 'bg-yellow-500',
+    order: 4,
   },
   {
     id: 'meeting',
     name: 'Meeting Scheduled',
     description: 'Meeting has been scheduled',
     color: 'bg-orange-500',
+    order: 5,
   },
   {
     id: 'closed',
     name: 'Closed',
     description: 'Deal has been closed',
     color: 'bg-green-700',
+    order: 6,
   },
   {
     id: 'lost',
     name: 'Lost',
     description: 'Opportunity has been lost',
     color: 'bg-red-500',
+    order: 7,
   },
 ];
 

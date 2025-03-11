@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CampaignFormData } from '../../types/campaignTypes';
 import ManualImport from './ManualImport';
 import CsvImport from './CsvImport';
 import SavedLeadLists from './SavedLeadLists';
 import ImportMethodSelector from './ImportMethodSelector';
 import { useLeadImport } from './hooks/useLeadImport';
+import { useToast } from "@/hooks/use-toast";
 
 interface LeadImportProps {
   formData: CampaignFormData;
@@ -14,11 +15,28 @@ interface LeadImportProps {
   onBack: () => void;
 }
 
-type ImportMethod = 'manual' | 'csv';
+type ImportMethod = 'manual' | 'csv' | 'saved';
 
 const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, onBack }) => {
   const [importMethod, setImportMethod] = useState<ImportMethod>('manual');
   const { savedLeadLists, loadLeadList } = useLeadImport();
+  const { toast } = useToast();
+  
+  // Handle loading a saved lead list
+  const handleLoadLeadList = (listId: string) => {
+    const leads = loadLeadList(listId);
+    if (leads) {
+      setFormData(prev => ({
+        ...prev,
+        leads: [...leads]
+      }));
+      
+      toast({
+        title: "Lead List Loaded",
+        description: `${leads.length} leads have been loaded successfully.`
+      });
+    }
+  };
   
   // Check if form has required leads
   const hasLeads = formData.leads.length > 0;
@@ -28,20 +46,21 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
       <div>
         <h3 className="text-lg font-medium mb-2">Import Leads</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          Add leads to your campaign by entering them manually or importing a CSV file.
+          Add leads to your campaign by entering them manually, importing a CSV file, or selecting a saved lead list.
         </p>
         
         {/* Import method selection */}
         <ImportMethodSelector 
           importMethod={importMethod} 
           setImportMethod={setImportMethod} 
+          hasSavedLists={savedLeadLists.length > 0}
         />
         
         {/* Saved lead lists */}
-        {savedLeadLists.length > 0 && (
+        {importMethod === 'saved' && savedLeadLists.length > 0 && (
           <SavedLeadLists 
             savedLeadLists={savedLeadLists} 
-            loadLeadList={loadLeadList} 
+            loadLeadList={handleLoadLeadList} 
           />
         )}
         

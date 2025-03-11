@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Trash2, Save, X } from 'lucide-react';
 import { CampaignFormData, LeadData } from '../../types/campaignTypes';
 import { useToast } from "@/hooks/use-toast";
 import { useLeadImport } from './hooks/useLeadImport';
@@ -27,7 +26,10 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
     status: formData.stages[0]?.id || '',
     assignedTo: '',
     notes: '',
-    socialProfiles: {},
+    socialProfiles: {
+      twitter: '',
+      linkedin: ''
+    },
   });
   
   // Handle form input changes for manual lead entry
@@ -51,13 +53,13 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
     }
   };
   
-  // Add a new lead manually
+  // Add a new lead manually - only require email for simplicity
   const addLead = (andAnother: boolean = false) => {
-    if (!currentLead.firstName || !currentLead.lastName || !currentLead.email) {
+    if (!currentLead.email) {
       // Show validation error
       toast({
         title: "Validation Error",
-        description: "First name, last name and email are required",
+        description: "Email is required",
         variant: "destructive"
       });
       return;
@@ -93,7 +95,10 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
         status: formData.stages[0]?.id || '',
         assignedTo: '',
         notes: '',
-        socialProfiles: {},
+        socialProfiles: {
+          twitter: '',
+          linkedin: ''
+        },
       });
     } else {
       // Show the list of added leads
@@ -106,7 +111,10 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
         status: formData.stages[0]?.id || '',
         assignedTo: '',
         notes: '',
-        socialProfiles: {},
+        socialProfiles: {
+          twitter: '',
+          linkedin: ''
+        },
       });
     }
   };

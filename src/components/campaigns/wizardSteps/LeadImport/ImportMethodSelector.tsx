@@ -1,39 +1,41 @@
 
 import React from 'react';
-import { UserPlus, Upload } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileUp, UserPlus, SaveAll } from 'lucide-react';
 
 interface ImportMethodSelectorProps {
-  importMethod: 'manual' | 'csv';
-  setImportMethod: (method: 'manual' | 'csv') => void;
+  importMethod: string;
+  setImportMethod: (method: any) => void;
+  hasSavedLists?: boolean;
 }
 
 const ImportMethodSelector: React.FC<ImportMethodSelectorProps> = ({ 
   importMethod, 
-  setImportMethod 
+  setImportMethod,
+  hasSavedLists = false
 }) => {
   return (
-    <div className="flex space-x-4 mb-6">
-      <button
-        onClick={() => setImportMethod('manual')}
-        className={cn(
-          "flex-1 py-3 px-4 rounded-lg border border-border flex items-center justify-center gap-2",
-          importMethod === 'manual' ? "bg-primary/10 border-primary" : "hover:bg-muted/20"
-        )}
+    <div className="mb-6">
+      <Tabs
+        value={importMethod}
+        onValueChange={setImportMethod}
+        className="w-full"
       >
-        <UserPlus className="h-5 w-5" />
-        <span>Manually Add Leads</span>
-      </button>
-      <button
-        onClick={() => setImportMethod('csv')}
-        className={cn(
-          "flex-1 py-3 px-4 rounded-lg border border-border flex items-center justify-center gap-2",
-          importMethod === 'csv' ? "bg-primary/10 border-primary" : "hover:bg-muted/20"
-        )}
-      >
-        <Upload className="h-5 w-5" />
-        <span>Import from CSV</span>
-      </button>
+        <TabsList className="grid grid-cols-3 w-full">
+          <TabsTrigger value="manual" className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            <span>Manual Entry</span>
+          </TabsTrigger>
+          <TabsTrigger value="csv" className="flex items-center gap-2">
+            <FileUp className="h-4 w-4" />
+            <span>CSV Import</span>
+          </TabsTrigger>
+          <TabsTrigger value="saved" className="flex items-center gap-2" disabled={!hasSavedLists}>
+            <SaveAll className="h-4 w-4" />
+            <span>Saved Lists</span>
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
     </div>
   );
 };

@@ -5,23 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData, defaultStages } from '../types/campaignTypes';
 import { campaignData } from '../campaignData';
 
-// Add type for campaign data
-interface CampaignData {
-  id: number;
-  name: string;
-  status: string;
-  type: string;
-  channels: string[];
-  leads: number;
-  responses: number;
-  positive: number;
-  negative: number;
-  conversion: string;
-  teamMembers: string[];
-  createdAt: string;
-  description?: string; // Make sure this is included
-}
-
 export const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -88,13 +71,14 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
     if (existingCampaign) {
       const campaignIndex = campaignData.findIndex(c => c.id === existingCampaign.id);
       if (campaignIndex !== -1) {
+        // Update the existing campaign
         campaignData[campaignIndex] = {
           ...campaignData[campaignIndex],
           name: formData.name,
-          description: formData.description,
           channels: formData.channels,
           leads: formData.leads.length,
           teamMembers: Object.values(formData.teamAssignments).flat(),
+          description: formData.description // Make sure description is updated
         };
         
         toast({
@@ -103,7 +87,8 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         });
       }
     } else {
-      const newCampaign: CampaignData = {
+      // Create a new campaign
+      const newCampaign = {
         id: campaignData.length + 1,
         name: formData.name,
         status: 'Active',
@@ -116,7 +101,7 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         conversion: '0%',
         teamMembers: Object.values(formData.teamAssignments).flat(),
         createdAt: new Date().toISOString().split('T')[0],
-        description: formData.description,
+        description: formData.description // Add description property
       };
 
       campaignData.unshift(newCampaign);

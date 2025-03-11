@@ -1,13 +1,39 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LeadData } from '../../../types/campaignTypes';
 import { useToast } from "@/hooks/use-toast";
 
-// Shared saved lead lists for reuse across instances
-const savedLeadListsStore: { id: string; name: string; leads: LeadData[] }[] = [];
+// Create a global shared store for saved lead lists that persists between hook instances
+type SavedLeadList = { id: string; name: string; leads: LeadData[] };
+let globalSavedLeadLists: SavedLeadList[] = [];
+
+// Try to load from localStorage if available
+if (typeof window !== 'undefined') {
+  try {
+    const saved = localStorage.getItem('savedLeadLists');
+    if (saved) {
+      globalSavedLeadLists = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error loading saved lead lists from localStorage', e);
+  }
+}
 
 export const useLeadImport = () => {
   const { toast } = useToast();
+  const [savedLeadLists, setSavedLeadLists] = useState<SavedLeadList[]>(globalSavedLeadLists);
+  
+  // Save to localStorage whenever lists change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('savedLeadLists', JSON.stringify(savedLeadLists));
+        globalSavedLeadLists = savedLeadLists;
+      } catch (e) {
+        console.error('Error saving lead lists to localStorage', e);
+      }
+    }
+  }, [savedLeadLists]);
   
   // Generate a unique ID for new leads
   const generateId = () => `lead-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -40,7 +66,7 @@ export const useLeadImport = () => {
     };
     
     // Add to saved lists
-    savedLeadListsStore.push(newList);
+    setSavedLeadLists(prev => [...prev, newList]);
     
     toast({
       title: "Lead List Saved",
@@ -52,12 +78,8 @@ export const useLeadImport = () => {
   
   // Function to load a saved lead list
   const loadLeadList = (listId: string) => {
-    const list = savedLeadListsStore.find(l => l.id === listId);
+    const list = savedLeadLists.find(l => l.id === listId);
     if (list) {
-      toast({
-        title: "Lead List Loaded",
-        description: `"${list.name}" with ${list.leads.length} leads has been loaded`,
-      });
       return list.leads;
     }
     return null;
@@ -67,6 +89,6 @@ export const useLeadImport = () => {
     generateId,
     saveLeadList,
     loadLeadList,
-    savedLeadLists: savedLeadListsStore,
+    savedLeadLists,
   };
 };

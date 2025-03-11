@@ -1,4 +1,3 @@
-
 export interface CampaignData {
   id: number;
   name: string;
@@ -13,6 +12,17 @@ export interface CampaignData {
   teamMembers: string[];
   createdAt: string;
 }
+
+// Update available channels for outreach
+export const availableChannels = [
+  { id: 'email', name: 'Email', icon: 'Mail' },
+  { id: 'phone', name: 'Call', icon: 'Phone' },
+  { id: 'sms', name: 'SMS', icon: 'MessageSquare' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'Linkedin' },
+  { id: 'twitter', name: 'Twitter', icon: 'Twitter' },
+  { id: 'whatsapp', name: 'WhatsApp', icon: 'MessageCircle' },
+  { id: 'instagram', name: 'Instagram', icon: 'Instagram' },
+];
 
 // Mock campaign data
 export const campaignData: CampaignData[] = [

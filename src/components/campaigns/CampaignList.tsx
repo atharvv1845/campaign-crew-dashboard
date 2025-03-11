@@ -1,0 +1,189 @@
+
+import React, { useState } from 'react';
+import { Search, Filter, Plus, MoreHorizontal, ChevronDown, ArrowUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Mock campaign data
+const campaignData = [
+  {
+    id: 1,
+    name: 'Q4 Product Launch',
+    status: 'Active',
+    type: 'Email',
+    leads: 1243,
+    responses: 341,
+    conversion: '27.4%',
+    createdAt: '2023-09-15',
+  },
+  {
+    id: 2,
+    name: 'Summer Sale Outreach',
+    status: 'Active',
+    type: 'Email',
+    leads: 2540,
+    responses: 764,
+    conversion: '30.1%',
+    createdAt: '2023-06-01',
+  },
+  {
+    id: 3,
+    name: 'Customer Feedback Survey',
+    status: 'Completed',
+    type: 'Email',
+    leads: 864,
+    responses: 342,
+    conversion: '39.6%',
+    createdAt: '2023-08-10',
+  },
+  {
+    id: 4,
+    name: 'New Feature Announcement',
+    status: 'Draft',
+    type: 'Email',
+    leads: 0,
+    responses: 0,
+    conversion: '0%',
+    createdAt: '2023-10-05',
+  },
+  {
+    id: 5,
+    name: 'Webinar Invitation',
+    status: 'Scheduled',
+    type: 'Email',
+    leads: 2100,
+    responses: 0,
+    conversion: '0%',
+    createdAt: '2023-10-01',
+  },
+  {
+    id: 6,
+    name: 'Customer Re-engagement',
+    status: 'Active',
+    type: 'Email',
+    leads: 3654,
+    responses: 872,
+    conversion: '23.9%',
+    createdAt: '2023-07-22',
+  },
+];
+
+// Campaign status badge component
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case 'Active':
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case 'Completed':
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      case 'Draft':
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+      case 'Scheduled':
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
+
+  return (
+    <span className={cn(
+      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+      getStatusStyles(status)
+    )}>
+      {status}
+    </span>
+  );
+};
+
+const CampaignList: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Filter campaigns based on search term
+  const filteredCampaigns = campaignData.filter(campaign => 
+    campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  return (
+    <div className="space-y-6">
+      {/* Header and actions */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <input 
+            type="text" 
+            placeholder="Search campaigns..." 
+            className="glass-input pl-9 pr-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 w-full sm:w-[300px]"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <button className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-sm hover:bg-muted/20 transition-colors">
+            <Filter className="h-4 w-4" />
+            <span>Filter</span>
+            <ChevronDown className="h-4 w-4" />
+          </button>
+          
+          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm shadow-sm hover:bg-primary/90 transition-colors">
+            <Plus className="h-4 w-4" />
+            <span>New Campaign</span>
+          </button>
+        </div>
+      </div>
+      
+      {/* Campaigns table */}
+      <div className="glass-card rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-muted/20 border-b border-border">
+                <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <div className="flex items-center gap-1">
+                    Campaign Name
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Leads</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Responses</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Conversion</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border bg-card">
+              {filteredCampaigns.map((campaign) => (
+                <tr 
+                  key={campaign.id}
+                  className="hover:bg-muted/20 transition-colors cursor-pointer"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium">{campaign.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <StatusBadge status={campaign.status} />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">{campaign.type}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.leads.toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.responses.toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.conversion}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.createdAt}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                    <button className="text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-muted/20 transition-colors">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CampaignList;

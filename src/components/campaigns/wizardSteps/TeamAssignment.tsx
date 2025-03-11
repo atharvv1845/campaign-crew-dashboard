@@ -1,7 +1,8 @@
 
-import React from 'react';
-import { CampaignFormData, availableChannels } from '../CreateCampaign';
-import { ChevronDown, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { CampaignFormData } from '../types/campaignTypes';
+import { availableChannels } from '../constants/channels';
+import { ChevronDown, UserPlus, Check } from 'lucide-react';
 
 interface TeamAssignmentProps {
   formData: CampaignFormData;
@@ -20,6 +21,13 @@ const teamMembers = [
 ];
 
 const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, onNext, onBack }) => {
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  
+  // Toggle dropdown visibility
+  const toggleDropdown = (channelId: string) => {
+    setOpenDropdown(openDropdown === channelId ? null : channelId);
+  };
+
   // Assign a team member to a channel
   const assignTeamMember = (channelId: string, memberId: string) => {
     setFormData(prev => {
@@ -86,8 +94,11 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
                     <span className="text-sm font-medium">{channel.name}</span>
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="relative group">
-                      <button className="flex items-center justify-between w-full px-3 py-2 border border-border rounded-md text-sm hover:border-primary">
+                    <div className="relative">
+                      <button 
+                        className="flex items-center justify-between w-full px-3 py-2 border border-border rounded-md text-sm hover:border-primary"
+                        onClick={() => toggleDropdown(channel.id)}
+                      >
                         <div className="flex items-center gap-2">
                           <UserPlus className="h-4 w-4 text-muted-foreground" />
                           <span>{getAssignedMemberNames(channel.id)}</span>
@@ -95,29 +106,32 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
                       </button>
                       
-                      {/* Dropdown menu */}
-                      <div className="absolute left-0 mt-1 w-full bg-card shadow-lg rounded-lg border border-border overflow-hidden z-10 hidden group-hover:block">
-                        <div className="p-1">
-                          {teamMembers.map(member => {
-                            const isAssigned = getAssignedMembers(channel.id).includes(member.id);
-                            return (
-                              <button 
-                                key={member.id}
-                                onClick={() => assignTeamMember(channel.id, member.id)}
-                                className="flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-muted/20 rounded-md"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <span>{member.avatar}</span>
-                                  <span>{member.name}</span>
-                                </div>
-                                {isAssigned && (
-                                  <span className="h-2 w-2 rounded-full bg-primary" />
-                                )}
-                              </button>
-                            );
-                          })}
+                      {/* Improved dropdown menu */}
+                      {openDropdown === channel.id && (
+                        <div className="absolute left-0 mt-1 w-full bg-card shadow-lg rounded-lg border border-border overflow-hidden z-10">
+                          <div className="p-1 max-h-[200px] overflow-y-auto">
+                            {teamMembers.map(member => {
+                              const isAssigned = getAssignedMembers(channel.id).includes(member.id);
+                              return (
+                                <button 
+                                  key={member.id}
+                                  onClick={() => assignTeamMember(channel.id, member.id)}
+                                  className="flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-muted/20 rounded-md"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span>{member.avatar}</span>
+                                    <span>{member.name}</span>
+                                    <span className="text-xs text-muted-foreground ml-1">({member.workload})</span>
+                                  </div>
+                                  {isAssigned && (
+                                    <Check className="h-4 w-4 text-primary" />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </td>
                 </tr>

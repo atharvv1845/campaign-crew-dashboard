@@ -1,8 +1,9 @@
 
 import React, { useState, useRef } from 'react';
-import { UserPlus, Upload, FileCheck, Plus, Trash2, Check, X, Download } from 'lucide-react';
+import { UserPlus, Upload, FileCheck, Plus, Trash2, Check, X, Download, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CampaignFormData, LeadData } from '../types/campaignTypes';
+import { useToast } from "@/hooks/use-toast";
 
 interface LeadImportProps {
   formData: CampaignFormData;
@@ -12,6 +13,9 @@ interface LeadImportProps {
 }
 
 type ImportMethod = 'manual' | 'csv';
+
+// Saved lead lists for reuse
+const savedLeadLists: { id: string; name: string; leads: LeadData[] }[] = [];
 
 const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, onBack }) => {
   const [importMethod, setImportMethod] = useState<ImportMethod>('manual');
@@ -30,7 +34,10 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [csvMapping, setCsvMapping] = useState<Record<string, string>>({});
   const [csvPreview, setCsvPreview] = useState<any[]>([]);
+  const [saveListMode, setSaveListMode] = useState(false);
+  const [listName, setListName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   
   // Generate a unique ID for new leads
   const generateId = () => `lead-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -60,6 +67,11 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
   const addLead = (andAnother: boolean = false) => {
     if (!currentLead.firstName || !currentLead.lastName || !currentLead.email) {
       // Show validation error
+      toast({
+        title: "Validation Error",
+        description: "First name, last name and email are required",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -117,6 +129,61 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
       ...prev,
       leads: prev.leads.filter(lead => lead.id !== id)
     }));
+  };
+  
+  // Save the current lead list
+  const saveLeadList = () => {
+    if (!listName) {
+      toast({
+        title: "Validation Error",
+        description: "Please provide a name for your lead list",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (formData.leads.length === 0) {
+      toast({
+        title: "No Leads",
+        description: "Cannot save an empty lead list",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create a new list
+    const newList = {
+      id: `list-${Date.now()}`,
+      name: listName,
+      leads: [...formData.leads]
+    };
+    
+    // Add to saved lists
+    savedLeadLists.push(newList);
+    
+    toast({
+      title: "Lead List Saved",
+      description: `"${listName}" with ${formData.leads.length} leads has been saved for future use`,
+    });
+    
+    setSaveListMode(false);
+    setListName('');
+  };
+  
+  // Load a saved lead list
+  const loadLeadList = (listId: string) => {
+    const list = savedLeadLists.find(l => l.id === listId);
+    if (list) {
+      setFormData(prev => ({
+        ...prev,
+        leads: [...list.leads]
+      }));
+      
+      toast({
+        title: "Lead List Loaded",
+        description: `"${list.name}" with ${list.leads.length} leads has been loaded`,
+      });
+    }
   };
   
   // Trigger file input click
@@ -352,13 +419,78 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
           </button>
         </div>
         
+        {/* Saved lead lists */}
+        {savedLeadLists.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-medium">Saved Lead Lists</h4>
+            </div>
+            <div className="border border-border rounded-lg p-2 max-h-[150px] overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {savedLeadLists.map(list => (
+                  <button
+                    key={list.id}
+                    onClick={() => loadLeadList(list.id)}
+                    className="flex items-center justify-between p-2 border border-border rounded hover:bg-muted/20 text-left"
+                  >
+                    <div>
+                      <p className="font-medium text-sm">{list.name}</p>
+                      <p className="text-xs text-muted-foreground">{list.leads.length} leads</p>
+                    </div>
+                    <Plus className="h-4 w-4" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Manual lead input form */}
         {importMethod === 'manual' && (
           <div className="space-y-6">
-            {/* Current leads list */}
+            {/* Current leads list with save option */}
             {formData.leads.length > 0 && (
               <div className="mb-6">
-                <h4 className="text-sm font-medium mb-2">Added Leads ({formData.leads.length})</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium">Added Leads ({formData.leads.length})</h4>
+                  {!saveListMode ? (
+                    <button
+                      onClick={() => setSaveListMode(true)}
+                      className="flex items-center gap-1 text-xs font-medium text-primary"
+                    >
+                      <Save className="h-3.5 w-3.5" />
+                      Save as Lead List
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setSaveListMode(false)}
+                      className="flex items-center gap-1 text-xs font-medium text-muted-foreground"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      Cancel
+                    </button>
+                  )}
+                </div>
+                
+                {saveListMode && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={listName}
+                      onChange={(e) => setListName(e.target.value)}
+                      placeholder="Enter lead list name"
+                      className="flex-1 px-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                    <button
+                      onClick={saveLeadList}
+                      disabled={!listName}
+                      className="px-3 py-1.5 bg-primary text-primary-foreground text-sm rounded-md disabled:opacity-50"
+                    >
+                      Save List
+                    </button>
+                  </div>
+                )}
+                
                 <div className="border border-border rounded-lg overflow-hidden">
                   <div className="max-h-[200px] overflow-y-auto">
                     <table className="w-full text-sm">
@@ -411,60 +543,6 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
                     onChange={handleLeadInputChange}
                     className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                     required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="lastName" className="block text-sm font-medium">
-                    Last Name <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    value={currentLead.lastName}
-                    onChange={handleLeadInputChange}
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium">
-                    Email <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={currentLead.email}
-                    onChange={handleLeadInputChange}
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="company" className="block text-sm font-medium">
-                    Company <span className="text-muted-foreground">(Optional)</span>
-                  </label>
-                  <input
-                    id="company"
-                    name="company"
-                    type="text"
-                    value={currentLead.company}
-                    onChange={handleLeadInputChange}
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="block text-sm font-medium">
-                    Phone <span className="text-muted-foreground">(Optional)</span>
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={currentLead.phone}
-                    onChange={handleLeadInputChange}
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
                 

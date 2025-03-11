@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCampaignCreation } from './hooks/useCampaignCreation';
@@ -19,9 +19,10 @@ export { availableChannels } from './constants/channels';
 
 interface CreateCampaignProps {
   onClose: () => void;
+  existingCampaign?: any; // For edit mode
 }
 
-const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
+const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose, existingCampaign }) => {
   const {
     currentStep,
     formData,
@@ -31,7 +32,12 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
     handleSubmit,
     handleClose,
     exitAnimation
-  } = useCampaignCreation(onClose);
+  } = useCampaignCreation(onClose, existingCampaign);
+
+  // Prevent closing when clicking outside by stopping event propagation
+  const handleModalClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   // Array of step components to display
   const steps = [
@@ -78,10 +84,13 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
           "relative bg-card w-full max-w-4xl max-h-[90vh] rounded-xl shadow-lg transition-all duration-300",
           exitAnimation ? "opacity-0 scale-95" : "opacity-100 scale-100"
         )}
+        onClick={handleModalClick} // Stop propagation
       >
         {/* Header with close button */}
         <div className="flex justify-between items-center p-6 border-b border-border">
-          <h2 className="text-xl font-semibold">Create New Campaign</h2>
+          <h2 className="text-xl font-semibold">
+            {existingCampaign ? 'Edit Campaign' : 'Create New Campaign'}
+          </h2>
           <button 
             onClick={handleClose}
             className="p-2 rounded-full hover:bg-muted/50 transition-colors"

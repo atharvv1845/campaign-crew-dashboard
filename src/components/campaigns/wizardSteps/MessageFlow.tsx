@@ -1,22 +1,11 @@
 
-import React, { useState, useCallback, useRef } from 'react';
-import { CampaignFormData, availableChannels } from '../CreateCampaign';
-import { Plus, MessageSquare, Clock, ArrowRight, Edit, Trash2, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { CampaignFormData, MessageStep, defaultStages } from '../types/campaignTypes';
+import { availableChannels } from '../constants/channels';
+import { Plus, MessageSquare, Clock, ArrowRight, Edit, Trash2, Save, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  ReactFlow,
-  MiniMap,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Node,
-  Edge,
-  Connection,
-  Panel
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from '@/hooks/use-toast';
 
 interface MessageFlowProps {
   formData: CampaignFormData;
@@ -25,502 +14,590 @@ interface MessageFlowProps {
   onBack: () => void;
 }
 
-// Node types
-const nodeTypes = {
-  messageNode: MessageNode,
-  delayNode: DelayNode,
-  conditionNode: ConditionNode
-};
-
-// Custom nodes
-function MessageNode({ data, id }: { data: any, id: string }) {
-  return (
-    <div className="p-4 bg-card border border-border rounded-lg w-[250px]">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4 text-primary" />
-          <span className="font-medium text-sm">{data.channel} Message</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={data.onEdit}
-            className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-          >
-            <Edit className="h-3 w-3" />
-          </button>
-          <button
-            onClick={() => data.onDelete(id)}
-            className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
-        </div>
-      </div>
-      <div className="text-xs truncate">{data.message || 'No message content'}</div>
-      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-        {data.assignedTo ? (
-          <span>Assigned: {data.assignedTo}</span>
-        ) : (
-          <span>Unassigned</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function DelayNode({ data, id }: { data: any, id: string }) {
-  return (
-    <div className="p-4 bg-card border border-border rounded-lg w-[180px]">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-blue-500" />
-          <span className="font-medium text-sm">Delay</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={data.onEdit}
-            className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-          >
-            <Edit className="h-3 w-3" />
-          </button>
-          <button
-            onClick={() => data.onDelete(id)}
-            className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
-        </div>
-      </div>
-      <div className="text-xs">
-        Wait for {data.days} day{data.days !== 1 ? 's' : ''}
-      </div>
-    </div>
-  );
-}
-
-function ConditionNode({ data, id }: { data: any, id: string }) {
-  return (
-    <div className="p-4 bg-card border border-border rounded-lg w-[220px]">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <ArrowRight className="h-4 w-4 text-yellow-500" />
-          <span className="font-medium text-sm">Condition</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={data.onEdit}
-            className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-          >
-            <Edit className="h-3 w-3" />
-          </button>
-          <button
-            onClick={() => data.onDelete(id)}
-            className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
-        </div>
-      </div>
-      <div className="text-xs">
-        {data.condition}: {data.action}
-      </div>
-    </div>
-  );
-}
+// Mock saved templates data
+const mockTemplates = [
+  { id: 'temp1', name: 'Initial Outreach', content: 'Hi [name], I noticed your profile and wanted to connect regarding [topic].' },
+  { id: 'temp2', name: 'Follow Up', content: 'Hi [name], I wanted to follow up on my previous message about [topic].' },
+];
 
 const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext, onBack }) => {
+  const { toast } = useToast();
+  const [activeChannel, setActiveChannel] = useState<string>(formData.channels[0] || '');
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  
   // Get selected channels
   const selectedChannels = availableChannels.filter(channel => 
     formData.channels.includes(channel.id)
   );
   
-  // Initial nodes and edges
-  const initialNodes: Node[] = formData.messageFlow.nodes.length > 0 
-    ? formData.messageFlow.nodes 
-    : [
-        {
-          id: 'start',
-          type: 'input',
-          data: { label: 'Start' },
-          position: { x: 250, y: 5 },
-          style: {
-            background: '#f5f5f5',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            padding: '10px',
-            width: 100,
-            textAlign: 'center'
-          }
-        }
-      ];
+  // Initialize step flows if not present
+  React.useEffect(() => {
+    if (!formData.stepFlows) {
+      const initialStepFlows: Record<string, MessageStep[]> = {};
+      formData.channels.forEach(channel => {
+        initialStepFlows[channel] = [];
+      });
       
-  const initialEdges: Edge[] = formData.messageFlow.edges.length > 0 
-    ? formData.messageFlow.edges 
-    : [];
-    
-  // Set up nodes and edges
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  
-  // Modal state for node editing
-  const [showNodeModal, setShowNodeModal] = useState(false);
-  const [modalType, setModalType] = useState<'message' | 'delay' | 'condition'>('message');
-  const [currentNode, setCurrentNode] = useState<any>(null);
-  const [nodeFormData, setNodeFormData] = useState<any>({
-    channel: '',
-    message: '',
-    assignedTo: '',
-    days: 1,
-    condition: 'No Reply',
-    action: 'Move to Follow-Up'
-  });
-  
-  // React Flow instance
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  
-  // Handle connections between nodes
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
-  
-  // Save the flow to form data
-  const saveFlow = () => {
-    setFormData(prev => ({
-      ...prev,
-      messageFlow: {
-        nodes,
-        edges
-      }
-    }));
-  };
-  
-  // Add a new node
-  const addNode = (type: 'message' | 'delay' | 'condition') => {
-    setModalType(type);
-    setCurrentNode(null);
-    
-    // Set default values based on node type
-    if (type === 'message') {
-      setNodeFormData({
-        channel: selectedChannels[0]?.id || '',
-        message: '',
-        assignedTo: ''
-      });
-    } else if (type === 'delay') {
-      setNodeFormData({
-        days: 1
-      });
-    } else if (type === 'condition') {
-      setNodeFormData({
-        condition: 'No Reply',
-        action: 'Move to Follow-Up'
-      });
+      setFormData(prev => ({
+        ...prev,
+        stepFlows: initialStepFlows
+      }));
     }
-    
-    setShowNodeModal(true);
+  }, [formData.channels, setFormData]);
+  
+  // Get steps for current channel
+  const getChannelSteps = (): MessageStep[] => {
+    return formData.stepFlows?.[activeChannel] || [];
   };
   
-  // Edit an existing node
-  const editNode = (nodeId: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    
-    setCurrentNode(node);
-    setModalType(node.type.replace('Node', '') as any);
-    setNodeFormData(node.data);
-    setShowNodeModal(true);
-  };
-  
-  // Delete a node
-  const deleteNode = (nodeId: string) => {
-    setNodes(nodes.filter(n => n.id !== nodeId));
-    setEdges(edges.filter(e => e.source !== nodeId && e.target !== nodeId));
-  };
-  
-  // Handle changes in the node form
-  const handleNodeFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNodeFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  // Save a node from the modal
-  const saveNode = () => {
-    // Generate node ID if new node
-    const nodeId = currentNode ? currentNode.id : `${modalType}-${Date.now()}`;
-    
-    // Create the node object
-    const newNode = {
-      id: nodeId,
-      type: `${modalType}Node`,
-      data: {
-        ...nodeFormData,
-        onEdit: () => editNode(nodeId),
-        onDelete: deleteNode
-      },
-      position: currentNode 
-        ? currentNode.position 
-        : { 
-            x: Math.max(...nodes.map(n => n.position.x)) + 100,
-            y: Math.max(...nodes.map(n => n.position.y)) + 100
-          }
+  // Add a new step
+  const addStep = (type: 'message' | 'delay' | 'condition') => {
+    const steps = getChannelSteps();
+    const newStepId = `${activeChannel}-${type}-${Date.now()}`;
+    const newStep: MessageStep = {
+      id: newStepId,
+      type,
+      order: steps.length + 1,
+      data: type === 'message' 
+        ? { message: '', assignedTo: '' } 
+        : type === 'delay' 
+        ? { days: 1 } 
+        : { condition: 'no_response', action: 'continue' }
     };
     
-    // Update or add the node
-    if (currentNode) {
-      setNodes(nodes.map(n => n.id === nodeId ? newNode : n));
-    } else {
-      setNodes([...nodes, newNode]);
-      
-      // Add an edge from the last node if this is a new node
-      const lastNodeId = nodes[nodes.length - 1]?.id;
-      if (lastNodeId) {
-        setEdges([
-          ...edges,
-          {
-            id: `e-${lastNodeId}-${nodeId}`,
-            source: lastNodeId,
-            target: nodeId,
-            type: 'smoothstep'
-          }
-        ]);
+    setFormData(prev => ({
+      ...prev,
+      stepFlows: {
+        ...prev.stepFlows,
+        [activeChannel]: [...steps, newStep]
       }
-    }
-    
-    setShowNodeModal(false);
+    }));
   };
   
-  // Check if the flow is valid (has at least one message node)
-  const hasMessageNodes = nodes.some(node => node.type === 'messageNode');
-
+  // Delete a step
+  const deleteStep = (stepId: string) => {
+    const steps = getChannelSteps();
+    const filteredSteps = steps.filter(step => step.id !== stepId);
+    
+    // Reorder remaining steps
+    const reorderedSteps = filteredSteps.map((step, index) => ({
+      ...step,
+      order: index + 1
+    }));
+    
+    setFormData(prev => ({
+      ...prev,
+      stepFlows: {
+        ...prev.stepFlows,
+        [activeChannel]: reorderedSteps
+      }
+    }));
+    
+    toast({
+      title: "Step Removed",
+      description: "Step has been removed from the sequence."
+    });
+  };
+  
+  // Update a step
+  const updateStep = (stepId: string, data: any) => {
+    const steps = getChannelSteps();
+    const updatedSteps = steps.map(step => 
+      step.id === stepId ? { ...step, data: { ...step.data, ...data } } : step
+    );
+    
+    setFormData(prev => ({
+      ...prev,
+      stepFlows: {
+        ...prev.stepFlows,
+        [activeChannel]: updatedSteps
+      }
+    }));
+  };
+  
+  // Save message as template
+  const saveAsTemplate = (stepId: string) => {
+    const step = getChannelSteps().find(s => s.id === stepId);
+    if (step && step.type === 'message') {
+      // This would actually save to your template store
+      toast({
+        title: "Template Saved",
+        description: "Message has been saved as a template."
+      });
+    }
+  };
+  
+  // Use a saved template
+  const useTemplate = (stepId: string, templateContent: string) => {
+    updateStep(stepId, { message: templateContent });
+    setShowTemplateModal(false);
+    
+    toast({
+      title: "Template Applied",
+      description: "Template has been applied to the message."
+    });
+  };
+  
+  // Move step up in order
+  const moveStepUp = (stepId: string) => {
+    const steps = getChannelSteps();
+    const stepIndex = steps.findIndex(s => s.id === stepId);
+    
+    if (stepIndex > 0) {
+      const newSteps = [...steps];
+      const temp = newSteps[stepIndex];
+      newSteps[stepIndex] = newSteps[stepIndex - 1];
+      newSteps[stepIndex - 1] = temp;
+      
+      // Update order property
+      const reorderedSteps = newSteps.map((step, index) => ({
+        ...step,
+        order: index + 1
+      }));
+      
+      setFormData(prev => ({
+        ...prev,
+        stepFlows: {
+          ...prev.stepFlows,
+          [activeChannel]: reorderedSteps
+        }
+      }));
+    }
+  };
+  
+  // Move step down in order
+  const moveStepDown = (stepId: string) => {
+    const steps = getChannelSteps();
+    const stepIndex = steps.findIndex(s => s.id === stepId);
+    
+    if (stepIndex < steps.length - 1) {
+      const newSteps = [...steps];
+      const temp = newSteps[stepIndex];
+      newSteps[stepIndex] = newSteps[stepIndex + 1];
+      newSteps[stepIndex + 1] = temp;
+      
+      // Update order property
+      const reorderedSteps = newSteps.map((step, index) => ({
+        ...step,
+        order: index + 1
+      }));
+      
+      setFormData(prev => ({
+        ...prev,
+        stepFlows: {
+          ...prev.stepFlows,
+          [activeChannel]: reorderedSteps
+        }
+      }));
+    }
+  };
+  
+  // Render a message step
+  const renderMessageStep = (step: MessageStep) => {
+    const { data } = step as { data: MessageStepData };
+    return (
+      <div className="p-4 border border-border rounded-lg">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-primary" />
+            <span className="font-medium text-sm">Message</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSelectedTemplate(step)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              title="Use Template"
+            >
+              <FileText className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => saveAsTemplate(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              title="Save as Template"
+            >
+              <Save className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => moveStepUp(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              disabled={step.order === 1}
+              title="Move Up"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => moveStepDown(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              disabled={step.order === getChannelSteps().length}
+              title="Move Down"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => deleteStep(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              title="Delete Step"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div className="mb-3">
+          <textarea
+            value={data.message}
+            onChange={(e) => updateStep(step.id, { message: e.target.value })}
+            className="w-full p-3 border border-border rounded-md min-h-[120px] focus:outline-none focus:ring-1 focus:ring-primary/50"
+            placeholder="Enter your message content..."
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Use <span className="font-mono">[name]</span>, <span className="font-mono">[company]</span> for personalization.
+          </p>
+        </div>
+        <div>
+          <label className="text-sm font-medium">Assign To:</label>
+          <select
+            value={data.assignedTo || ''}
+            onChange={(e) => updateStep(step.id, { assignedTo: e.target.value })}
+            className="w-full mt-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+          >
+            <option value="">Unassigned</option>
+            <option value="John">John Smith</option>
+            <option value="Sarah">Sarah Lee</option>
+            <option value="Alex">Alex Chen</option>
+          </select>
+        </div>
+      </div>
+    );
+  };
+  
+  // Render a delay step
+  const renderDelayStep = (step: MessageStep) => {
+    const { data } = step as { data: DelayStepData };
+    return (
+      <div className="p-4 border border-border rounded-lg">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-blue-500" />
+            <span className="font-medium text-sm">Delay</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => moveStepUp(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              disabled={step.order === 1}
+              title="Move Up"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => moveStepDown(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              disabled={step.order === getChannelSteps().length}
+              title="Move Down"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => deleteStep(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              title="Delete Step"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">Wait for</span>
+          <div className="flex-1">
+            <input
+              type="number"
+              min="0"
+              value={data.days}
+              onChange={(e) => updateStep(step.id, { days: parseInt(e.target.value) || 0 })}
+              className="w-20 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+            />
+          </div>
+          <span className="text-sm">days</span>
+          <div className="flex-1">
+            <input
+              type="number"
+              min="0"
+              max="23"
+              value={data.hours || 0}
+              onChange={(e) => updateStep(step.id, { hours: parseInt(e.target.value) || 0 })}
+              className="w-20 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+            />
+          </div>
+          <span className="text-sm">hours before next step</span>
+        </div>
+      </div>
+    );
+  };
+  
+  // Render a condition step
+  const renderConditionStep = (step: MessageStep) => {
+    const { data } = step as { data: ConditionStepData };
+    return (
+      <div className="p-4 border border-border rounded-lg">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <ArrowRight className="h-4 w-4 text-yellow-500" />
+            <span className="font-medium text-sm">Condition</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => moveStepUp(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              disabled={step.order === 1}
+              title="Move Up"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => moveStepDown(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              disabled={step.order === getChannelSteps().length}
+              title="Move Down"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => deleteStep(step.id)}
+              className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+              title="Delete Step"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-sm font-medium">If:</label>
+            <select
+              value={data.condition}
+              onChange={(e) => updateStep(step.id, { condition: e.target.value })}
+              className="w-full mt-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+            >
+              <option value="replied">Lead Replied</option>
+              <option value="no_response">No Response</option>
+              <option value="negative_response">Negative Response</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm font-medium">Then:</label>
+            <select
+              value={data.action}
+              onChange={(e) => updateStep(step.id, { action: e.target.value })}
+              className="w-full mt-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+            >
+              <option value="move_stage">Move to Stage</option>
+              <option value="continue">Continue Sequence</option>
+              <option value="mark_not_interested">Mark as Not Interested</option>
+            </select>
+          </div>
+          
+          {data.action === 'move_stage' && (
+            <div>
+              <label className="text-sm font-medium">Target Stage:</label>
+              <select
+                value={data.targetStage || ''}
+                onChange={(e) => updateStep(step.id, { targetStage: e.target.value })}
+                className="w-full mt-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+              >
+                <option value="">Select a Stage</option>
+                {formData.stages.map(stage => (
+                  <option key={stage.id} value={stage.id}>
+                    {stage.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          
+          {data.action === 'continue' && (
+            <div>
+              <label className="text-sm font-medium">Wait Days:</label>
+              <input
+                type="number"
+                min="0"
+                value={data.waitDays || 0}
+                onChange={(e) => updateStep(step.id, { waitDays: parseInt(e.target.value) || 0 })}
+                className="w-full mt-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary/50"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+  
+  // Render a step based on its type
+  const renderStep = (step: MessageStep) => {
+    switch (step.type) {
+      case 'message':
+        return renderMessageStep(step);
+      case 'delay':
+        return renderDelayStep(step);
+      case 'condition':
+        return renderConditionStep(step);
+      default:
+        return null;
+    }
+  };
+  
+  // Check if we have at least one message step
+  const hasMessageSteps = Object.values(formData.stepFlows || {}).some(
+    steps => steps.some(step => step.type === 'message')
+  );
+  
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium mb-2">Message Sequence Flow</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Create a sequence of messages and conditions to guide your outreach workflow.
+          Create step-by-step message sequences for each channel in your outreach campaign.
         </p>
         
-        {/* Flow builder */}
-        <div className="border border-border rounded-lg" style={{ height: 500 }}>
-          <div ref={reactFlowWrapper} style={{ height: '100%' }}>
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              nodeTypes={nodeTypes}
-              fitView
-            >
-              <Background />
-              <Controls />
-              <MiniMap />
-              
-              <Panel position="top-right">
-                <div className="flex gap-2 bg-background p-2 rounded-lg shadow-sm">
-                  <button
-                    onClick={() => addNode('message')}
-                    className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                  >
-                    <MessageSquare className="h-3 w-3" />
-                    Message
-                  </button>
-                  <button
-                    onClick={() => addNode('delay')}
-                    className="flex items-center gap-1 px-3 py-1 bg-blue-500/10 text-blue-500 rounded-md text-sm"
-                  >
-                    <Clock className="h-3 w-3" />
-                    Delay
-                  </button>
-                  <button
-                    onClick={() => addNode('condition')}
-                    className="flex items-center gap-1 px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-md text-sm"
-                  >
-                    <ArrowRight className="h-3 w-3" />
-                    Condition
-                  </button>
+        {/* Channel tabs */}
+        <Tabs 
+          value={activeChannel} 
+          onValueChange={setActiveChannel}
+          className="w-full"
+        >
+          <TabsList className="mb-4">
+            {selectedChannels.map(channel => (
+              <TabsTrigger 
+                key={channel.id} 
+                value={channel.id}
+                className="min-w-[100px]"
+              >
+                {channel.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          
+          {selectedChannels.map(channel => (
+            <TabsContent key={channel.id} value={channel.id} className="space-y-4">
+              {/* Steps for this channel */}
+              {formData.stepFlows?.[channel.id]?.length > 0 ? (
+                <div className="space-y-4">
+                  {formData.stepFlows[channel.id]
+                    .sort((a, b) => a.order - b.order)
+                    .map(step => (
+                      <div key={step.id} className="animate-fade-in">
+                        {renderStep(step)}
+                      </div>
+                    ))
+                  }
                 </div>
-              </Panel>
-            </ReactFlow>
+              ) : (
+                <div className="text-center p-8 border border-dashed border-border rounded-lg text-muted-foreground">
+                  <p>No steps added yet. Add your first step below.</p>
+                </div>
+              )}
+              
+              {/* Add step buttons */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <button
+                  onClick={() => addStep('message')}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-md"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Add Message</span>
+                </button>
+                <button
+                  onClick={() => addStep('delay')}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-md"
+                >
+                  <Clock className="h-4 w-4" />
+                  <span>Add Delay</span>
+                </button>
+                <button
+                  onClick={() => addStep('condition')}
+                  className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 text-yellow-500 rounded-md"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                  <span>Add Condition</span>
+                </button>
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+        
+        {/* Template selection modal */}
+        {showTemplateModal && selectedTemplate && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div 
+              className="bg-card w-full max-w-md rounded-xl shadow-lg"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center p-4 border-b border-border">
+                <h3 className="text-lg font-medium">Select Template</h3>
+                <button 
+                  onClick={() => setShowTemplateModal(false)}
+                  className="p-2 rounded-full hover:bg-muted/50 transition-colors"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="p-4 max-h-[400px] overflow-y-auto">
+                <div className="space-y-2">
+                  {mockTemplates.map(template => (
+                    <div 
+                      key={template.id}
+                      className="p-3 border border-border rounded-lg hover:border-primary hover:bg-muted/20 cursor-pointer transition-colors"
+                      onClick={() => useTemplate(selectedTemplate.id, template.content)}
+                    >
+                      <h4 className="font-medium">{template.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{template.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="p-4 border-t border-border">
+                <button
+                  onClick={() => setShowTemplateModal(false)}
+                  className="w-full px-4 py-2 bg-muted hover:bg-muted/80 rounded-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Tips */}
         <div className="mt-4 p-3 bg-muted/20 rounded-lg text-sm">
           <div className="flex items-start gap-2">
-            <Settings className="h-4 w-4 mt-0.5 text-muted-foreground" />
             <div>
               <span className="font-medium">Flow Building Tips:</span>
               <ul className="list-disc list-inside text-muted-foreground mt-1 ml-2 text-xs">
-                <li>Add message nodes for different channels in your sequence</li>
-                <li>Add delay nodes to wait before sending the next message</li>
-                <li>Use conditions to create different paths based on lead responses</li>
-                <li>Connect nodes to create a complete flow</li>
+                <li>Start with a message step to engage your leads</li>
+                <li>Add delay steps between messages to give leads time to respond</li>
+                <li>Use condition steps to create different paths based on lead responses</li>
+                <li>Each channel can have its own unique sequence of steps</li>
               </ul>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Node editing modal */}
-      {showNodeModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div 
-            className="bg-card w-full max-w-md rounded-xl shadow-lg"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center p-4 border-b border-border">
-              <h3 className="text-lg font-medium">
-                {currentNode ? 'Edit' : 'Add'} {
-                  modalType === 'message' ? 'Message' : 
-                  modalType === 'delay' ? 'Delay' : 'Condition'
-                }
-              </h3>
-              <button 
-                onClick={() => setShowNodeModal(false)}
-                className="p-2 rounded-full hover:bg-muted/50 transition-colors"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="p-4">
-              {modalType === 'message' && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="channel" className="block text-sm font-medium">
-                      Channel
-                    </label>
-                    <select
-                      id="channel"
-                      name="channel"
-                      value={nodeFormData.channel}
-                      onChange={handleNodeFormChange}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    >
-                      {selectedChannels.map(channel => (
-                        <option key={channel.id} value={channel.id}>
-                          {channel.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="block text-sm font-medium">
-                      Message Content
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={nodeFormData.message}
-                      onChange={handleNodeFormChange}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px]"
-                      placeholder="Enter your message content..."
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Use <span className="font-mono">[name]</span>, <span className="font-mono">[company]</span> for personalization.
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="assignedTo" className="block text-sm font-medium">
-                      Assigned To
-                    </label>
-                    <input
-                      id="assignedTo"
-                      name="assignedTo"
-                      type="text"
-                      value={nodeFormData.assignedTo}
-                      onChange={handleNodeFormChange}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      placeholder="Team member name"
-                    />
-                  </div>
-                </div>
-              )}
-              
-              {modalType === 'delay' && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="days" className="block text-sm font-medium">
-                      Delay Duration (days)
-                    </label>
-                    <input
-                      id="days"
-                      name="days"
-                      type="number"
-                      min="1"
-                      value={nodeFormData.days}
-                      onChange={handleNodeFormChange}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-                </div>
-              )}
-              
-              {modalType === 'condition' && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="condition" className="block text-sm font-medium">
-                      Condition
-                    </label>
-                    <select
-                      id="condition"
-                      name="condition"
-                      value={nodeFormData.condition}
-                      onChange={handleNodeFormChange}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    >
-                      <option value="No Reply">No Reply</option>
-                      <option value="Positive Reply">Positive Reply</option>
-                      <option value="Negative Reply">Negative Reply</option>
-                      <option value="Email Opened">Email Opened</option>
-                      <option value="Email Link Clicked">Email Link Clicked</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="action" className="block text-sm font-medium">
-                      Action
-                    </label>
-                    <input
-                      id="action"
-                      name="action"
-                      type="text"
-                      value={nodeFormData.action}
-                      onChange={handleNodeFormChange}
-                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      placeholder="e.g., Move to Follow-Up, Assign to Manager"
-                    />
-                  </div>
-                </div>
-              )}
-              
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  onClick={() => setShowNodeModal(false)}
-                  className="px-4 py-2 border border-border rounded-lg hover:bg-muted/20 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={saveNode}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       
       {/* Navigation buttons */}
       <div className="flex justify-between pt-4 border-t border-border">
@@ -532,10 +609,9 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
         </button>
         <button
           onClick={() => {
-            saveFlow();
             onNext();
           }}
-          disabled={!hasMessageNodes}
+          disabled={!hasMessageSteps}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next

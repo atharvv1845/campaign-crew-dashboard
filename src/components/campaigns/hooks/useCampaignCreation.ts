@@ -19,6 +19,7 @@ export const useCampaignCreation = (onClose: () => void) => {
     shareNotes: false,
     leads: [],
     messageFlow: { nodes: [], edges: [] },
+    stepFlows: {},
   });
   const [exitAnimation, setExitAnimation] = useState(false);
 

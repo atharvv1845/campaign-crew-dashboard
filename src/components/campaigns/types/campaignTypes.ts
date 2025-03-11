@@ -11,6 +11,8 @@ export interface CampaignFormData {
   shareNotes: boolean;
   leads: LeadData[];
   messageFlow: FlowData;
+  // New field for step-based message flow
+  stepFlows: Record<string, MessageStep[]>;
 }
 
 // Lead data structure
@@ -28,10 +30,38 @@ export interface LeadData {
   source: 'manual' | 'csv';
 }
 
-// Message flow data structure
+// Message flow data structure (for backwards compatibility)
 export interface FlowData {
   nodes: any[];
   edges: any[];
+}
+
+// New step-based message flow structure
+export interface MessageStep {
+  id: string;
+  type: 'message' | 'delay' | 'condition';
+  order: number;
+  data: MessageStepData | DelayStepData | ConditionStepData;
+}
+
+// Message step data
+export interface MessageStepData {
+  message: string;
+  assignedTo?: string;
+}
+
+// Delay step data
+export interface DelayStepData {
+  days: number;
+  hours?: number;
+}
+
+// Condition step data
+export interface ConditionStepData {
+  condition: 'replied' | 'no_response' | 'negative_response';
+  action: 'move_stage' | 'continue' | 'mark_not_interested';
+  targetStage?: string;
+  waitDays?: number;
 }
 
 // Default stages for the campaign

@@ -39,7 +39,7 @@ export const useCampaignCreation = (onClose: () => void) => {
 
   // Move to the next step
   const nextStep = () => {
-    if (currentStep < 7) {
+    if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     }
   };

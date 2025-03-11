@@ -22,8 +22,7 @@ const WizardProgress: React.FC<WizardProgressProps> = ({ currentStep, totalSteps
       case 3: return 'Message Flow';
       case 4: return 'Lead Stages';
       case 5: return 'Team Assignment';
-      case 6: return 'Message Templates';
-      case 7: return 'Review & Launch';
+      case 6: return 'Review & Launch';
       default: return `Step ${stepNumber}`;
     }
   };

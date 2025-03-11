@@ -8,7 +8,6 @@ import { useCampaignCreation } from './hooks/useCampaignCreation';
 import CampaignSetup from './wizardSteps/CampaignSetup';
 import LeadStages from './wizardSteps/LeadStages';
 import TeamAssignment from './wizardSteps/TeamAssignment';
-import MessageSequence from './wizardSteps/MessageSequence';
 import ReviewLaunch from './wizardSteps/ReviewLaunch';
 import WizardProgress from './wizardSteps/WizardProgress';
 import LeadImport from './wizardSteps/LeadImport';
@@ -65,12 +64,6 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
       onNext={() => nextStep()}
       onBack={() => prevStep()}
     />,
-    <MessageSequence
-      formData={formData}
-      setFormData={setFormData}
-      onNext={() => nextStep()}
-      onBack={() => prevStep()}
-    />,
     <ReviewLaunch
       formData={formData}
       onSubmit={handleSubmit}
@@ -79,14 +72,12 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 ease-in-out"
-         onClick={handleClose}>
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 ease-in-out">
       <div 
         className={cn(
           "relative bg-card w-full max-w-4xl max-h-[90vh] rounded-xl shadow-lg transition-all duration-300",
           exitAnimation ? "opacity-0 scale-95" : "opacity-100 scale-100"
         )}
-        onClick={e => e.stopPropagation()}
       >
         {/* Header with close button */}
         <div className="flex justify-between items-center p-6 border-b border-border">
@@ -101,7 +92,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
         </div>
 
         {/* Progress indicator */}
-        <WizardProgress currentStep={currentStep} totalSteps={7} />
+        <WizardProgress currentStep={currentStep} totalSteps={6} />
 
         {/* Step content with scroll */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-150px)]">

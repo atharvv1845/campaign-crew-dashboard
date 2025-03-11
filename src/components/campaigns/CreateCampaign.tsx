@@ -155,7 +155,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
          onClick={handleClose}>
       <div 
         className={cn(
-          "relative bg-card w-full max-w-4xl rounded-xl shadow-lg transition-all duration-300",
+          "relative bg-card w-full max-w-4xl max-h-[90vh] rounded-xl shadow-lg transition-all duration-300",
           exitAnimation ? "opacity-0 scale-95" : "opacity-100 scale-100"
         )}
         onClick={e => e.stopPropagation()}
@@ -175,8 +175,8 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
         {/* Progress indicator */}
         <WizardProgress currentStep={currentStep} totalSteps={5} />
 
-        {/* Step content */}
-        <div className="p-6">
+        {/* Step content with scroll */}
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-150px)]">
           {steps[currentStep - 1]}
         </div>
       </div>

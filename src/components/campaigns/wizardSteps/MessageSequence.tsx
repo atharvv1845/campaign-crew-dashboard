@@ -73,8 +73,8 @@ const MessageSequence: React.FC<MessageSequenceProps> = ({ formData, setFormData
           Create message templates for each channel. These will be available when you send messages to leads.
         </p>
         
-        {/* Message templates */}
-        <div className="space-y-4">
+        {/* Message templates - scrollable container */}
+        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
           {selectedChannels.map(channel => {
             const message = formData.messages[channel.id] || '';
             const charLimit = getCharacterLimit(channel.id);

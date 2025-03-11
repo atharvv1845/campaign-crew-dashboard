@@ -27,7 +27,7 @@ const templates = [
     id: 3,
     name: 'Demo Request',
     subject: 'Quick demo of [product] for [company]?',
-    preview: 'Hi [name], I'd like to offer you a personalized demo of our solution that has helped...',
+    preview: "Hi [name], I'd like to offer you a personalized demo of our solution that has helped...",
     usageCount: 873,
     responseRate: 41,
     lastUsed: '3 days ago',

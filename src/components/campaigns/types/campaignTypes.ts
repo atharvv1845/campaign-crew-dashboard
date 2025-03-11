@@ -1,4 +1,3 @@
-
 import { Node, Edge } from 'reactflow';
 
 // Campaign form data structure
@@ -46,17 +45,11 @@ export interface StageData {
 // Message step data
 export interface MessageStepData {
   id: string;
-  type: 'message' | 'delay' | 'condition';
-  channel?: string;
-  template?: string;
-  content?: string;
-  duration?: number;
-  unit?: 'minutes' | 'hours' | 'days';
-  field?: string;
-  operator?: string;
-  value?: string;
-  order?: number;
-  data?: any; // Add data property for reactflow compatibility
+  type: 'message';
+  channel: string;
+  templateId?: string;
+  content: string;
+  subject?: string;
 }
 
 // Delay step data
@@ -64,8 +57,7 @@ export interface DelayStepData {
   id: string;
   type: 'delay';
   duration: number;
-  unit: 'minutes' | 'hours' | 'days';
-  order?: number;
+  unit: 'hours' | 'days' | 'weeks';
 }
 
 // Condition step data
@@ -75,13 +67,15 @@ export interface ConditionStepData {
   field: string;
   operator: string;
   value: string;
-  order?: number;
+  truePath: string[];
+  falsePath: string[];
 }
 
 // Flow data structure
 export interface FlowData {
-  nodes: Node[];
-  edges: Edge[];
+  steps: Record<string, FlowStepData>;
+  connections: Array<{from: string, to: string}>;
+  startNode: string | null;
 }
 
 // Default stages for new campaigns
@@ -141,3 +135,4 @@ export const defaultStages: StageData[] = [
 export type MessageStep = MessageStepData;
 export type DelayStep = DelayStepData;
 export type ConditionStep = ConditionStepData;
+export type FlowStepData = MessageStepData | DelayStepData | ConditionStepData;

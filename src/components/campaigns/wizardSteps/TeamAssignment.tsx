@@ -2,7 +2,13 @@
 import React, { useState } from 'react';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
-import { ChevronDown, UserPlus, Check } from 'lucide-react';
+import { ChevronDown, UserPlus, Check, Users } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 
 interface TeamAssignmentProps {
   formData: CampaignFormData;
@@ -21,13 +27,6 @@ const teamMembers = [
 ];
 
 const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, onNext, onBack }) => {
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  
-  // Toggle dropdown visibility
-  const toggleDropdown = (channelId: string) => {
-    setOpenDropdown(openDropdown === channelId ? null : channelId);
-  };
-
   // Assign a team member to a channel
   const assignTeamMember = (channelId: string, memberId: string) => {
     setFormData(prev => {
@@ -94,45 +93,45 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
                     <span className="text-sm font-medium">{channel.name}</span>
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="relative">
-                      <button 
-                        className="flex items-center justify-between w-full px-3 py-2 border border-border rounded-md text-sm hover:border-primary"
-                        onClick={() => toggleDropdown(channel.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <UserPlus className="h-4 w-4 text-muted-foreground" />
-                          <span>{getAssignedMemberNames(channel.id)}</span>
-                        </div>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                      </button>
-                      
-                      {/* Improved dropdown menu */}
-                      {openDropdown === channel.id && (
-                        <div className="absolute left-0 mt-1 w-full bg-card shadow-lg rounded-lg border border-border overflow-hidden z-10">
-                          <div className="p-1 max-h-[200px] overflow-y-auto">
-                            {teamMembers.map(member => {
-                              const isAssigned = getAssignedMembers(channel.id).includes(member.id);
-                              return (
-                                <button 
-                                  key={member.id}
-                                  onClick={() => assignTeamMember(channel.id, member.id)}
-                                  className="flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-muted/20 rounded-md"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span>{member.avatar}</span>
-                                    <span>{member.name}</span>
-                                    <span className="text-xs text-muted-foreground ml-1">({member.workload})</span>
-                                  </div>
-                                  {isAssigned && (
-                                    <Check className="h-4 w-4 text-primary" />
-                                  )}
-                                </button>
-                              );
-                            })}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button 
+                          className="flex items-center justify-between w-full px-3 py-2 border border-border rounded-md text-sm hover:border-primary bg-card"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span>{getAssignedMemberNames(channel.id)}</span>
                           </div>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-56 bg-popover p-2">
+                        <div className="text-sm font-medium px-2 py-1.5 text-muted-foreground">
+                          Select team members:
                         </div>
-                      )}
-                    </div>
+                        {teamMembers.map(member => {
+                          const isAssigned = getAssignedMembers(channel.id).includes(member.id);
+                          return (
+                            <DropdownMenuItem 
+                              key={member.id}
+                              onClick={() => assignTeamMember(channel.id, member.id)}
+                              className="flex items-center justify-between cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-sm">
+                                  {member.avatar}
+                                </span>
+                                <span>{member.name}</span>
+                                <span className="text-xs text-muted-foreground">({member.workload})</span>
+                              </div>
+                              {isAssigned && (
+                                <Check className="h-4 w-4 text-primary" />
+                              )}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               ))}

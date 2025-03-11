@@ -1,65 +1,61 @@
 
 import React from 'react';
-import { Search, Filter, ChevronDown } from 'lucide-react';
+import { Search, Filter, Calendar } from 'lucide-react';
 
-interface CampaignFiltersProps {
+export interface CampaignFiltersProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
-  filterStatus: string | null;
-  setFilterStatus: (value: string | null) => void;
+  setSearchTerm: (term: string) => void;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
 }
 
 const CampaignFilters: React.FC<CampaignFiltersProps> = ({
   searchTerm,
   setSearchTerm,
-  filterStatus,
-  setFilterStatus,
+  statusFilter,
+  setStatusFilter
 }) => {
-  // Statuses for filter dropdown
-  const statuses = ["Active", "Completed", "Draft", "Scheduled"];
-
   return (
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Search className="h-4 w-4 text-muted-foreground" />
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search campaigns..." 
-          className="glass-input pl-9 pr-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 w-full sm:w-[300px]"
+    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      {/* Search */}
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Search campaigns..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-9 pr-4 py-2 w-full border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
       </div>
       
-      <div className="flex items-center gap-3">
-        <div className="relative group">
-          <button className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-sm hover:bg-muted/20 transition-colors">
-            <Filter className="h-4 w-4" />
-            <span>Filter Status</span>
-            <ChevronDown className="h-4 w-4" />
-          </button>
-          <div className="absolute right-0 mt-1 w-48 bg-card shadow-lg rounded-lg border border-border overflow-hidden z-50 hidden group-hover:block">
-            <div className="py-1">
-              <button 
-                onClick={() => setFilterStatus(null)} 
-                className={`block w-full text-left px-4 py-2 text-sm hover:bg-muted/20 ${filterStatus === null ? 'bg-muted/20' : ''}`}
-              >
-                All Statuses
-              </button>
-              {statuses.map(status => (
-                <button 
-                  key={status} 
-                  onClick={() => setFilterStatus(status)}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-muted/20 ${filterStatus === status ? 'bg-muted/20' : ''}`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
+      {/* Filters */}
+      <div className="flex gap-2">
+        <div className="relative">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="appearance-none pl-9 pr-8 py-2 border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Paused">Paused</option>
+            <option value="Completed">Completed</option>
+            <option value="Draft">Draft</option>
+            <option value="Scheduled">Scheduled</option>
+          </select>
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
         </div>
+        
+        <button className="px-4 py-2 border border-border rounded-lg bg-card flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <span>Date</span>
+        </button>
       </div>
     </div>
   );

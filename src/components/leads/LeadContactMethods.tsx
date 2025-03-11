@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Phone, Mail, MessageSquare, Linkedin, Twitter, MessageCircle, Instagram } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Linkedin, Twitter, MessageCircle, Instagram, Facebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LeadContactMethodsProps {
@@ -17,6 +17,7 @@ const icons = {
   twitter: Twitter,
   whatsapp: MessageCircle,
   instagram: Instagram,
+  facebook: Facebook,
 };
 
 export const LeadContactMethods: React.FC<LeadContactMethodsProps> = ({

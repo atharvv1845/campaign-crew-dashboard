@@ -69,18 +69,32 @@ const leadData: Lead[] = [
 
 const LeadTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All Statuses');
   
-  // Filter leads based on search term
-  const filteredLeads = leadData.filter(lead => 
-    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.company.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter leads based on search term and status
+  const filteredLeads = leadData.filter(lead => {
+    // Apply search filter
+    const matchesSearch = 
+      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.company.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Apply status filter if not "All Statuses"
+    const matchesStatus = statusFilter === 'All Statuses' || lead.status === statusFilter;
+    
+    // Return true if both conditions are met
+    return matchesSearch && matchesStatus;
+  });
   
   return (
     <div className="space-y-6">
       {/* Header and actions */}
-      <LeadFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <LeadFilters 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+      />
       
       {/* Leads table */}
       <LeadTableComponent leads={filteredLeads} />

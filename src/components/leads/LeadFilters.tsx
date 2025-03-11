@@ -5,22 +5,58 @@ import { Search, Filter, Download, Mail, UserPlus, ChevronDown } from 'lucide-re
 interface LeadFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
 }
 
-const LeadFilters: React.FC<LeadFiltersProps> = ({ searchTerm, setSearchTerm }) => {
+const LeadFilters: React.FC<LeadFiltersProps> = ({ 
+  searchTerm, 
+  setSearchTerm, 
+  statusFilter, 
+  setStatusFilter 
+}) => {
+  // Status options for the filter
+  const statusOptions = [
+    "All Statuses",
+    "Interested",
+    "Contacted",
+    "Not Interested",
+    "Responded",
+    "New"
+  ];
+
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Search className="h-4 w-4 text-muted-foreground" />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <input 
+            type="text" 
+            placeholder="Search leads..." 
+            className="glass-input pl-9 pr-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 w-full sm:w-[300px]"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        <input 
-          type="text" 
-          placeholder="Search leads..." 
-          className="glass-input pl-9 pr-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 w-full sm:w-[300px]"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        
+        <div className="relative">
+          <select
+            className="glass-input pl-4 pr-8 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 appearance-none w-full sm:w-[200px]"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </div>
+        </div>
       </div>
       
       <div className="flex flex-wrap items-center gap-3">

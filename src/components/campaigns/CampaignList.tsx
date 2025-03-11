@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Plus, MoreHorizontal, ChevronDown, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import CreateCampaign from './CreateCampaign';
 
 // Mock campaign data
 const campaignData = [
@@ -152,6 +153,7 @@ const ChannelBadge: React.FC<{ channel: string }> = ({ channel }) => {
 const CampaignList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
   
   // Filter campaigns based on search term and status
@@ -216,7 +218,7 @@ const CampaignList: React.FC = () => {
           
           <button 
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm shadow-sm hover:bg-primary/90 transition-colors"
-            onClick={() => navigate('/campaigns/new')}
+            onClick={() => setShowCreateModal(true)}
           >
             <Plus className="h-4 w-4" />
             <span>New Campaign</span>
@@ -292,6 +294,9 @@ const CampaignList: React.FC = () => {
           </table>
         </div>
       </div>
+      
+      {/* Create Campaign Modal */}
+      {showCreateModal && <CreateCampaign />}
     </div>
   );
 };

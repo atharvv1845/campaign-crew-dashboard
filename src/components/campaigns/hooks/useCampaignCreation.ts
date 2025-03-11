@@ -1,8 +1,26 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData, defaultStages } from '../types/campaignTypes';
 import { campaignData } from '../campaignData';
+
+// Add type for campaign data
+interface CampaignData {
+  id: number;
+  name: string;
+  status: string;
+  type: string;
+  channels: string[];
+  leads: number;
+  responses: number;
+  positive: number;
+  negative: number;
+  conversion: string;
+  teamMembers: string[];
+  createdAt: string;
+  description?: string; // Make sure this is included
+}
 
 export const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
   const navigate = useNavigate();
@@ -85,7 +103,7 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         });
       }
     } else {
-      const newCampaign = {
+      const newCampaign: CampaignData = {
         id: campaignData.length + 1,
         name: formData.name,
         status: 'Active',

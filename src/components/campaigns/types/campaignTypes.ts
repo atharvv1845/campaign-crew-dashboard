@@ -119,3 +119,8 @@ export const defaultStages: StageData[] = [
     color: 'bg-red-500',
   },
 ];
+
+// Export these for use in MessageFlow.tsx
+export type MessageStep = MessageStepData;
+export type DelayStep = DelayStepData;
+export type ConditionStep = ConditionStepData;

@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Campaigns from "./pages/Campaigns";
+import CampaignDetail from "./pages/CampaignDetail";
 import Leads from "./pages/Leads";
 import Messaging from "./pages/Messaging";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,15 @@ const App = () => (
             element={
               <MainLayout>
                 <Campaigns />
+              </MainLayout>
+            }
+          />
+          
+          <Route
+            path="/campaigns/:id"
+            element={
+              <MainLayout>
+                <CampaignDetail />
               </MainLayout>
             }
           />

@@ -56,6 +56,35 @@ const CreateCampaign: React.FC = () => {
     shareNotes: false,
   });
 
+  // Move to the next step
+  const nextStep = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  // Move to the previous step
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = () => {
+    // In a real app, you would send this data to your backend
+    console.log('Campaign created:', formData);
+    
+    // Show success notification
+    toast({
+      title: 'Campaign Created',
+      description: `${formData.name} campaign has been created successfully!`,
+    });
+    
+    // Redirect to campaigns list
+    navigate('/campaigns');
+  };
+
   // Array of step components to display
   const steps = [
     <CampaignSetup
@@ -87,35 +116,6 @@ const CreateCampaign: React.FC = () => {
       onBack={() => prevStep()}
     />,
   ];
-
-  // Move to the next step
-  const nextStep = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  // Move to the previous step
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = () => {
-    // In a real app, you would send this data to your backend
-    console.log('Campaign created:', formData);
-    
-    // Show success notification
-    toast({
-      title: 'Campaign Created',
-      description: `${formData.name} campaign has been created successfully!`,
-    });
-    
-    // Redirect to campaigns list
-    navigate('/campaigns');
-  };
 
   // Close the wizard
   const handleClose = () => {

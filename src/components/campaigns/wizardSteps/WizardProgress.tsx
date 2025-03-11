@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 interface WizardProgressProps {
   currentStep: number;
@@ -19,9 +20,9 @@ const WizardProgress: React.FC<WizardProgressProps> = ({ currentStep, totalSteps
   return (
     <div className="px-6 pt-4">
       {/* Progress bar */}
-      <div className="relative h-1 w-full bg-muted rounded-full overflow-hidden mb-4">
+      <div className="relative h-1.5 w-full bg-muted rounded-full overflow-hidden mb-4">
         <div 
-          className="absolute h-full bg-primary transition-all duration-300 ease-in-out"
+          className="absolute h-full bg-primary transition-all duration-500 ease-in-out"
           style={{ width: `${(currentStep / totalSteps) * 100}%` }}
         />
       </div>
@@ -36,13 +37,17 @@ const WizardProgress: React.FC<WizardProgressProps> = ({ currentStep, totalSteps
           >
             <div 
               className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium mb-1 transition-colors",
+                "flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium mb-1.5 transition-all duration-300",
                 index + 1 < currentStep ? "bg-primary text-primary-foreground" : 
                 index + 1 === currentStep ? "bg-primary/80 text-primary-foreground ring-2 ring-primary ring-offset-2" : 
                 "bg-muted text-muted-foreground"
               )}
             >
-              {index + 1}
+              {index + 1 < currentStep ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                index + 1
+              )}
             </div>
             <span 
               className={cn(

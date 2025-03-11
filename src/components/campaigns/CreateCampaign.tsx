@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, Download, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import CampaignSetup from './wizardSteps/CampaignSetup';
 import LeadStages from './wizardSteps/LeadStages';
@@ -9,6 +9,7 @@ import TeamAssignment from './wizardSteps/TeamAssignment';
 import MessageSequence from './wizardSteps/MessageSequence';
 import ReviewLaunch from './wizardSteps/ReviewLaunch';
 import WizardProgress from './wizardSteps/WizardProgress';
+import { cn } from '@/lib/utils';
 
 // Define the campaign data structure
 export interface CampaignFormData {
@@ -41,7 +42,11 @@ const defaultStages = [
   { id: '5', name: 'Converted', order: 5 },
 ];
 
-const CreateCampaign: React.FC = () => {
+interface CreateCampaignProps {
+  onClose: () => void;
+}
+
+const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
@@ -55,6 +60,21 @@ const CreateCampaign: React.FC = () => {
     notes: '',
     shareNotes: false,
   });
+  const [exitAnimation, setExitAnimation] = useState(false);
+
+  // Handle escape key press to close modal
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   // Move to the next step
   const nextStep = () => {
@@ -81,8 +101,21 @@ const CreateCampaign: React.FC = () => {
       description: `${formData.name} campaign has been created successfully!`,
     });
     
-    // Redirect to campaigns list
-    navigate('/campaigns');
+    // Close the modal with animation
+    handleClose();
+    
+    // Redirect to campaigns list after animation
+    setTimeout(() => {
+      navigate('/campaigns');
+    }, 300);
+  };
+
+  // Close the wizard with animation
+  const handleClose = () => {
+    setExitAnimation(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
   };
 
   // Array of step components to display
@@ -117,21 +150,23 @@ const CreateCampaign: React.FC = () => {
     />,
   ];
 
-  // Close the wizard
-  const handleClose = () => {
-    // You might want to show a confirmation dialog if there are unsaved changes
-    navigate('/campaigns');
-  };
-
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="relative bg-card w-full max-w-4xl rounded-xl shadow-lg">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 ease-in-out"
+         onClick={handleClose}>
+      <div 
+        className={cn(
+          "relative bg-card w-full max-w-4xl rounded-xl shadow-lg transition-all duration-300",
+          exitAnimation ? "opacity-0 scale-95" : "opacity-100 scale-100"
+        )}
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header with close button */}
         <div className="flex justify-between items-center p-6 border-b border-border">
           <h2 className="text-xl font-semibold">Create New Campaign</h2>
           <button 
             onClick={handleClose}
             className="p-2 rounded-full hover:bg-muted/50 transition-colors"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>

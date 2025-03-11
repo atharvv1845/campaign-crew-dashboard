@@ -38,7 +38,9 @@ const CampaignList: React.FC = () => {
       <CampaignTable campaigns={filteredCampaigns} />
       
       {/* Create Campaign Modal */}
-      {showCreateModal && <CreateCampaign />}
+      {showCreateModal && (
+        <CreateCampaign onClose={() => setShowCreateModal(false)} />
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Check } from 'lucide-react';
 
 interface WizardProgressProps {
   currentStep: number;
@@ -9,56 +8,64 @@ interface WizardProgressProps {
 }
 
 const WizardProgress: React.FC<WizardProgressProps> = ({ currentStep, totalSteps }) => {
-  const steps = [
-    'Campaign Setup',
-    'Lead Stages',
-    'Team Assignment',
-    'Message Sequence',
-    'Review & Launch'
-  ];
+  // Create a steps array for rendering
+  const steps = Array.from({ length: totalSteps }, (_, i) => ({
+    number: i + 1,
+    active: i + 1 <= currentStep
+  }));
+
+  // Get step name based on step number
+  const getStepName = (stepNumber: number) => {
+    switch (stepNumber) {
+      case 1: return 'Campaign Setup';
+      case 2: return 'Import Leads';
+      case 3: return 'Message Flow';
+      case 4: return 'Lead Stages';
+      case 5: return 'Team Assignment';
+      case 6: return 'Message Templates';
+      case 7: return 'Review & Launch';
+      default: return `Step ${stepNumber}`;
+    }
+  };
 
   return (
-    <div className="px-6 pt-4">
-      {/* Progress bar */}
-      <div className="relative h-1.5 w-full bg-muted rounded-full overflow-hidden mb-4">
-        <div 
-          className="absolute h-full bg-primary transition-all duration-500 ease-in-out"
-          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-        />
-      </div>
-      
-      {/* Step indicators */}
-      <div className="flex justify-between mb-2">
-        {steps.map((step, index) => (
-          <div 
-            key={index} 
-            className="flex flex-col items-center"
-            style={{ width: `${100 / totalSteps}%` }}
-          >
-            <div 
-              className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium mb-1.5 transition-all duration-300",
-                index + 1 < currentStep ? "bg-primary text-primary-foreground" : 
-                index + 1 === currentStep ? "bg-primary/80 text-primary-foreground ring-2 ring-primary ring-offset-2" : 
-                "bg-muted text-muted-foreground"
+    <div className="border-b border-border">
+      <div className="px-6 py-3 overflow-x-auto">
+        <div className="flex items-center min-w-max">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.number}>
+              {/* Step circle */}
+              <div
+                className={cn(
+                  "flex flex-col items-center justify-center",
+                  index > 0 ? "ml-2" : ""
+                )}
+              >
+                <div 
+                  className={cn(
+                    "h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+                    step.active ? "bg-primary text-primary-foreground" : "bg-muted/40 text-muted-foreground"
+                  )}
+                >
+                  {step.number}
+                </div>
+                <span className="text-xs mt-1 text-muted-foreground whitespace-nowrap">
+                  {getStepName(step.number)}
+                </span>
+              </div>
+              
+              {/* Connector line */}
+              {index < steps.length - 1 && (
+                <div 
+                  className={cn(
+                    "h-[2px] transition-colors flex-grow mx-1 mt-[-14px]",
+                    steps[index + 1].active ? "bg-primary" : "bg-muted/40"
+                  )}
+                ></div>
               )}
-            >
-              {index + 1 < currentStep ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                index + 1
-              )}
-            </div>
-            <span 
-              className={cn(
-                "text-xs text-center",
-                index + 1 === currentStep ? "font-medium" : "text-muted-foreground"
-              )}
-            >
-              {step}
-            </span>
-          </div>
-        ))}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
   );

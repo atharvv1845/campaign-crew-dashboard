@@ -9,6 +9,8 @@ import TeamAssignment from './wizardSteps/TeamAssignment';
 import MessageSequence from './wizardSteps/MessageSequence';
 import ReviewLaunch from './wizardSteps/ReviewLaunch';
 import WizardProgress from './wizardSteps/WizardProgress';
+import LeadImport from './wizardSteps/LeadImport';
+import MessageFlow from './wizardSteps/MessageFlow';
 import { cn } from '@/lib/utils';
 
 // Define the campaign data structure
@@ -21,6 +23,29 @@ export interface CampaignFormData {
   messages: Record<string, string>;
   notes: string;
   shareNotes: boolean;
+  leads: LeadData[];
+  messageFlow: FlowData;
+}
+
+// Lead data structure
+export interface LeadData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  company?: string;
+  email: string;
+  phone?: string;
+  socialProfiles?: Record<string, string>;
+  status: string;
+  assignedTo?: string;
+  notes?: string;
+  source: 'manual' | 'csv';
+}
+
+// Message flow data structure
+export interface FlowData {
+  nodes: any[];
+  edges: any[];
 }
 
 // Available channels for outreach
@@ -59,6 +84,8 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
     messages: {},
     notes: '',
     shareNotes: false,
+    leads: [],
+    messageFlow: { nodes: [], edges: [] },
   });
   const [exitAnimation, setExitAnimation] = useState(false);
 
@@ -125,6 +152,18 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
       setFormData={setFormData}
       onNext={() => nextStep()}
     />,
+    <LeadImport
+      formData={formData}
+      setFormData={setFormData}
+      onNext={() => nextStep()}
+      onBack={() => prevStep()}
+    />,
+    <MessageFlow
+      formData={formData}
+      setFormData={setFormData}
+      onNext={() => nextStep()}
+      onBack={() => prevStep()}
+    />,
     <LeadStages
       formData={formData}
       setFormData={setFormData}
@@ -173,7 +212,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
         </div>
 
         {/* Progress indicator */}
-        <WizardProgress currentStep={currentStep} totalSteps={5} />
+        <WizardProgress currentStep={currentStep} totalSteps={7} />
 
         {/* Step content with scroll */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-150px)]">

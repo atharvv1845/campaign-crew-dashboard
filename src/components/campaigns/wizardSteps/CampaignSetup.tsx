@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { CampaignFormData, availableChannels } from '../CreateCampaign';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CampaignFormData } from '../types/campaignTypes';
+import { availableChannels } from '../constants/channels';
 
 interface CampaignSetupProps {
   formData: CampaignFormData;

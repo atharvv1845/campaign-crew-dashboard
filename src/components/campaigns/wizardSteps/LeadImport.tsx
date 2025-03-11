@@ -1,8 +1,8 @@
 
 import React, { useState, useRef } from 'react';
 import { UserPlus, Upload, FileCheck, Plus, Trash2, Check, X, Download } from 'lucide-react';
-import { CampaignFormData, LeadData } from '../CreateCampaign';
 import { cn } from '@/lib/utils';
+import { CampaignFormData, LeadData } from '../types/campaignTypes';
 
 interface LeadImportProps {
   formData: CampaignFormData;

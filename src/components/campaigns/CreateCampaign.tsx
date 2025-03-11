@@ -1,8 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { X, Download, Rocket } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React from 'react';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useCampaignCreation } from './hooks/useCampaignCreation';
+
+// Import wizard steps
 import CampaignSetup from './wizardSteps/CampaignSetup';
 import LeadStages from './wizardSteps/LeadStages';
 import TeamAssignment from './wizardSteps/TeamAssignment';
@@ -11,139 +13,26 @@ import ReviewLaunch from './wizardSteps/ReviewLaunch';
 import WizardProgress from './wizardSteps/WizardProgress';
 import LeadImport from './wizardSteps/LeadImport';
 import MessageFlow from './wizardSteps/MessageFlow';
-import { cn } from '@/lib/utils';
 
-// Define the campaign data structure
-export interface CampaignFormData {
-  name: string;
-  description: string;
-  channels: string[];
-  stages: { id: string; name: string; order: number }[];
-  teamAssignments: Record<string, string[]>;
-  messages: Record<string, string>;
-  notes: string;
-  shareNotes: boolean;
-  leads: LeadData[];
-  messageFlow: FlowData;
-}
-
-// Lead data structure
-export interface LeadData {
-  id: string;
-  firstName: string;
-  lastName: string;
-  company?: string;
-  email: string;
-  phone?: string;
-  socialProfiles?: Record<string, string>;
-  status: string;
-  assignedTo?: string;
-  notes?: string;
-  source: 'manual' | 'csv';
-}
-
-// Message flow data structure
-export interface FlowData {
-  nodes: any[];
-  edges: any[];
-}
-
-// Available channels for outreach
-export const availableChannels = [
-  { id: 'email', name: 'Email' },
-  { id: 'linkedin', name: 'LinkedIn' },
-  { id: 'twitter', name: 'Twitter' },
-  { id: 'whatsapp', name: 'WhatsApp' },
-  { id: 'instagram', name: 'Instagram' },
-  { id: 'facebook', name: 'Facebook' },
-];
-
-// Default stages for the campaign
-const defaultStages = [
-  { id: '1', name: 'Not Contacted', order: 1 },
-  { id: '2', name: 'Contacted', order: 2 },
-  { id: '3', name: 'Follow-Up Needed', order: 3 },
-  { id: '4', name: 'Positive Response', order: 4 },
-  { id: '5', name: 'Converted', order: 5 },
-];
+// Re-export types for backward compatibility
+export { type CampaignFormData, type LeadData, type FlowData } from './types/campaignTypes';
+export { availableChannels } from './constants/channels';
 
 interface CreateCampaignProps {
   onClose: () => void;
 }
 
 const CreateCampaign: React.FC<CreateCampaignProps> = ({ onClose }) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<CampaignFormData>({
-    name: '',
-    description: '',
-    channels: [],
-    stages: [...defaultStages],
-    teamAssignments: {},
-    messages: {},
-    notes: '',
-    shareNotes: false,
-    leads: [],
-    messageFlow: { nodes: [], edges: [] },
-  });
-  const [exitAnimation, setExitAnimation] = useState(false);
-
-  // Handle escape key press to close modal
-  useEffect(() => {
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscapeKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, []);
-
-  // Move to the next step
-  const nextStep = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  // Move to the previous step
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = () => {
-    // In a real app, you would send this data to your backend
-    console.log('Campaign created:', formData);
-    
-    // Show success notification
-    toast({
-      title: 'Campaign Created',
-      description: `${formData.name} campaign has been created successfully!`,
-    });
-    
-    // Close the modal with animation
-    handleClose();
-    
-    // Redirect to campaigns list after animation
-    setTimeout(() => {
-      navigate('/campaigns');
-    }, 300);
-  };
-
-  // Close the wizard with animation
-  const handleClose = () => {
-    setExitAnimation(true);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
+  const {
+    currentStep,
+    formData,
+    setFormData,
+    nextStep,
+    prevStep,
+    handleSubmit,
+    handleClose,
+    exitAnimation
+  } = useCampaignCreation(onClose);
 
   // Array of step components to display
   const steps = [

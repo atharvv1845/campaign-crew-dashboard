@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { CampaignFormData, availableChannels } from '../CreateCampaign';
+import { CampaignFormData } from '../types/campaignTypes';
+import { availableChannels } from '../constants/channels';
 
 interface MessageSequenceProps {
   formData: CampaignFormData;

@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { CampaignFormData } from '../CreateCampaign';
 import { GripVertical, Edit, Trash, Check, X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CampaignFormData } from '../types/campaignTypes';
 
 interface LeadStagesProps {
   formData: CampaignFormData;

@@ -42,6 +42,8 @@ const CampaignDetail: React.FC = () => {
   const campaign = {
     ...campaignData,
     contacted: campaignData.leads - Math.floor(campaignData.leads * 0.15), // Add missing contacted property
+    positive: Math.floor(campaignData.responses * 0.7), // Add missing positive property
+    negative: Math.floor(campaignData.responses * 0.3), // Add missing negative property
     teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'], // Add team members for dropdown assignments
     stages: [
       { id: 1, name: 'Not Contacted', count: 24 },

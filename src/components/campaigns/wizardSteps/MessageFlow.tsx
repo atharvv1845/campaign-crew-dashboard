@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import ReactFlow, { 
   Node, 
@@ -21,17 +20,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { channels } from '../constants/channels';
-import { MessageStep, MessageStepData, DelayStepData, ConditionStepData } from '../types/campaignTypes';
+import { availableChannels } from '../constants/channels';
+import { CampaignFormData, MessageStep, MessageStepData, DelayStepData, ConditionStepData } from '../types/campaignTypes';
 
-// Node types
+interface MessageFlowProps {
+  formData: CampaignFormData;
+  setFormData: React.Dispatch<React.SetStateAction<CampaignFormData>>;
+  onNext: () => void;
+  onBack: () => void;
+}
+
 const nodeTypes = {
   messageNode: MessageNode,
   delayNode: DelayNode,
   conditionNode: ConditionNode,
 };
 
-// Initial nodes
 const initialNodes: Node[] = [
   {
     id: '1',
@@ -40,12 +44,11 @@ const initialNodes: Node[] = [
     data: {
       label: 'Initial Outreach',
       channel: 'email',
-      message: 'Hi {{name}}, I noticed your work at {{company}} and thought we should connect...',
+      message: 'Hi {{firstName}}, I noticed your work at {{company}} and thought we should connect...',
     },
   },
 ];
 
-// Initial edges
 const initialEdges: Edge[] = [];
 
 interface MessageNodeProps {
@@ -124,7 +127,7 @@ function ConditionNode({ data, id }: ConditionNodeProps) {
   );
 }
 
-const MessageFlow: React.FC = () => {
+const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext, onBack }) => {
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -153,7 +156,6 @@ const MessageFlow: React.FC = () => {
 
   const handleNodeClick = (event: React.MouseEvent, node: Node) => {
     setSelectedNode(node.id);
-    // Populate the form with the node's data
     if (node.type === 'messageNode') {
       setNodeType('message');
       setNodeData({
@@ -208,7 +210,6 @@ const MessageFlow: React.FC = () => {
 
   const saveNode = () => {
     if (selectedNode) {
-      // Update existing node
       setNodes((nds) =>
         nds.map((node) => {
           if (node.id === selectedNode) {
@@ -252,7 +253,6 @@ const MessageFlow: React.FC = () => {
         })
       );
     } else {
-      // Add new node
       const id = (nodes.length + 1).toString();
       let newNode: Node;
 
@@ -301,7 +301,6 @@ const MessageFlow: React.FC = () => {
 
       setNodes([...nodes, newNode]);
 
-      // If there are other nodes, add an edge from the last node to the new one
       if (nodes.length > 0) {
         const lastNodeId = nodes[nodes.length - 1].id;
         const newEdge: Edge = {
@@ -379,7 +378,7 @@ const MessageFlow: React.FC = () => {
                         <SelectValue placeholder="Select channel" />
                       </SelectTrigger>
                       <SelectContent>
-                        {channels.map((channel) => (
+                        {availableChannels.map((channel) => (
                           <SelectItem key={channel.id} value={channel.id}>
                             {channel.name}
                           </SelectItem>
@@ -420,7 +419,7 @@ const MessageFlow: React.FC = () => {
                     rows={6}
                   />
                   <div className="text-xs text-muted-foreground">
-                    Use {{name}}, {{company}}, etc. for personalization.
+                    Use {{firstName}}, {{company}}, etc. for personalization.
                   </div>
                 </div>
               </>
@@ -538,6 +537,15 @@ const MessageFlow: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <div className="flex justify-between mt-6">
+        <Button variant="outline" onClick={onBack}>
+          Back
+        </Button>
+        <Button onClick={onNext}>
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

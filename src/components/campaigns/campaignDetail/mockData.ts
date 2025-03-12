@@ -1,4 +1,3 @@
-
 // Campaign data for demo
 export const campaignData = {
   id: 1,
@@ -13,6 +12,8 @@ export const campaignData = {
   meetingsBooked: 12,
   targetResponses: 50,
   targetMeetings: 15,
+  positive: 30,  // Added positive responses
+  negative: 12,  // Added negative responses
   performance: [
     { date: "Mar 15", responses: 0 },
     { date: "Mar 16", responses: 3 },

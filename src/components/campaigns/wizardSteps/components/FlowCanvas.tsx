@@ -49,7 +49,7 @@ const FlowCanvas: React.FC<FlowCanvasProps> = ({
         
         {/* Empty state message */}
         {nodes.length === 0 && (
-          <Panel position="center" className="text-center p-4 bg-white/80 rounded-md shadow-sm">
+          <Panel position="top-center" className="text-center p-4 bg-white/80 rounded-md shadow-sm">
             <div className="flex flex-col items-center justify-center gap-2">
               <p className="text-muted-foreground">
                 Your message flow is empty. Use the buttons above to add message steps.

@@ -61,7 +61,12 @@ export const useCampaignData = (id: string | undefined) => {
               channels: foundCampaign.channels || [],
               teamMembers: foundCampaign.teamMembers || [],
               createdAt: foundCampaign.createdAt || new Date().toISOString().slice(0, 10),
-              leads: foundCampaign.leads || 0,
+              // Use the actual lead data if it exists instead of just the count
+              leads: Array.isArray(foundCampaign.leads) 
+                ? foundCampaign.leads 
+                : Array.isArray(foundCampaign.leadsData) 
+                  ? foundCampaign.leadsData 
+                  : [],
               responses: foundCampaign.responses || 0,
               positive: foundCampaign.positive || 0,
               negative: foundCampaign.negative || 0,

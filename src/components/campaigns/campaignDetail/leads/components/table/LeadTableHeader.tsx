@@ -56,6 +56,15 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         <th className="py-3 px-6 text-left font-medium">Title</th>
       )}
       
+      {/* Always show these core fields */}
+      {displayColumn('currentStage') && (
+        <th className="py-3 px-6 text-left font-medium">Stage</th>
+      )}
+      
+      {displayColumn('assignedTo') && (
+        <th className="py-3 px-6 text-left font-medium">Assigned To</th>
+      )}
+      
       {/* Always show these core date fields */}
       {displayColumn('firstContacted') && (
         <th className="py-3 px-6 text-left font-medium">First Contacted</th>
@@ -67,15 +76,6 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
       
       {displayColumn('followUpDate') && (
         <th className="py-3 px-6 text-left font-medium">Next Follow Up</th>
-      )}
-      
-      {/* Always show these core management fields */}
-      {displayColumn('currentStage') && (
-        <th className="py-3 px-6 text-left font-medium">Stage</th>
-      )}
-      
-      {displayColumn('assignedTo') && (
-        <th className="py-3 px-6 text-left font-medium">Assigned To</th>
       )}
       
       {displayColumn('notes') && (

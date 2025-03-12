@@ -44,6 +44,25 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     }
   };
 
+  // Filter out fields that have no data across all leads
+  const getPopulatedFields = () => {
+    const fieldCounts: Record<string, number> = {};
+    
+    // Count how many leads have each field populated
+    leads.forEach(lead => {
+      Object.entries(lead).forEach(([key, value]) => {
+        if (value && value !== '' && value !== 'N/A' && key !== 'id') {
+          fieldCounts[key] = (fieldCounts[key] || 0) + 1;
+        }
+      });
+    });
+    
+    // Return fields that have data in at least one lead
+    return Object.keys(fieldCounts).filter(key => fieldCounts[key] > 0);
+  };
+
+  const populatedFields = getPopulatedFields();
+
   return (
     <div className="glass-card rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
@@ -55,6 +74,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
               allSelected={leads.length > 0 && selectedLeads.length === leads.length}
               leads={leads}
               selectedLeads={selectedLeads}
+              populatedFields={populatedFields}
             />
           </thead>
           <tbody className="divide-y divide-border bg-card">
@@ -69,6 +89,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
                   onLeadClick={onLeadClick}
                   onUpdateLead={handleUpdateLead}
                   onOpen={onLeadClick || (() => {})}
+                  populatedFields={populatedFields}
                 />
               ))
             ) : (

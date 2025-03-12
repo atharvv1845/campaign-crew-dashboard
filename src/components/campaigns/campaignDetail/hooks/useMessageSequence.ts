@@ -30,7 +30,14 @@ export const useMessageSequence = () => {
     handleUpdateStep,
     handleDeleteStep,
     handleMoveStep
-  } = useStepOperations(sequence, setSequence, setEditingStep, setEditingStepData);
+  } = useStepOperations(
+    sequence, 
+    setSequence, 
+    editingStep, // Pass editingStep as parameter
+    setEditingStep, 
+    editingStepData, // Pass editingStepData as parameter
+    setEditingStepData
+  );
 
   const {
     handleSaveWorkflow,

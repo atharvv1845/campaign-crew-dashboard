@@ -5,7 +5,9 @@ import { MessageStep } from './sequenceTypes';
 export const useStepOperations = (
   sequence: MessageStep[], 
   setSequence: React.Dispatch<React.SetStateAction<MessageStep[]>>,
+  editingStep: number | null, // Added editingStep as a parameter
   setEditingStep: React.Dispatch<React.SetStateAction<number | null>>,
+  editingStepData: MessageStep | null, // Added editingStepData as a parameter
   setEditingStepData: React.Dispatch<React.SetStateAction<MessageStep | null>>
 ) => {
   const { toast } = useToast();
@@ -37,10 +39,9 @@ export const useStepOperations = (
   };
   
   const handleUpdateStep = () => {
-    // Fix: Don't try to use setEditingStepData directly as a condition
+    // Now we can use editingStepData and editingStep directly since they're parameters
     if (!editingStepData) return;
     
-    // Fix: Use the proper way to update sequence based on editingStep and editingStepData
     setSequence(sequence.map(step => 
       step.id === editingStep ? editingStepData : step
     ));

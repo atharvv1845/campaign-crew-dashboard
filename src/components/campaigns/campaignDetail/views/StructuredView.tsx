@@ -1,7 +1,7 @@
 
 import React from 'react';
 import StructuredMessageWorkflow from '../StructuredMessageWorkflow';
-import { MessageStep } from '../hooks/useMessageSequence';
+import { MessageStep } from '../hooks/sequenceTypes';
 
 interface StructuredViewProps {
   steps: MessageStep[];

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { MessageStep } from '../../hooks/useMessageSequence';
+import { MessageStep } from '../../hooks/sequenceTypes';
 
 interface SaveWorkflowDialogProps {
   open: boolean;

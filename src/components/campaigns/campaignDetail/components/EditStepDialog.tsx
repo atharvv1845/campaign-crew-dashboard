@@ -9,7 +9,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageStep } from '../hooks/useMessageSequence';
+import { MessageStep } from '../hooks/sequenceTypes';
 import MessageStepForm from './forms/MessageStepForm';
 import DelayStepForm from './forms/DelayStepForm';
 

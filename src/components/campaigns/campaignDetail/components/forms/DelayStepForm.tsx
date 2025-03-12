@@ -1,7 +1,7 @@
 
 import React from 'react';
 import DelayForm from './DelayForm';
-import { MessageStep } from '../../hooks/useMessageSequence';
+import { MessageStep } from '../../hooks/sequenceTypes';
 
 interface DelayStepFormProps {
   data: MessageStep;

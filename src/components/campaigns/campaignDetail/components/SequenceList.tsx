@@ -1,7 +1,7 @@
 
 import React from 'react';
 import MessageStepCard from './MessageStepCard';
-import { MessageStep } from '../hooks/useMessageSequence';
+import { MessageStep } from '../hooks/sequenceTypes';
 
 interface SequenceListProps {
   sequence: MessageStep[];

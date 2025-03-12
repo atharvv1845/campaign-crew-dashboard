@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableChannels } from '../../../constants/channels';
-import { MessageStep } from '../../hooks/useMessageSequence';
+import { MessageStep } from '../../hooks/sequenceTypes';
 
 interface StepEditDialogProps {
   open: boolean;

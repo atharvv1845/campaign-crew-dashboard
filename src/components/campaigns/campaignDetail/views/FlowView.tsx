@@ -2,7 +2,7 @@
 import React from 'react';
 import SequenceList from '../components/SequenceList';
 import StepActionButtons from '../components/StepActionButtons';
-import { MessageStep } from '../hooks/useMessageSequence';
+import { MessageStep } from '../hooks/sequenceTypes';
 
 interface FlowViewProps {
   sequence: MessageStep[];

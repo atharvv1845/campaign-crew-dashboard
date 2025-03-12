@@ -5,7 +5,7 @@ import TeamAssignment from './TeamAssignment';
 import EmailForm from './EmailForm';
 import MessageForm from './MessageForm';
 import ConditionSelector from './ConditionSelector';
-import { MessageStep } from '../../hooks/useMessageSequence';
+import { MessageStep } from '../../hooks/sequenceTypes';
 
 interface MessageStepFormProps {
   data: MessageStep;

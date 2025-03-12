@@ -1,6 +1,14 @@
 
 import React from 'react';
-import ReactFlow, { Background, Controls, NodeTypes, Panel, ConnectionLineType, ConnectionMode } from 'reactflow';
+import ReactFlow, { 
+  Background, 
+  Controls, 
+  NodeTypes, 
+  Panel, 
+  ConnectionLineType, 
+  ConnectionMode,
+  MarkerType 
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 import MessageNode from '../flowNodes/MessageNode';
 import DelayNode from '../flowNodes/DelayNode';
@@ -85,7 +93,7 @@ const FlowCanvas: React.FC<FlowCanvasProps> = ({
           animated: true,
           style: { stroke: '#3b82f6', strokeWidth: 2 },
           markerEnd: {
-            type: 'arrowclosed',
+            type: MarkerType.ArrowClosed,
             color: '#3b82f6',
           },
         }}

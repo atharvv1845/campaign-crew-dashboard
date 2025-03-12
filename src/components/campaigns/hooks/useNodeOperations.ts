@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { Node, Edge } from 'reactflow';
+import { Node, Edge, Position, MarkerType } from 'reactflow';
 import { MessageStepData, DelayStepData, ConditionStepData } from '../types/campaignTypes';
 
 interface UseNodeOperationsProps {
@@ -42,8 +42,8 @@ export function useNodeOperations({
             label: data.label || `${type.charAt(0).toUpperCase() + type.slice(1)} ${newNodeId}`
           },
           // Add source and target handles to allow connecting from multiple points
-          sourcePosition: 'bottom',
-          targetPosition: 'top',
+          sourcePosition: Position.Bottom,
+          targetPosition: Position.Top,
         };
 
         console.log("Added new node:", newNode);
@@ -78,7 +78,7 @@ export function useNodeOperations({
             type: 'smoothstep',
             style: { stroke: '#3b82f6', strokeWidth: 2 },
             markerEnd: {
-              type: 'arrowclosed',
+              type: MarkerType.ArrowClosed,
               color: '#3b82f6',
             },
           };
@@ -167,7 +167,7 @@ export function useNodeOperations({
         type: 'smoothstep',
         style: { stroke: '#3b82f6', strokeWidth: 2 },
         markerEnd: {
-          type: 'arrowclosed',
+          type: MarkerType.ArrowClosed,
           color: '#3b82f6',
         },
       };

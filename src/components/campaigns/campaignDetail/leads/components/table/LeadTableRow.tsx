@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
@@ -83,7 +82,7 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
           />
         </td>
       )}
-      <td className="py-3 px-6">{lead.name}</td>
+      <td className="py-3 px-6">{lead.name || ''}</td>
       
       {displayColumn('socialProfiles') && (
         <td className="py-3 px-6">

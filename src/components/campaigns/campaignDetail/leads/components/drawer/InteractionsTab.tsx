@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Interaction } from '../../types/interactions';
+import { Interaction, InteractionType } from '../../types/interactions';
 import { getInteractionIcon } from '../../utils/interactionUtils';
 import { Lead } from '../../types';
 import { useInteractions } from '../../hooks/useInteractions';
@@ -10,7 +10,7 @@ import { useInteractions } from '../../hooks/useInteractions';
 interface InteractionsTabProps {
   lead: Lead;
   interactions?: Interaction[];
-  onLogInteraction?: (type: 'email' | 'call' | 'meeting' | 'message', description: string) => void;
+  onLogInteraction?: (type: InteractionType, description: string) => void;
 }
 
 const InteractionsTab: React.FC<InteractionsTabProps> = ({ 
@@ -25,7 +25,7 @@ const InteractionsTab: React.FC<InteractionsTabProps> = ({
   const onLogInteraction = propLogInteraction || hookLogInteraction;
   
   const [showLogForm, setShowLogForm] = useState(false);
-  const [interactionType, setInteractionType] = useState<'email' | 'call' | 'meeting' | 'message'>('call');
+  const [interactionType, setInteractionType] = useState<InteractionType>(InteractionType.Call);
   const [description, setDescription] = useState('');
 
   const handleSubmitInteraction = () => {
@@ -35,6 +35,14 @@ const InteractionsTab: React.FC<InteractionsTabProps> = ({
       setShowLogForm(false);
     }
   };
+
+  // Transform interaction data for display
+  const transformedInteractions = interactions?.map(interaction => ({
+    ...interaction,
+    date: new Date(interaction.timestamp).toLocaleString(),
+    description: interaction.content,
+    user: interaction.user || 'You'
+  }));
 
   return (
     <div className="mt-4 space-y-4">
@@ -56,12 +64,12 @@ const InteractionsTab: React.FC<InteractionsTabProps> = ({
             <select 
               className="text-sm p-2 bg-background border rounded-md flex-1"
               value={interactionType}
-              onChange={(e) => setInteractionType(e.target.value as any)}
+              onChange={(e) => setInteractionType(e.target.value as InteractionType)}
             >
-              <option value="call">Call</option>
-              <option value="email">Email</option>
-              <option value="meeting">Meeting</option>
-              <option value="message">Message</option>
+              <option value={InteractionType.Call}>Call</option>
+              <option value={InteractionType.Email}>Email</option>
+              <option value={InteractionType.Meeting}>Meeting</option>
+              <option value={InteractionType.Message}>Message</option>
             </select>
           </div>
           <textarea 
@@ -90,8 +98,8 @@ const InteractionsTab: React.FC<InteractionsTabProps> = ({
       )}
       
       <div className="space-y-3">
-        {interactions && interactions.length > 0 ? (
-          interactions.map(interaction => (
+        {transformedInteractions && transformedInteractions.length > 0 ? (
+          transformedInteractions.map(interaction => (
             <div key={interaction.id} className="flex items-start gap-3 p-3 bg-muted/10 rounded-md">
               <div className="mt-0.5">
                 {getInteractionIcon(interaction.type)}
@@ -99,7 +107,7 @@ const InteractionsTab: React.FC<InteractionsTabProps> = ({
               <div className="flex-1">
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">
-                    {interaction.type.charAt(0).toUpperCase() + interaction.type.slice(1)}
+                    {String(interaction.type).charAt(0).toUpperCase() + String(interaction.type).slice(1)}
                   </span>
                   <span className="text-xs text-muted-foreground">{interaction.date}</span>
                 </div>

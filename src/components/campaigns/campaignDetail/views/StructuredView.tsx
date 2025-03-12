@@ -6,11 +6,15 @@ import { MessageStep } from '../hooks/sequenceTypes';
 interface StructuredViewProps {
   steps: MessageStep[];
   onUpdateSteps: (steps: MessageStep[]) => void;
+  campaign?: any;
+  updateCampaign?: (data: any) => void;
 }
 
 const StructuredView: React.FC<StructuredViewProps> = ({
   steps,
-  onUpdateSteps
+  onUpdateSteps,
+  campaign,
+  updateCampaign
 }) => {
   const handleUpdateSteps = (newSteps: MessageStep[]) => {
     console.log("StructuredView updating steps:", newSteps.length);

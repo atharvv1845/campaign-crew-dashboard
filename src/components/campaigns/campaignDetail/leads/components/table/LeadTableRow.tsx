@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Mail, Phone, MessageSquare } from 'lucide-react';
 import StageBadge from '../../../badges/StageBadge';
-import { Lead } from '../../types';
+import { Lead, Campaign } from '../../types';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +16,22 @@ import {
 interface LeadTableRowProps {
   lead: Lead;
   onOpen: (lead: Lead) => void;
+  campaign?: Campaign;
+  onSelectLead?: (leadId: number, selected: boolean) => void;
+  isSelected?: boolean;
+  onLeadClick?: (lead: Lead) => void;
+  onUpdateLead?: (lead: Lead) => void;
 }
 
-const LeadTableRow: React.FC<LeadTableRowProps> = ({ lead, onOpen }) => {
+const LeadTableRow: React.FC<LeadTableRowProps> = ({ 
+  lead, 
+  onOpen,
+  campaign,
+  onSelectLead,
+  isSelected,
+  onLeadClick,
+  onUpdateLead
+}) => {
   return (
     <tr>
       <td className="py-2 px-4">{lead.name}</td>

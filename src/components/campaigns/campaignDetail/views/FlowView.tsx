@@ -11,6 +11,8 @@ interface FlowViewProps {
   onDelete: (id: number) => void;
   onMove: (id: number, direction: 'up' | 'down') => void;
   onAddStep: (type: string) => void;
+  campaign?: any;
+  updateCampaign?: (data: any) => void;
 }
 
 const FlowView: React.FC<FlowViewProps> = ({
@@ -18,7 +20,9 @@ const FlowView: React.FC<FlowViewProps> = ({
   onEdit,
   onDelete,
   onMove,
-  onAddStep
+  onAddStep,
+  campaign,
+  updateCampaign
 }) => {
   const handleDelete = (id: number) => {
     if (sequence.length <= 1) {

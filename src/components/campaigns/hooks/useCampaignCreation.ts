@@ -26,7 +26,7 @@ const defaultFormData: CampaignFormData = {
   teamAssignments: {}
 };
 
-const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
+const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, existingCampaign?: any) => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<CampaignFormData>(defaultFormData);
@@ -155,8 +155,11 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
         });
       }
 
-      // Close the form with animation
-      handleClose();
+      // Close the form with animation and pass the campaign data
+      setExitAnimation(true);
+      setTimeout(() => {
+        onClose(formData);
+      }, 300);
     } catch (error) {
       console.error("Error saving campaign:", error);
       toast({
@@ -165,7 +168,7 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
         variant: "destructive"
       });
     }
-  }, [formData, existingCampaign, toast, handleClose]);
+  }, [formData, existingCampaign, toast, onClose]);
 
   return {
     currentStep,

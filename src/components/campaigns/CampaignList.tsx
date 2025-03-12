@@ -4,8 +4,10 @@ import { PlusCircle } from 'lucide-react';
 import CampaignTable from './CampaignTable';
 import CampaignFilters from './CampaignFilters';
 import CreateCampaign from './CreateCampaign';
+import CampaignCreatedSummary from './CampaignCreatedSummary';
 import { campaignData } from './campaignData';
 import { useToast } from '@/hooks/use-toast';
+import { CampaignFormData, LeadData } from './types/campaignTypes';
 
 const CampaignList: React.FC = () => {
   const { toast } = useToast();
@@ -14,6 +16,7 @@ const CampaignList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [campaigns, setCampaigns] = useState([...campaignData]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [createdCampaign, setCreatedCampaign] = useState<CampaignFormData | null>(null);
   
   // Update campaigns when campaignData changes or when modal closes
   useEffect(() => {
@@ -36,11 +39,13 @@ const CampaignList: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
   
-  const handleCampaignCreated = () => {
+  const handleCampaignCreated = (campaign: CampaignFormData) => {
     // Force refresh of campaign data
     setRefreshTrigger(prev => prev + 1);
     // Close the campaign creation modal
     setShowCreateCampaign(false);
+    // Set the created campaign to show the summary
+    setCreatedCampaign(campaign);
     
     toast({
       title: "Success",
@@ -50,6 +55,23 @@ const CampaignList: React.FC = () => {
   
   const refreshList = () => {
     setRefreshTrigger(prev => prev + 1);
+  };
+  
+  const handleLeadUpdate = (leadId: string, updates: Partial<LeadData>) => {
+    if (!createdCampaign) return;
+    
+    // Update the lead in the created campaign
+    const updatedLeads = createdCampaign.leads.map(lead => 
+      lead.id === leadId ? { ...lead, ...updates } : lead
+    );
+    
+    setCreatedCampaign({
+      ...createdCampaign,
+      leads: updatedLeads
+    });
+    
+    // In a real app, this would also update the lead in the database
+    console.log(`Updated lead ${leadId} with`, updates);
   };
   
   return (
@@ -83,7 +105,15 @@ const CampaignList: React.FC = () => {
       
       {showCreateCampaign && (
         <CreateCampaign 
-          onClose={handleCampaignCreated} 
+          onClose={(campaign) => handleCampaignCreated(campaign)} 
+        />
+      )}
+      
+      {createdCampaign && (
+        <CampaignCreatedSummary
+          campaign={createdCampaign}
+          onClose={() => setCreatedCampaign(null)}
+          onLeadUpdate={handleLeadUpdate}
         />
       )}
     </div>

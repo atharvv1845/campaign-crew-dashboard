@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,7 +18,7 @@ export { type CampaignFormData, type LeadData } from './types/campaignTypes';
 export { availableChannels } from './constants/channels';
 
 interface CreateCampaignProps {
-  onClose: () => void;
+  onClose: (campaign?: CampaignFormData) => void;
   existingCampaign?: any; // For edit mode
 }
 

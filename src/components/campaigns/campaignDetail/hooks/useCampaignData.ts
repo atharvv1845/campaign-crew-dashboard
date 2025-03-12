@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { campaignData } from '../../campaignData';
@@ -63,7 +64,9 @@ export const useCampaignData = (id: string | undefined) => {
               // Use the actual lead data if it exists instead of just the count
               leads: Array.isArray(foundCampaign.leads) 
                 ? foundCampaign.leads 
-                : [],
+                : Array.isArray(foundCampaign.leadsData) 
+                  ? foundCampaign.leadsData 
+                  : [],
               responses: foundCampaign.responses || 0,
               positive: foundCampaign.positive || 0,
               negative: foundCampaign.negative || 0,

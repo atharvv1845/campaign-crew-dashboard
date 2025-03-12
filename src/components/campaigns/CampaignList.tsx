@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +6,7 @@ import CampaignTable from './CampaignTable';
 import CampaignFilters from './CampaignFilters';
 import CreateCampaign from './CreateCampaign';
 import CampaignCreatedSummary from './CampaignCreatedSummary';
-import { campaignData, CampaignData } from './campaignData';
+import { campaignData } from './campaignData';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData, LeadData } from './types/campaignTypes';
 
@@ -15,13 +16,32 @@ const CampaignList: React.FC = () => {
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [campaigns, setCampaigns] = useState<CampaignData[]>([...campaignData]);
+  const [campaigns, setCampaigns] = useState([...campaignData]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [createdCampaign, setCreatedCampaign] = useState<CampaignFormData | null>(null);
   
   const refreshList = () => {
     console.log("Manually refreshing campaign list");
-    setCampaigns([...campaignData]);
+    const sanitizedCampaigns = campaignData.map(campaign => ({
+      id: campaign.id,
+      name: campaign.name || 'Untitled Campaign',
+      description: campaign.description || '',
+      status: campaign.status || 'Draft',
+      type: campaign.type || 'Email',
+      channels: campaign.channels || [],
+      leads: campaign.leads || 0,
+      responses: campaign.responses || 0,
+      positive: campaign.positive || 0,
+      negative: campaign.negative || 0,
+      conversion: campaign.conversion || '0%',
+      teamMembers: campaign.teamMembers || [],
+      createdAt: campaign.createdAt || new Date().toISOString().slice(0, 10),
+      contacted: campaign.contacted || 0,
+      stages: campaign.stages || [],
+      messageFlow: campaign.messageFlow || { nodes: [], edges: [] }
+    }));
+    
+    setCampaigns(sanitizedCampaigns);
     setRefreshTrigger(prev => prev + 1);
   };
 

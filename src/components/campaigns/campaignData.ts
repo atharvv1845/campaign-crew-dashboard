@@ -1,11 +1,13 @@
 
+import { Lead } from './campaignDetail/leads/types';
+
 export interface CampaignData {
-  id: number;
+  id: number | string;
   name: string;
   status: string;
   type: string;
   channels: string[];
-  leads: number;
+  leads: Lead[] | number;
   responses: number;
   positive: number;
   negative: number;
@@ -23,7 +25,7 @@ export interface CampaignData {
     name: string;
     count: number;
   }>;
-  leadsData?: any[];
+  leadsData?: Lead[];
 }
 
 // Empty initial data array - will be populated by actual data

@@ -1,6 +1,6 @@
 
 export interface Lead {
-  id: number;
+  id: number | string;
   name: string;
   email?: string;
   phone?: string;
@@ -9,17 +9,32 @@ export interface Lead {
   status: string;
   lastContact?: string;
   notes?: string;
-  campaignId: number;
+  campaignId: number | string;
+  // Social profiles
+  linkedin?: string;
+  twitter?: string;
+  facebook?: string;
+  instagram?: string;
+  whatsapp?: string;
+  // Additional fields
+  title?: string;
+  socialProfiles?: {
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    whatsapp?: string;
+  };
 }
 
 export interface CampaignStage {
-  id: number;
+  id: number | string;
   name: string;
   count: number;
 }
 
 export interface Campaign {
-  id: number;
+  id: number | string;
   name: string;
   status: string;
   leads: Lead[];
@@ -29,4 +44,6 @@ export interface Campaign {
   conversion: string;
   teamMembers: string[];
   stages: CampaignStage[];
+  description?: string;
+  leadsData?: Lead[];
 }

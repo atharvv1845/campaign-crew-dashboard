@@ -3,7 +3,7 @@ import React from 'react';
 import { Phone, Mail, MessageSquare, Linkedin, Twitter, MessageCircle, Instagram, Facebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface LeadContactMethodsProps {
+export interface LeadContactMethodsProps {
   methods: string[];
   onMethodsChange?: (methods: string[]) => void;
   readOnly?: boolean;

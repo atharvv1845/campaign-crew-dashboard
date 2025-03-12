@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
 import { campaignData } from '../campaignData';
+import { Lead } from '../campaignDetail/leads/types';
 
 // Default empty form data
 const defaultFormData: CampaignFormData = {
@@ -40,7 +41,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         name: existingCampaign.name || '',
         description: existingCampaign.description || '',
         channels: existingCampaign.channels?.map((c: string) => c.toLowerCase()) || [],
-        leads: [], // We would need to fetch leads data
+        leads: Array.isArray(existingCampaign.leadsData) ? existingCampaign.leadsData : [],
         flows: [], // We would need to fetch message flow data
         stages: existingCampaign.stages || defaultFormData.stages, 
         team: existingCampaign.teamMembers || [],
@@ -93,7 +94,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
       // Generate new campaign ID
       const campaignId = existingCampaign 
         ? existingCampaign.id 
-        : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
+        : Math.max(...campaignData.map(c => Number(c.id) || 0), 0) + 1;
       
       console.log("Creating campaign with ID:", campaignId);
       
@@ -106,6 +107,12 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         count: 0 // Initialize count to zero
       }));
       
+      // Prepare leads data - ensure each lead has the proper campaignId
+      const leadsWithCampaignId: Lead[] = formData.leads.map(lead => ({
+        ...lead,
+        campaignId: campaignId
+      }));
+      
       // Create a new, properly formatted campaign object
       const newCampaign = {
         id: campaignId,
@@ -114,7 +121,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         status: 'Active',
         type: 'Email',
         channels: formData.channels,
-        leads: formData.leads.length,
+        leads: leadsWithCampaignId, // Store the actual lead objects
         responses: 0,
         positive: 0,
         negative: 0,
@@ -123,7 +130,8 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         createdAt: new Date().toISOString().slice(0, 10),
         contacted: 0,
         messageFlow: formData.messageFlow || { nodes: [], edges: [] },
-        stages: normalizedStages
+        stages: normalizedStages,
+        leadsData: leadsWithCampaignId // Duplicate leads in leadsData for backward compatibility
       };
 
       if (existingCampaign) {
@@ -159,13 +167,10 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
     currentStep,
     formData,
     setFormData,
-    nextStep: () => setCurrentStep(prev => prev < 6 ? prev + 1 : prev),
-    prevStep: () => setCurrentStep(prev => prev > 1 ? prev - 1 : prev),
+    nextStep,
+    prevStep,
     handleSubmit,
-    handleClose: () => {
-      setExitAnimation(true);
-      setTimeout(() => onClose(), 300);
-    },
+    handleClose,
     exitAnimation
   };
 };

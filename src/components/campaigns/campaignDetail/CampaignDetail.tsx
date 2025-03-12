@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { campaignData } from '../campaignData';
 import LeadTable from './leads/LeadTable';
 import StatusBadge from './components/StatusBadge';
+import { Lead } from './leads/types';
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,31 +20,41 @@ const CampaignDetail: React.FC = () => {
   useEffect(() => {
     if (!id) return;
 
-    // Simulate API call to fetch campaign data
-    setTimeout(() => {
-      const foundCampaign = campaignData.find(c => c.id === parseInt(id));
-      
-      if (foundCampaign) {
-        // Create dummy leads if they don't exist as objects already
-        if (typeof foundCampaign.leads === 'number') {
-          const dummyLeads = Array.from({ length: foundCampaign.leads }, (_, i) => ({
-            id: i + 1,
-            name: `Lead ${i + 1}`,
-            email: `lead${i + 1}@example.com`,
-            company: `Company ${i + 1}`,
-            status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
-            lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            campaignId: parseInt(id)
-          }));
-          
-          foundCampaign.leadsData = dummyLeads;
-        }
+    // Find the campaign by ID
+    const foundCampaign = campaignData.find(c => String(c.id) === id);
+    
+    if (foundCampaign) {
+      // Use the leads directly if they exist as an array
+      if (Array.isArray(foundCampaign.leads)) {
+        foundCampaign.leadsData = foundCampaign.leads;
+      } 
+      // If leadsData already exists, use that
+      else if (Array.isArray(foundCampaign.leadsData)) {
+        // leadsData already exists, do nothing
+      }
+      // If there's just a number, create placeholder leads
+      else if (typeof foundCampaign.leads === 'number') {
+        // Create minimal placeholder leads
+        const dummyLeads: Lead[] = Array.from({ length: foundCampaign.leads }, (_, i) => ({
+          id: i + 1,
+          name: `Lead ${i + 1}`,
+          email: `lead${i + 1}@example.com`,
+          company: `Company ${i + 1}`,
+          status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
+          lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          campaignId: parseInt(id)
+        }));
         
-        setCampaign(foundCampaign);
+        foundCampaign.leadsData = dummyLeads;
+      } else {
+        // If no leads data at all, initialize an empty array
+        foundCampaign.leadsData = [];
       }
       
-      setLoading(false);
-    }, 500);
+      setCampaign(foundCampaign);
+    }
+    
+    setLoading(false);
   }, [id]);
 
   if (loading) {
@@ -73,9 +84,9 @@ const CampaignDetail: React.FC = () => {
     navigate('/campaigns');
   };
 
-  const handleUpdateLeadStatus = (leadId: number, newStatus: string) => {
+  const handleUpdateLeadStatus = (leadId: number | string, newStatus: string) => {
     // Update in local state first (optimistic update)
-    const updatedLeadsData = campaign.leadsData.map((lead: any) => 
+    const updatedLeadsData = campaign.leadsData.map((lead: Lead) => 
       lead.id === leadId ? { ...lead, status: newStatus } : lead
     );
     
@@ -89,8 +100,6 @@ const CampaignDetail: React.FC = () => {
       title: "Lead status updated",
       description: `Lead status has been changed to ${newStatus}`,
     });
-    
-    // In a real app, you would make an API call here to update the backend
   };
 
   return (
@@ -124,7 +133,7 @@ const CampaignDetail: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {typeof campaign.leads === 'number' ? campaign.leads : campaign.leads.length}
+              {Array.isArray(campaign.leadsData) ? campaign.leadsData.length : 0}
             </div>
           </CardContent>
         </Card>

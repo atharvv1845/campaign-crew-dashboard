@@ -17,6 +17,11 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
     navigate(`/campaigns/${campaign.id}`);
   };
 
+  // Calculate the number of leads
+  const leadCount = Array.isArray(campaign.leads) 
+    ? campaign.leads.length 
+    : (campaign.leadsData ? campaign.leadsData.length : campaign.leads || 0);
+
   return (
     <tr 
       className="border-b border-border hover:bg-muted/40 cursor-pointer transition-colors"
@@ -35,7 +40,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
           ))}
         </div>
       </td>
-      <td className="p-4">{campaign.leads || 0}</td>
+      <td className="p-4">{leadCount}</td>
       <td className="p-4">{campaign.responses || 0}</td>
       <td className="p-4">
         <div className="flex items-center gap-1">

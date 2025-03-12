@@ -29,7 +29,7 @@ import { Lead } from './types';
 
 interface LeadTableProps {
   leads: Lead[];
-  onStatusChange: (leadId: number, status: string) => void;
+  onStatusChange: (leadId: number | string, status: string) => void;
 }
 
 const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
@@ -48,7 +48,7 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
   const currentLeads = filteredLeads.slice(indexOfFirstLead, indexOfLastLead);
   const totalPages = Math.ceil(filteredLeads.length / leadsPerPage);
   
-  const handleStatusChange = (leadId: number, status: string) => {
+  const handleStatusChange = (leadId: number | string, status: string) => {
     onStatusChange(leadId, status);
   };
   

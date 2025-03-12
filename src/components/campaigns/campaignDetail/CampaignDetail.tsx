@@ -18,8 +18,11 @@ const CampaignDetail: React.FC = () => {
 
   // Force a refresh when loading a new campaign
   useEffect(() => {
-    refreshCampaign();
-  }, [id]);
+    if (id) {
+      console.log('Campaign ID changed, refreshing data for ID:', id);
+      refreshCampaign();
+    }
+  }, [id, refreshCampaign]);
 
   // Handle edit campaign modal
   const handleEditCampaignClick = () => {
@@ -58,6 +61,8 @@ const CampaignDetail: React.FC = () => {
     contacted: campaign.contacted || 0,
     stages: campaign.stages || []
   };
+
+  console.log('Rendering campaign detail for:', safeCampaign.id, safeCampaign.name);
 
   return (
     <div className="space-y-6">

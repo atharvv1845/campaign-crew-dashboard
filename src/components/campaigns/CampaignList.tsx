@@ -55,6 +55,7 @@ const CampaignList: React.FC = () => {
   const handleCampaignCreated = (campaign: CampaignFormData) => {
     // Find the new campaign in the campaignData array
     const newCampaignId = campaignData[campaignData.length - 1].id;
+    console.log("New campaign created with ID:", newCampaignId);
     
     // Force refresh of campaign data
     setRefreshTrigger(prev => prev + 1);
@@ -72,6 +73,7 @@ const CampaignList: React.FC = () => {
     
     // Navigate to the new campaign after a short delay
     setTimeout(() => {
+      console.log("Navigating to newly created campaign:", newCampaignId);
       navigate(`/campaigns/${newCampaignId}`);
     }, 1000);
   };

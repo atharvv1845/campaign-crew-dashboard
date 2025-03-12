@@ -38,7 +38,23 @@ export const useCampaignData = (id: string | undefined) => {
           
           if (foundCampaign) {
             console.log('Displaying campaign:', foundCampaign);
-            setCampaign(foundCampaign);
+            
+            // Ensure all required fields are present to prevent errors
+            const sanitizedCampaign = {
+              ...foundCampaign,
+              channels: foundCampaign.channels || [],
+              teamMembers: foundCampaign.teamMembers || [],
+              createdAt: foundCampaign.createdAt || new Date().toISOString().slice(0, 10),
+              leads: foundCampaign.leads || 0,
+              responses: foundCampaign.responses || 0,
+              positive: foundCampaign.positive || 0,
+              negative: foundCampaign.negative || 0,
+              conversion: foundCampaign.conversion || '0%',
+              stages: foundCampaign.stages || [],
+              messageFlow: foundCampaign.messageFlow || { nodes: [], edges: [] }
+            };
+            
+            setCampaign(sanitizedCampaign);
           } else {
             console.log('No campaigns available');
             toast({

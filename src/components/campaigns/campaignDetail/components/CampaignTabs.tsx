@@ -5,12 +5,18 @@ import { Separator } from '@/components/ui/separator';
 import StatCards from '../StatCards';
 import LeadTracking from '../LeadTracking';
 import MessageSequence from '../MessageSequence';
-import { OutreachSummary } from '../outreachSummary';
 import ChannelsAndStages from '../ChannelsAndStages';
 import CampaignReports from '../CampaignReports';
 import CampaignExportImport from './CampaignExportImport';
 import CampaignDescription from '../CampaignDescription';
 import { Lead } from '../leads/types';
+import {
+  LeadsContactedCard,
+  ResponseBreakdownCard,
+  CampaignStatusCard,
+  TeamPerformanceCard,
+  outreachMockData
+} from '../outreachSummary';
 
 interface CampaignTabsProps {
   campaign: any;
@@ -92,7 +98,32 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
           <ChannelsAndStages campaign={campaign} />
         </div>
         <Separator />
-        <OutreachSummary campaign={campaign} />
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Outreach Summary</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <LeadsContactedCard 
+              today={outreachMockData.today} 
+              thisWeek={outreachMockData.thisWeek} 
+              thisMonth={outreachMockData.thisMonth} 
+            />
+            
+            <ResponseBreakdownCard 
+              positiveResponses={outreachMockData.positiveResponses}
+              negativeResponses={outreachMockData.negativeResponses}
+              notReplied={outreachMockData.notReplied}
+              responseRate={outreachMockData.responseRate}
+            />
+            
+            <CampaignStatusCard 
+              campaign={campaign}
+            />
+          </div>
+          
+          <TeamPerformanceCard 
+            teamPerformance={outreachMockData.teamPerformance}
+          />
+        </div>
       </TabsContent>
 
       <TabsContent value="leads" className="space-y-6">

@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import ReactFlow, { Background, Controls, NodeTypes } from 'reactflow';
+import ReactFlow, { Background, Controls, NodeTypes, Panel } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -11,6 +11,7 @@ import FlowNodeEditor from './FlowNodeEditor';
 import { useFlowState } from '../hooks/useFlowState';
 import { useNodeOperations } from '../hooks/useNodeOperations';
 import FlowControlsToolbar from './FlowControlsToolbar';
+import { toast } from '@/hooks/use-toast';
 
 interface MessageFlowProps {
   formData: CampaignFormData;
@@ -103,11 +104,14 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
         assignedTo: '',
         templateId: '',
         subject: '',
+        channel: 'email',
+        label: `New Message`,
       });
     } else if (type === 'delay') {
       setNodeData({
         days: 1,
         hours: 0,
+        label: 'Wait Period',
       });
     } else {
       setNodeData({
@@ -115,6 +119,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
         action: '',
         targetStage: '',
         waitDays: 0,
+        label: 'Condition',
       });
     }
     
@@ -122,6 +127,15 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
   };
 
   const handleSaveNode = () => {
+    if (!nodeData.message && nodeType === 'message') {
+      toast({
+        title: "Validation Error",
+        description: "Message content is required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (selectedNode) {
       updateNode(selectedNode, nodeType, nodeData);
     } else {
@@ -138,6 +152,13 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
   };
 
   const saveFlowToFormData = () => {
+    if (nodes.length === 0) {
+      toast({
+        title: "Warning",
+        description: "Your message flow is empty. Consider adding at least one message step.",
+      });
+    }
+    
     setFormData({
       ...formData,
       messageFlow: {
@@ -170,6 +191,11 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
         >
           <Background />
           <Controls />
+          <Panel position="top-right">
+            <div className="bg-white dark:bg-slate-800 p-2 rounded shadow-md text-xs">
+              {nodes.length} nodes | {edges.length} connections
+            </div>
+          </Panel>
         </ReactFlow>
       </div>
 

@@ -86,12 +86,12 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
     }
 
     // Create new campaign or update existing
-    const campaignId = existingCampaign ? existingCampaign.id : campaignData.length + 1;
+    const campaignId = existingCampaign ? existingCampaign.id : Math.max(...campaignData.map(c => c.id), 0) + 1;
     const newCampaign = {
       id: campaignId,
       name: formData.name,
       description: formData.description,
-      status: formData.leads.length > 0 ? 'Active' : 'Draft',
+      status: 'Active', // Always set to Active for better visibility
       type: 'Email', // Default type
       channels: formData.channels.map(channel => {
         // Convert channel id to display name (first letter uppercase)
@@ -121,9 +121,10 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
     } else {
       // Add new campaign to the list
       campaignData.push(newCampaign);
+      console.log("Added new campaign:", newCampaign);
       toast({
         title: "Campaign Created",
-        description: `${formData.name} has been ${formData.leads.length > 0 ? 'launched' : 'saved as draft'}.`
+        description: `${formData.name} has been created successfully.`
       });
     }
 

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import CampaignTable from './CampaignTable';
 import CampaignFilters from './CampaignFilters';
@@ -10,9 +10,15 @@ const CampaignList: React.FC = () => {
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [campaigns, setCampaigns] = useState(campaignData);
+  
+  // Update campaigns when campaignData changes
+  useEffect(() => {
+    setCampaigns([...campaignData]);
+  }, [showCreateCampaign]);
   
   // Filter campaigns based on search term and status
-  const filteredCampaigns = campaignData.filter(campaign => {
+  const filteredCampaigns = campaigns.filter(campaign => {
     // Apply search filter
     const matchesSearch = 
       campaign.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -23,6 +29,12 @@ const CampaignList: React.FC = () => {
     // Return true if both conditions are met
     return matchesSearch && matchesStatus;
   });
+  
+  const handleCampaignCreated = () => {
+    // Force refresh of campaign data
+    setCampaigns([...campaignData]);
+    setShowCreateCampaign(false);
+  };
   
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -51,7 +63,9 @@ const CampaignList: React.FC = () => {
       </div>
       
       {showCreateCampaign && (
-        <CreateCampaign onClose={() => setShowCreateCampaign(false)} />
+        <CreateCampaign 
+          onClose={handleCampaignCreated} 
+        />
       )}
     </div>
   );

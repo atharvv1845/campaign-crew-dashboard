@@ -17,6 +17,14 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
     <>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
+          <Label>Label</Label>
+          <Input
+            value={data.label || ''}
+            onChange={(e) => onChange({ ...data, label: e.target.value })}
+            placeholder="Message name or label"
+          />
+        </div>
+        <div className="space-y-2">
           <Label>Channel</Label>
           <Select 
             value={data.channel || "email"}
@@ -34,10 +42,13 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
             </SelectContent>
           </Select>
         </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Assigned To</Label>
           <Select 
-            value={data.assignedTo} 
+            value={data.assignedTo || ''} 
             onValueChange={(value) => onChange({ ...data, assignedTo: value })}
           >
             <SelectTrigger>
@@ -47,6 +58,22 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
               <SelectItem value="john">John Smith</SelectItem>
               <SelectItem value="sarah">Sarah Lee</SelectItem>
               <SelectItem value="mike">Mike Johnson</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Template</Label>
+          <Select 
+            value={data.templateId || ''} 
+            onValueChange={(value) => onChange({ ...data, templateId: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select template" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="template1">Product Introduction</SelectItem>
+              <SelectItem value="template2">Follow Up</SelectItem>
+              <SelectItem value="template3">Meeting Request</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -62,12 +89,13 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
       </div>
 
       <div className="space-y-2">
-        <Label>Message</Label>
+        <Label>Message <span className="text-red-500">*</span></Label>
         <Textarea
-          value={data.message}
+          value={data.message || ''}
           onChange={(e) => onChange({ ...data, message: e.target.value })}
           placeholder="Enter your message..."
           rows={6}
+          required
         />
         <div className="text-xs text-muted-foreground">
           Use {"{{firstName}}"}, {"{{company}}"}, etc. for personalization.

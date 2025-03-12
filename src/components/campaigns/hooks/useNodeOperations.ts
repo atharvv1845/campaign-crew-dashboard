@@ -32,8 +32,8 @@ export function useNodeOperations({
             type: 'messageNode',
             position: { x: 250, y: nodes.length * 150 + 100 },
             data: {
-              label: `Message ${id}`,
-              channel: 'email',
+              label: messageData.label || `Message ${id}`,
+              channel: messageData.channel || 'email',
               message: messageData.message,
               assignedTo: messageData.assignedTo,
               templateId: messageData.templateId,
@@ -47,7 +47,7 @@ export function useNodeOperations({
             type: 'delayNode',
             position: { x: 250, y: nodes.length * 150 + 100 },
             data: {
-              label: `Delay ${id}`,
+              label: delayData.label || `Delay ${id}`,
               days: delayData.days,
               hours: delayData.hours,
             },
@@ -59,7 +59,7 @@ export function useNodeOperations({
             type: 'conditionNode',
             position: { x: 250, y: nodes.length * 150 + 100 },
             data: {
-              label: `Condition ${id}`,
+              label: conditionData.label || `Condition ${id}`,
               condition: conditionData.condition,
               action: conditionData.action,
               targetStage: conditionData.targetStage,
@@ -70,6 +70,7 @@ export function useNodeOperations({
 
         setNodes([...nodes, newNode]);
 
+        // If there are existing nodes, create an edge from the last node to the new node
         if (nodes.length > 0) {
           const lastNodeId = nodes[nodes.length - 1].id;
           const newEdge: Edge = {
@@ -80,6 +81,9 @@ export function useNodeOperations({
           };
           setEdges([...edges, newEdge]);
         }
+        
+        console.log("Added new node:", newNode);
+        console.log("Current nodes:", [...nodes, newNode]);
       }
     };
   }, [nodes, edges, setNodes, setEdges]);
@@ -94,7 +98,9 @@ export function useNodeOperations({
               ...node,
               data: {
                 ...node.data,
+                label: messageData.label || node.data.label,
                 message: messageData.message,
+                channel: messageData.channel || node.data.channel,
                 assignedTo: messageData.assignedTo,
                 templateId: messageData.templateId,
                 subject: messageData.subject,
@@ -106,6 +112,7 @@ export function useNodeOperations({
               ...node,
               data: {
                 ...node.data,
+                label: delayData.label || node.data.label,
                 days: delayData.days,
                 hours: delayData.hours,
               },
@@ -116,6 +123,7 @@ export function useNodeOperations({
               ...node,
               data: {
                 ...node.data,
+                label: conditionData.label || node.data.label,
                 condition: conditionData.condition,
                 action: conditionData.action,
                 targetStage: conditionData.targetStage,
@@ -127,15 +135,46 @@ export function useNodeOperations({
         return node;
       })
     );
+    
+    console.log("Updated node:", nodeId);
   }, [setNodes]);
 
   const deleteNode = useCallback((nodeId: string) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    
+    // Remove any edges connected to this node
     setEdges((eds) =>
       eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
     );
+    
+    // Create new edges to connect the nodes before and after the deleted node
+    const sourceEdges = edges.filter(edge => edge.target === nodeId);
+    const targetEdges = edges.filter(edge => edge.source === nodeId);
+    
+    if (sourceEdges.length > 0 && targetEdges.length > 0) {
+      const sourceNode = sourceEdges[0].source;
+      const targetNode = targetEdges[0].target;
+      
+      const newEdge: Edge = {
+        id: `e${sourceNode}-${targetNode}`,
+        source: sourceNode,
+        target: targetNode,
+        animated: true,
+      };
+      
+      // Add this new edge only if it doesn't already exist
+      setEdges(eds => {
+        const edgeExists = eds.some(e => e.source === sourceNode && e.target === targetNode);
+        if (!edgeExists) {
+          return [...eds.filter(e => e.source !== nodeId && e.target !== nodeId), newEdge];
+        }
+        return eds.filter(e => e.source !== nodeId && e.target !== nodeId);
+      });
+    }
+    
     setShowNodeModal(false);
-  }, [setNodes, setEdges, setShowNodeModal]);
+    console.log("Deleted node:", nodeId);
+  }, [edges, setEdges, setNodes, setShowNodeModal]);
 
   return {
     addNode: (type: 'message' | 'delay' | 'condition') => {

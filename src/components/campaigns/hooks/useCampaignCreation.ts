@@ -12,7 +12,11 @@ const defaultFormData: CampaignFormData = {
   leads: [],
   flows: [],
   stages: [],
-  team: []
+  team: [],
+  messageFlow: {
+    nodes: [],
+    edges: []
+  }
 };
 
 const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
@@ -32,7 +36,11 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
         leads: [], // We would need to fetch leads data
         flows: [], // We would need to fetch message flow data
         stages: [], // We would need to fetch stages data
-        team: existingCampaign.teamMembers || []
+        team: existingCampaign.teamMembers || [],
+        messageFlow: {
+          nodes: [],
+          edges: []
+        }
       };
       
       setFormData(transformedData);
@@ -52,6 +60,15 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
       setCurrentStep(prevStep => prevStep - 1);
     }
   }, [currentStep]);
+
+  // Handle closing the form
+  const handleClose = useCallback(() => {
+    setExitAnimation(true);
+    // Wait for animation to complete before closing
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [onClose]);
 
   // Handle form submission
   const handleSubmit = useCallback(() => {
@@ -109,16 +126,7 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
 
     // Close the form with animation
     handleClose();
-  }, [formData, existingCampaign, toast, handleClose]);
-
-  // Handle closing the form
-  const handleClose = useCallback(() => {
-    setExitAnimation(true);
-    // Wait for animation to complete before closing
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  }, [onClose]);
+  }, [formData, existingCampaign, toast, onClose, handleClose]);
 
   return {
     currentStep,

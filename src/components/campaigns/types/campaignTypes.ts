@@ -6,16 +6,18 @@ export interface CampaignFormData {
   description: string;
   channels: string[];
   stages: StageData[];
-  teamAssignments: Record<string, string[]>;
-  messages: Record<string, string>;
-  notes: string;
-  shareNotes: boolean;
+  team: string[]; // Adding the team property
   leads: LeadData[];
+  flows: any[]; // Adding the flows property
   messageFlow: {
     nodes: Node[];
     edges: Edge[];
   };
-  stepFlows: Record<string, MessageStep[]>;
+  teamAssignments?: Record<string, string[]>;
+  messages?: Record<string, string>;
+  notes?: string;
+  shareNotes?: boolean;
+  stepFlows?: Record<string, MessageStep[]>;
 }
 
 // Campaign data structure

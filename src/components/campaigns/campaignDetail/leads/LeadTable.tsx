@@ -1,7 +1,18 @@
 
-import React from 'react';
-import { Mail, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, Calendar, Edit, Check, X, MoreHorizontal } from 'lucide-react';
 import StageBadge from '../badges/StageBadge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { useToast } from "@/hooks/use-toast";
 
 interface Lead {
   id: number;
@@ -16,32 +27,127 @@ interface Lead {
   lastContacted: string;
   currentStage: string;
   assignedTo: string;
+  followUpDate?: string;
+  notes?: string;
+}
+
+interface Campaign {
+  stages: Array<{
+    id: number;
+    name: string;
+    count: number;
+  }>;
+  leads: number;
+  teamMembers?: string[];
 }
 
 interface LeadTableProps {
   leads: Lead[];
+  onLeadClick?: (lead: Lead) => void;
+  onSelectLead?: (leadId: number, selected: boolean) => void;
+  selectedLeads?: number[];
+  campaign?: Campaign;
 }
 
-const LeadTable: React.FC<LeadTableProps> = ({ leads }) => {
+const LeadTable: React.FC<LeadTableProps> = ({ 
+  leads, 
+  onLeadClick, 
+  onSelectLead,
+  selectedLeads = [],
+  campaign
+}) => {
+  const { toast } = useToast();
+  const [editingLead, setEditingLead] = useState<number | null>(null);
+  const [editNote, setEditNote] = useState<string>('');
+  
+  const handleEditNote = (lead: Lead) => {
+    setEditingLead(lead.id);
+    setEditNote(lead.notes || '');
+  };
+  
+  const saveNote = (leadId: number) => {
+    // In a real app, this would save to the database
+    // For now, we just show a toast
+    setEditingLead(null);
+    toast({
+      title: "Note saved",
+      description: "The lead note has been updated.",
+    });
+  };
+  
+  const updateLeadStage = (leadId: number, stage: string) => {
+    // In a real app, this would update the lead's stage in the database
+    toast({
+      title: "Stage updated",
+      description: `Lead stage changed to ${stage}.`,
+    });
+  };
+  
+  const updateLeadAssignment = (leadId: number, teamMember: string) => {
+    // In a real app, this would update the assigned team member in the database
+    toast({
+      title: "Assignment changed",
+      description: `Lead assigned to ${teamMember}.`,
+    });
+  };
+  
+  const updateFollowUpDate = (leadId: number, date: Date) => {
+    // In a real app, this would update the follow-up date in the database
+    toast({
+      title: "Follow-up date set",
+      description: `Follow-up scheduled for ${format(date, 'MMMM dd, yyyy')}.`,
+    });
+  };
+
   return (
     <div className="glass-card rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="bg-muted/20 border-b border-border">
+              {onSelectLead && (
+                <th className="px-3 py-3">
+                  <Checkbox 
+                    checked={leads.length > 0 && selectedLeads.length === leads.length}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        leads.forEach(lead => onSelectLead(lead.id, true));
+                      } else {
+                        leads.forEach(lead => onSelectLead(lead.id, false));
+                      }
+                    }}
+                  />
+                </th>
+              )}
               <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Lead</th>
               <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Company</th>
               <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Contact</th>
               <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Contacted</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Follow-up Date</th>
               <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Stage</th>
               <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Assigned To</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Notes</th>
+              <th className="text-left px-3 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-card">
             {leads.map(lead => (
               <tr key={lead.id} className="hover:bg-muted/10 transition-colors">
+                {onSelectLead && (
+                  <td className="px-3 py-4">
+                    <Checkbox 
+                      checked={selectedLeads.includes(lead.id)}
+                      onCheckedChange={(checked) => onSelectLead(lead.id, !!checked)}
+                    />
+                  </td>
+                )}
                 <td className="px-6 py-4">
-                  <div className="text-sm font-medium">{lead.name}</div>
+                  <div 
+                    className="text-sm font-medium cursor-pointer hover:text-primary"
+                    onClick={() => onLeadClick && onLeadClick(lead)}
+                  >
+                    {lead.name}
+                  </div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm">{lead.company}</div>
@@ -60,6 +166,7 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads }) => {
                         </svg>
                       </a>
                     )}
+                    {/* Additional contact methods */}
                     {lead.whatsapp && (
                       <a href={`https://wa.me/${lead.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400">
                         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -99,10 +206,166 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <StageBadge stage={lead.currentStage} />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7">
+                        {lead.followUpDate || 'Set date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <div className="p-3">
+                        <div className="space-y-2">
+                          {['Tomorrow', 'In 3 days', 'Next week'].map((option) => (
+                            <Button
+                              key={option}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => {
+                                const today = new Date();
+                                let date = new Date();
+                                
+                                if (option === 'Tomorrow') {
+                                  date.setDate(today.getDate() + 1);
+                                } else if (option === 'In 3 days') {
+                                  date.setDate(today.getDate() + 3);
+                                } else if (option === 'Next week') {
+                                  date.setDate(today.getDate() + 7);
+                                }
+                                
+                                updateFollowUpDate(lead.id, date);
+                              }}
+                            >
+                              {option}
+                            </Button>
+                          ))}
+                          {/* In a full implementation, add a date picker here */}
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm">{lead.assignedTo}</div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <div className="cursor-pointer">
+                        <StageBadge stage={lead.currentStage} />
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      {campaign?.stages && (
+                        <div className="p-2 space-y-1">
+                          {campaign.stages.map(stage => (
+                            <Button
+                              key={stage.id}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => updateLeadStage(lead.id, stage.name)}
+                            >
+                              {stage.name}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                </td>
+                <td className="px-6 py-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7">
+                        {lead.assignedTo}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      {campaign?.teamMembers && (
+                        <div className="p-2 space-y-1">
+                          {campaign.teamMembers.map(member => (
+                            <Button
+                              key={member}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => updateLeadAssignment(lead.id, member)}
+                            >
+                              {member}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                </td>
+                <td className="px-6 py-4 max-w-[200px]">
+                  {editingLead === lead.id ? (
+                    <div className="flex items-center space-x-2">
+                      <textarea
+                        className="w-full text-sm p-2 border rounded-md"
+                        value={editNote}
+                        onChange={(e) => setEditNote(e.target.value)}
+                        rows={2}
+                      />
+                      <div className="flex flex-col space-y-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => saveNote(lead.id)}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => setEditingLead(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between group">
+                      <div className="text-sm truncate max-w-[160px]">
+                        {lead.notes || 'No notes'}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100" 
+                        onClick={() => handleEditNote(lead)}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
+                </td>
+                <td className="px-3 py-4">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onLeadClick && onLeadClick(lead)}>
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditNote(lead)}>
+                        Edit Notes
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => {
+                        // In a real app, this would log a contact entry
+                        toast({
+                          title: "Contact logged",
+                          description: "Contact with this lead has been recorded.",
+                        });
+                      }}>
+                        Log Contact
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </td>
               </tr>
             ))}

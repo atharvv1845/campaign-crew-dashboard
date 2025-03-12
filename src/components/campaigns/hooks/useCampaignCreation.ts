@@ -78,7 +78,8 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
           channels: formData.channels,
           leads: formData.leads.length,
           teamMembers: Object.values(formData.teamAssignments).flat(),
-          description: formData.description
+          description: formData.description,
+          messageFlow: formData.messageFlow
         };
         
         toast({
@@ -103,7 +104,8 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         conversion: '0%',
         teamMembers: Object.values(formData.teamAssignments).flat(),
         createdAt: new Date().toISOString().split('T')[0],
-        description: formData.description
+        description: formData.description,
+        messageFlow: formData.messageFlow
       };
 
       campaignData.unshift(newCampaign);
@@ -112,13 +114,13 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         title: 'Campaign Created',
         description: `${formData.name} campaign has been created successfully!`,
       });
+      
+      // After campaign is created, navigate to its details page
+      handleClose();
+      setTimeout(() => {
+        navigate(`/campaigns/${newId}`);
+      }, 300);
     }
-    
-    handleClose();
-    
-    setTimeout(() => {
-      navigate('/campaigns');
-    }, 300);
   };
 
   const handleClose = () => {

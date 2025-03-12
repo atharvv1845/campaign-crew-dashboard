@@ -7,7 +7,7 @@ import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
 import LeadTracking from './LeadTracking';
 import MessageSequence from './MessageSequence';
-import { OutreachSummary } from './outreachSummary'; // Import as a named import, not default
+import OutreachSummary from './outreachSummary'; // Import as default
 import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
 import CampaignExportImport from './components/CampaignExportImport';
@@ -103,7 +103,7 @@ const CampaignDetail: React.FC = () => {
         <TabsContent value="overview" className="space-y-6">
           <StatCards campaign={campaign} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CampaignDescription campaign={campaign} /> {/* Changed 'data' prop to 'campaign' */}
+            <CampaignDescription campaign={campaign} />
             <ChannelsAndStages campaign={campaign} />
           </div>
           <Separator />

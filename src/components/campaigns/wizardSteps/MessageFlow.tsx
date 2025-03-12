@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactFlow, { Background, Controls, NodeTypes } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
@@ -58,7 +57,20 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     onEdgesChange,
     onConnect,
     handleNodeClick
-  } = useFlowState({ initialNodes, initialEdges });
+  } = useFlowState({ 
+    initialNodes: formData.messageFlow?.nodes?.length ? formData.messageFlow.nodes : initialNodes, 
+    initialEdges: formData.messageFlow?.edges?.length ? formData.messageFlow.edges : initialEdges 
+  });
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      messageFlow: {
+        nodes,
+        edges
+      }
+    }));
+  }, [nodes, edges, setFormData]);
 
   const { addNode, updateNode, deleteNode } = useNodeOperations({
     nodes,
@@ -112,7 +124,6 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     }
   };
 
-  // Update formData when flow changes
   const saveFlowToFormData = () => {
     setFormData({
       ...formData,

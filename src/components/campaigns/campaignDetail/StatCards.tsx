@@ -10,9 +10,46 @@ interface StatCardsProps {
     positive: number;
     negative: number;
   };
+  leadsData: Array<{
+    id: number;
+    currentStage: string;
+    [key: string]: any;
+  }>;
 }
 
-const StatCards: React.FC<StatCardsProps> = ({ campaign }) => {
+const StatCards: React.FC<StatCardsProps> = ({ campaign, leadsData }) => {
+  // Get actual count of leads
+  const totalLeads = leadsData.length;
+  
+  // Count contacted leads (those not in "New Lead" or initial stage)
+  const contactedLeads = leadsData.filter(lead => 
+    lead.currentStage !== 'New Lead' && 
+    lead.currentStage !== 'Not Contacted'
+  ).length;
+  
+  // Count responses (leads that have replied)
+  const responseLeads = leadsData.filter(lead => 
+    lead.currentStage === 'Replied' || 
+    lead.currentStage === 'Interested' || 
+    lead.currentStage === 'Meeting' || 
+    lead.currentStage === 'Qualified' || 
+    lead.currentStage === 'Positive' || 
+    lead.currentStage === 'Negative'
+  ).length;
+  
+  // Count positive responses
+  const positiveLeads = leadsData.filter(lead => 
+    lead.currentStage === 'Interested' || 
+    lead.currentStage === 'Meeting' || 
+    lead.currentStage === 'Qualified' || 
+    lead.currentStage === 'Positive'
+  ).length;
+  
+  // Count negative responses
+  const negativeLeads = leadsData.filter(lead => 
+    lead.currentStage === 'Negative'
+  ).length;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="glass-card p-4 rounded-xl">
@@ -22,18 +59,18 @@ const StatCards: React.FC<StatCardsProps> = ({ campaign }) => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Total Leads</p>
-            <p className="text-2xl font-bold">{campaign.leads.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{totalLeads}</p>
           </div>
         </div>
         <div className="mt-3">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-primary"
-              style={{ width: `${(campaign.contacted / campaign.leads) * 100}%` }}
+              style={{ width: `${totalLeads > 0 ? (contactedLeads / totalLeads) * 100 : 0}%` }}
             ></div>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {campaign.contacted.toLocaleString()} contacted ({Math.round((campaign.contacted / campaign.leads) * 100)}%)
+            {contactedLeads} contacted ({totalLeads > 0 ? Math.round((contactedLeads / totalLeads) * 100) : 0}%)
           </p>
         </div>
       </div>
@@ -45,18 +82,18 @@ const StatCards: React.FC<StatCardsProps> = ({ campaign }) => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Responses</p>
-            <p className="text-2xl font-bold">{campaign.responses.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{responseLeads}</p>
           </div>
         </div>
         <div className="mt-3">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-blue-500"
-              style={{ width: `${(campaign.responses / campaign.contacted) * 100}%` }}
+              style={{ width: `${contactedLeads > 0 ? (responseLeads / contactedLeads) * 100 : 0}%` }}
             ></div>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {Math.round((campaign.responses / campaign.contacted) * 100)}% response rate
+            {contactedLeads > 0 ? Math.round((responseLeads / contactedLeads) * 100) : 0}% response rate
           </p>
         </div>
       </div>
@@ -68,18 +105,18 @@ const StatCards: React.FC<StatCardsProps> = ({ campaign }) => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Positive</p>
-            <p className="text-2xl font-bold">{campaign.positive.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{positiveLeads}</p>
           </div>
         </div>
         <div className="mt-3">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-green-500"
-              style={{ width: `${(campaign.positive / campaign.responses) * 100}%` }}
+              style={{ width: `${responseLeads > 0 ? (positiveLeads / responseLeads) * 100 : 0}%` }}
             ></div>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {Math.round((campaign.positive / campaign.responses) * 100)}% of responses
+            {responseLeads > 0 ? Math.round((positiveLeads / responseLeads) * 100) : 0}% of responses
           </p>
         </div>
       </div>
@@ -91,18 +128,18 @@ const StatCards: React.FC<StatCardsProps> = ({ campaign }) => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Negative</p>
-            <p className="text-2xl font-bold">{campaign.negative.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{negativeLeads}</p>
           </div>
         </div>
         <div className="mt-3">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-red-500"
-              style={{ width: `${(campaign.negative / campaign.responses) * 100}%` }}
+              style={{ width: `${responseLeads > 0 ? (negativeLeads / responseLeads) * 100 : 0}%` }}
             ></div>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {Math.round((campaign.negative / campaign.responses) * 100)}% of responses
+            {responseLeads > 0 ? Math.round((negativeLeads / responseLeads) * 100) : 0}% of responses
           </p>
         </div>
       </div>

@@ -19,7 +19,7 @@ const CampaignList: React.FC = () => {
   useEffect(() => {
     console.log("Refreshing campaign list data, found:", campaignData.length);
     // Create a deep copy to avoid reference issues
-    const campaignsCopy = campaignData.map(campaign => ({...campaign}));
+    const campaignsCopy = JSON.parse(JSON.stringify(campaignData));
     setCampaigns(campaignsCopy);
   }, [showCreateCampaign, refreshTrigger]);
   
@@ -39,6 +39,7 @@ const CampaignList: React.FC = () => {
   const handleCampaignCreated = () => {
     // Force refresh of campaign data
     setRefreshTrigger(prev => prev + 1);
+    // Close the campaign creation modal
     setShowCreateCampaign(false);
     
     toast({

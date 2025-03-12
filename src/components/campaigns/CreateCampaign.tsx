@@ -1,8 +1,7 @@
-
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCampaignCreation } from './hooks/useCampaignCreation';
+import useCampaignCreation from './hooks/useCampaignCreation';
 
 // Import wizard steps
 import CampaignSetup from './wizardSteps/CampaignSetup';

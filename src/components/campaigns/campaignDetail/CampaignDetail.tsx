@@ -8,12 +8,12 @@ import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
 import LeadTracking from './LeadTracking';
 import MessageSequence from './MessageSequence';
-import OutreachSummary from './outreachSummary';
+import { OutreachSummary } from './outreachSummary/index';
 import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
 import CampaignExportImport from './components/CampaignExportImport';
 import { campaignData } from '../campaignData';
-import { Lead } from './LeadTracking';
+import { Lead } from './leads/types';
 
 const mockLeads: Lead[] = [
   {

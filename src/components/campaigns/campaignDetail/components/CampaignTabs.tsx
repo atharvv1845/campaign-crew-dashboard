@@ -99,15 +99,40 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     stages: stagesData
   };
 
+  // Generate tab list based on campaign information
+  const getTabs = () => {
+    // Base tabs that always show
+    const baseTabs = [
+      { value: "overview", label: "Overview" },
+      { value: "leads", label: `Leads (${campaignLeads.length})` }
+    ];
+    
+    // Only show Messages tab if the campaign has channels
+    const hasChannels = campaign.channels && campaign.channels.length > 0;
+    
+    // Only show Reports tab if the campaign has leads or responses
+    const hasLeadsOrResponses = campaignLeads.length > 0 || campaign.responses > 0;
+    
+    // Build complete tab list
+    const tabs = [
+      ...baseTabs,
+      ...(hasChannels ? [{ value: "messages", label: "Messages" }] : []),
+      ...(hasLeadsOrResponses ? [{ value: "reports", label: "Reports" }] : []),
+      { value: "settings", label: "Settings" }
+    ];
+    
+    return (
+      <TabsList className={`grid w-full max-w-3xl grid-cols-${tabs.length}`}>
+        {tabs.map(tab => (
+          <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
+        ))}
+      </TabsList>
+    );
+  };
+
   return (
     <Tabs defaultValue="overview" className="w-full">
-      <TabsList className="grid w-full max-w-3xl grid-cols-5">
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="leads">Leads</TabsTrigger>
-        <TabsTrigger value="messages">Messages</TabsTrigger>
-        <TabsTrigger value="reports">Reports</TabsTrigger>
-        <TabsTrigger value="settings">Settings</TabsTrigger>
-      </TabsList>
+      {getTabs()}
 
       <TabsContent value="overview" className="space-y-6">
         <StatCards campaign={campaign} />

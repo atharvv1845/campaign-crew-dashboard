@@ -16,25 +16,68 @@ const calculateStats = () => {
       messagesSent: 0,
       responseRate: 0,
       newLeads: 0,
+      changes: {
+        leadsChange: { value: "0%", positive: true },
+        messagesChange: { value: "0%", positive: true },
+        responseChange: { value: "0%", positive: true },
+        newLeadsChange: { value: "0%", positive: true }
+      },
       chartData: []
     };
   }
 
-  // Calculate totals
+  // Get recent campaigns (last 30 days) and older campaigns (previous 30 days)
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+  
+  const recentCampaigns = campaignData.filter(campaign => {
+    const campaignDate = new Date(campaign.createdAt);
+    return campaignDate >= thirtyDaysAgo && campaignDate <= now;
+  });
+  
+  const olderCampaigns = campaignData.filter(campaign => {
+    const campaignDate = new Date(campaign.createdAt);
+    return campaignDate >= sixtyDaysAgo && campaignDate < thirtyDaysAgo;
+  });
+
+  // Calculate current period stats
   const totalLeads = campaignData.reduce((sum, campaign) => {
     return sum + (Array.isArray(campaign.leads) ? campaign.leads.length : campaign.leads || 0);
   }, 0);
 
   const totalResponses = campaignData.reduce((sum, campaign) => sum + (campaign.responses || 0), 0);
-  const totalPositive = campaignData.reduce((sum, campaign) => sum + (campaign.positive || 0), 0);
-  const totalNegative = campaignData.reduce((sum, campaign) => sum + (campaign.negative || 0), 0);
-  
-  // Calculate response rate
-  const responseRate = totalLeads > 0 ? (totalResponses / totalLeads * 100).toFixed(1) : "0";
-  
-  // Estimate messages sent (typically more than responses)
   const messagesSent = totalResponses * 3;
+  const responseRate = totalLeads > 0 ? (totalResponses / totalLeads * 100).toFixed(1) : "0";
+  const newLeads = recentCampaigns.reduce((sum, campaign) => {
+    return sum + (Array.isArray(campaign.leads) ? campaign.leads.length : campaign.leads || 0);
+  }, 0);
 
+  // Calculate previous period stats
+  const previousLeads = olderCampaigns.reduce((sum, campaign) => {
+    return sum + (Array.isArray(campaign.leads) ? campaign.leads.length : campaign.leads || 0);
+  }, 0);
+  
+  const previousResponses = olderCampaigns.reduce((sum, campaign) => sum + (campaign.responses || 0), 0);
+  const previousMessagesSent = previousResponses * 3;
+  const previousResponseRate = previousLeads > 0 ? previousResponses / previousLeads * 100 : 0;
+
+  // Calculate percentage changes
+  const calculateChange = (current: number, previous: number) => {
+    if (previous === 0) return { value: "N/A", positive: true };
+    
+    const changePercent = ((current - previous) / previous * 100).toFixed(1);
+    const isPositive = current >= previous;
+    return { 
+      value: `${Math.abs(parseFloat(changePercent))}%`, 
+      positive: isPositive 
+    };
+  };
+
+  const leadsChange = calculateChange(newLeads, previousLeads);
+  const messagesChange = calculateChange(messagesSent, previousMessagesSent);
+  const responseChange = calculateChange(parseFloat(responseRate), previousResponseRate);
+  
   // Generate chart data based on campaigns
   const monthsMap = {
     'Jan': 0, 'Feb': 0, 'Mar': 0, 'Apr': 0, 'May': 0, 'Jun': 0, 'Jul': 0
@@ -59,12 +102,25 @@ const calculateStats = () => {
     totalLeads,
     messagesSent,
     responseRate,
-    newLeads: Math.round(totalLeads * 0.15), // Estimate new leads as 15% of total
+    newLeads,
+    changes: {
+      leadsChange,
+      messagesChange,
+      responseChange,
+      newLeadsChange: leadsChange // Reuse leads change for new leads (they're the same metric)
+    },
     chartData
   };
 };
 
-const { totalLeads, messagesSent, responseRate, newLeads, chartData } = calculateStats();
+const { 
+  totalLeads, 
+  messagesSent, 
+  responseRate, 
+  newLeads, 
+  changes: { leadsChange, messagesChange, responseChange, newLeadsChange },
+  chartData 
+} = calculateStats();
 
 const Dashboard: React.FC = () => {
   return (
@@ -74,28 +130,28 @@ const Dashboard: React.FC = () => {
         <StatCard 
           title="Total Leads" 
           value={totalLeads.toLocaleString()} 
-          change={{ value: "8.2%", positive: true }}
+          change={leadsChange}
           icon={Users}
           description={`${newLeads.toLocaleString()} new this month`}
         />
         <StatCard 
           title="Messages Sent" 
           value={messagesSent.toLocaleString()} 
-          change={{ value: "12.5%", positive: true }}
+          change={messagesChange}
           icon={MessageSquare}
           description={`${Math.round(messagesSent * 0.3).toLocaleString()} this month`}
         />
         <StatCard 
           title="Response Rate" 
           value={`${responseRate}%`} 
-          change={{ value: "3.1%", positive: true }}
+          change={responseChange}
           icon={BarChart4}
           description="Based on actual campaign data"
         />
         <StatCard 
           title="New Leads" 
           value={newLeads.toLocaleString()} 
-          change={{ value: "4.3%", positive: false }}
+          change={newLeadsChange}
           icon={UserPlus}
           description="Added in the last 30 days"
         />

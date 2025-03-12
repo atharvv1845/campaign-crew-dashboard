@@ -1,10 +1,10 @@
 
 import React from 'react';
-import CampaignDetail from '@/components/campaigns/campaignDetail';
+import CampaignDetail from '@/components/campaigns/campaignDetail/CampaignDetail';
 
 const CampaignDetailPage: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-6">
       <CampaignDetail />
     </div>
   );

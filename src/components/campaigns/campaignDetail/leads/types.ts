@@ -1,35 +1,15 @@
 
 export interface Lead {
   id: number;
-  name?: string; // Making name optional
-  company?: string; // Making company optional
-  email?: string; // Making email optional
-  linkedin?: string;
-  whatsapp?: string | null;
-  twitter?: string | null;
-  instagram?: string | null;
-  facebook?: string | null;
-  firstContacted?: string;
-  lastContacted?: string; // Making lastContacted optional
-  currentStage?: string; // Making currentStage optional
-  assignedTo?: string; // Making assignedTo optional
-  followUpDate?: string;
-  notes?: string;
-  campaignId?: number;
-  // Optional fields for backward compatibility
-  title?: string;
-  status?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  channel?: string;
+  status: string;
   lastContact?: string;
-  firstName?: string;
-  lastName?: string;
-  fullName?: string;
-  socialProfiles?: {
-    linkedin?: string;
-    twitter?: string;
-    instagram?: string;
-    facebook?: string;
-    whatsapp?: string;
-  };
+  notes?: string;
+  campaignId: number;
 }
 
 export interface CampaignStage {
@@ -39,7 +19,14 @@ export interface CampaignStage {
 }
 
 export interface Campaign {
+  id: number;
+  name: string;
+  status: string;
+  leads: Lead[];
+  responses: number;
+  positive: number;
+  negative: number;
+  conversion: string;
+  teamMembers: string[];
   stages: CampaignStage[];
-  leads: number;
-  teamMembers?: string[];
 }

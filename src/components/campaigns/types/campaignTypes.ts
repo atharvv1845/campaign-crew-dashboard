@@ -16,7 +16,7 @@ export interface CampaignFormData {
     nodes: Node[];
     edges: Edge[];
   };
-  stepFlows: Record<string, any>;
+  stepFlows: Record<string, MessageStep[]>;
 }
 
 // Lead data structure
@@ -50,32 +50,34 @@ export interface StageData {
 }
 
 // Message step data
-export interface MessageStepData {
+export interface MessageStep {
   id: string;
-  type: 'message';
-  channel: string;
+  type: 'message' | 'delay' | 'condition';
+  channel?: string;
+  order: number;
+  data: MessageStepData | DelayStepData | ConditionStepData;
+}
+
+// Message step specific data
+export interface MessageStepData {
+  message: string;
+  assignedTo: string;
   templateId?: string;
-  content: string;
   subject?: string;
 }
 
 // Delay step data
 export interface DelayStepData {
-  id: string;
-  type: 'delay';
-  duration: number;
-  unit: 'hours' | 'days' | 'weeks';
+  days: number;
+  hours?: number;
 }
 
 // Condition step data
 export interface ConditionStepData {
-  id: string;
-  type: 'condition';
-  field: string;
-  operator: string;
-  value: string;
-  truePath: string[];
-  falsePath: string[];
+  condition: string;
+  action: string;
+  targetStage?: string;
+  waitDays?: number;
 }
 
 // Flow data structure
@@ -138,8 +140,5 @@ export const defaultStages: StageData[] = [
   },
 ];
 
-// Export these for use in MessageFlow.tsx
-export type MessageStep = MessageStepData;
-export type DelayStep = DelayStepData;
-export type ConditionStep = ConditionStepData;
+// Type aliases for MessageFlow.tsx
 export type FlowStepData = MessageStepData | DelayStepData | ConditionStepData;

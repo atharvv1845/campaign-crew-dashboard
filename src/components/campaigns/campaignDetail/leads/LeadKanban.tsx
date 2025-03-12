@@ -39,7 +39,6 @@ const LeadKanban: React.FC<LeadKanbanProps> = ({ stages, leads, campaignLeads, o
           </div>
           
           <div className="p-3 space-y-2 max-h-[500px] overflow-y-auto">
-            {/* Filter leads by stage and map them here */}
             {leads
               .filter(lead => lead.currentStage === stage.name)
               .map(lead => (

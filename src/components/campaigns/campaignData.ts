@@ -12,7 +12,8 @@ export interface CampaignData {
   conversion: string;
   teamMembers: string[];
   createdAt: string;
-  description?: string; // Added description field
+  description?: string;
+  contacted?: number;
 }
 
 // Update available channels for outreach
@@ -41,6 +42,7 @@ export const campaignData: CampaignData[] = [
     conversion: '27.4%',
     teamMembers: ['John Smith', 'Sarah Lee'],
     createdAt: '2023-09-15',
+    contacted: 1050
   },
   {
     id: 2,
@@ -55,6 +57,7 @@ export const campaignData: CampaignData[] = [
     conversion: '30.1%',
     teamMembers: ['Alex Chen'],
     createdAt: '2023-06-01',
+    contacted: 2100
   },
   {
     id: 3,
@@ -69,6 +72,7 @@ export const campaignData: CampaignData[] = [
     conversion: '39.6%',
     teamMembers: ['John Smith', 'Mia Johnson'],
     createdAt: '2023-08-10',
+    contacted: 760
   },
   {
     id: 4,
@@ -83,6 +87,7 @@ export const campaignData: CampaignData[] = [
     conversion: '0%',
     teamMembers: [],
     createdAt: '2023-10-05',
+    contacted: 0
   },
   {
     id: 5,
@@ -97,6 +102,7 @@ export const campaignData: CampaignData[] = [
     conversion: '0%',
     teamMembers: ['Alex Chen', 'Sarah Lee'],
     createdAt: '2023-10-01',
+    contacted: 0
   },
   {
     id: 6,
@@ -111,5 +117,6 @@ export const campaignData: CampaignData[] = [
     conversion: '23.9%',
     teamMembers: ['Mia Johnson'],
     createdAt: '2023-07-22',
+    contacted: 3200
   },
 ];

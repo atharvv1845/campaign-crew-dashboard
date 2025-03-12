@@ -10,6 +10,7 @@ export const campaignData: CampaignData & {
     name: string;
     count: number;
   }>;
+  contacted?: number;
 } = {
   id: 1,
   name: "Q1 Tech Companies Outreach",
@@ -23,7 +24,8 @@ export const campaignData: CampaignData & {
   conversion: "10%",
   createdAt: "Jan 15, 2023",
   teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'],
-  description: "This campaign targets SaaS companies with 50-200 employees in the North American market. The primary goal is to schedule demos with decision-makers in the marketing and sales departments."
+  description: "This campaign targets SaaS companies with 50-200 employees in the North American market. The primary goal is to schedule demos with decision-makers in the marketing and sales departments.",
+  contacted: 1050
 };
 
 // Mock leads data for the campaign
@@ -37,6 +39,9 @@ export const leadsData: Array<{
   campaign: string;
   lastContact: string;
   contactMethods?: string[];
+  lastContacted?: string; // Add lastContacted for compatibility
+  currentStage?: string; // Add currentStage for compatibility
+  assignedTo?: string; // Add assignedTo for compatibility
 }> = [
   {
     id: 1,
@@ -47,7 +52,10 @@ export const leadsData: Array<{
     status: "Contacted",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 5, 2023",
-    contactMethods: ["email", "linkedin"]
+    contactMethods: ["email", "linkedin"],
+    lastContacted: "Mar 5, 2023",
+    currentStage: "Contacted",
+    assignedTo: "John Smith"
   },
   {
     id: 2,
@@ -58,7 +66,10 @@ export const leadsData: Array<{
     status: "Replied",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 8, 2023",
-    contactMethods: ["email", "call"]
+    contactMethods: ["email", "call"],
+    lastContacted: "Mar 8, 2023",
+    currentStage: "Replied",
+    assignedTo: "Sarah Lee"
   },
   {
     id: 3,
@@ -69,7 +80,10 @@ export const leadsData: Array<{
     status: "Not Contacted",
     campaign: "Q1 Tech Companies",
     lastContact: "Never",
-    contactMethods: ["linkedin"]
+    contactMethods: ["linkedin"],
+    lastContacted: "Never",
+    currentStage: "Not Contacted",
+    assignedTo: "Alex Chen"
   },
   {
     id: 4,
@@ -80,7 +94,10 @@ export const leadsData: Array<{
     status: "Contacted",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 10, 2023",
-    contactMethods: ["email"]
+    contactMethods: ["email"],
+    lastContacted: "Mar 10, 2023",
+    currentStage: "Contacted",
+    assignedTo: "John Smith"
   },
   {
     id: 5,
@@ -91,7 +108,10 @@ export const leadsData: Array<{
     status: "Replied",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 12, 2023",
-    contactMethods: ["email", "call"]
+    contactMethods: ["email", "call"],
+    lastContacted: "Mar 12, 2023",
+    currentStage: "Replied",
+    assignedTo: "Sarah Lee"
   },
   {
     id: 6,
@@ -102,7 +122,10 @@ export const leadsData: Array<{
     status: "Positive",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 15, 2023",
-    contactMethods: ["email", "linkedin", "whatsapp"]
+    contactMethods: ["email", "linkedin", "whatsapp"],
+    lastContacted: "Mar 15, 2023",
+    currentStage: "Positive",
+    assignedTo: "Mia Johnson"
   },
   {
     id: 7,
@@ -113,7 +136,10 @@ export const leadsData: Array<{
     status: "Negative",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 18, 2023",
-    contactMethods: ["email"]
+    contactMethods: ["email"],
+    lastContacted: "Mar 18, 2023",
+    currentStage: "Negative",
+    assignedTo: "Alex Chen"
   },
   {
     id: 8,
@@ -124,7 +150,10 @@ export const leadsData: Array<{
     status: "Not Contacted",
     campaign: "Q1 Tech Companies",
     lastContact: "Never",
-    contactMethods: ["linkedin"]
+    contactMethods: ["linkedin"],
+    lastContacted: "Never",
+    currentStage: "Not Contacted",
+    assignedTo: "John Smith"
   },
   {
     id: 9,
@@ -135,7 +164,10 @@ export const leadsData: Array<{
     status: "Contacted",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 20, 2023",
-    contactMethods: ["email", "call"]
+    contactMethods: ["email", "call"],
+    lastContacted: "Mar 20, 2023",
+    currentStage: "Contacted",
+    assignedTo: "Sarah Lee"
   },
   {
     id: 10,
@@ -146,6 +178,9 @@ export const leadsData: Array<{
     status: "Replied",
     campaign: "Q1 Tech Companies",
     lastContact: "Mar 22, 2023",
-    contactMethods: ["email"]
+    contactMethods: ["email"],
+    lastContacted: "Mar 22, 2023",
+    currentStage: "Replied",
+    assignedTo: "Mia Johnson"
   }
 ];

@@ -1,18 +1,10 @@
 
 import React from 'react';
+import { useStructuredWorkflow } from './hooks/useStructuredWorkflow';
 import { MessageStep } from './hooks/sequenceTypes';
-import { useWorkflowDialogs } from './hooks/useWorkflowDialogs';
-import { useStepActions } from './hooks/useStepActions';
-import { 
-  WorkflowHeader, 
-  WorkflowStepTable, 
-  AddStepButtons, 
-  StepEditDialog 
-} from './components/structuredWorkflow';
-import { 
-  SaveWorkflowDialog, 
-  LoadWorkflowDialog 
-} from './components/dialogs/WorkflowDialogs';
+import WorkflowHeader from './components/structuredWorkflow/WorkflowHeader';
+import WorkflowContent from './components/structuredWorkflow/WorkflowContent';
+import WorkflowDialogs from './components/structuredWorkflow/WorkflowDialogs';
 
 interface StructuredMessageWorkflowProps {
   steps: MessageStep[];
@@ -37,22 +29,13 @@ const StructuredMessageWorkflow: React.FC<StructuredMessageWorkflowProps> = ({
     savedWorkflows,
     setSavedWorkflows,
     handleSaveWorkflow,
-    handleLoadWorkflow
-  } = useWorkflowDialogs(steps, onUpdateSteps);
-
-  const {
+    handleLoadWorkflow,
     handleAddStep,
     handleEditStep,
     handleSaveStep,
     handleDeleteStep,
     handleMoveStep
-  } = useStepActions(
-    steps,
-    onUpdateSteps,
-    editingStep,
-    setEditingStep,
-    setShowEditDialog
-  );
+  } = useStructuredWorkflow(steps, onUpdateSteps);
 
   return (
     <div className="space-y-6">
@@ -62,41 +45,31 @@ const StructuredMessageWorkflow: React.FC<StructuredMessageWorkflowProps> = ({
         onLoadClick={() => setShowLoadDialog(true)}
       />
       
-      {/* Message workflow table */}
-      <WorkflowStepTable 
+      {/* Workflow content (table and buttons) */}
+      <WorkflowContent
         steps={steps}
+        onAddStep={handleAddStep}
         onEditStep={handleEditStep}
         onDeleteStep={handleDeleteStep}
         onMoveStep={handleMoveStep}
       />
       
-      {/* Add step buttons */}
-      <AddStepButtons onAddStep={handleAddStep} />
-      
-      {/* Step edit dialog */}
-      <StepEditDialog 
-        open={showEditDialog}
-        onOpenChange={setShowEditDialog}
+      {/* Dialogs */}
+      <WorkflowDialogs
+        showEditDialog={showEditDialog}
+        setShowEditDialog={setShowEditDialog}
         editingStep={editingStep}
-        onEditingStepChange={setEditingStep}
-        onSave={handleSaveStep}
-      />
-      
-      {/* Save workflow dialog */}
-      <SaveWorkflowDialog
-        open={showSaveDialog}
-        onOpenChange={setShowSaveDialog}
+        setEditingStep={setEditingStep}
+        showSaveDialog={showSaveDialog}
+        setShowSaveDialog={setShowSaveDialog}
+        showLoadDialog={showLoadDialog}
+        setShowLoadDialog={setShowLoadDialog}
         workflowName={workflowName}
         setWorkflowName={setWorkflowName}
-        onSave={handleSaveWorkflow}
-      />
-      
-      {/* Load workflow dialog */}
-      <LoadWorkflowDialog
-        open={showLoadDialog}
-        onOpenChange={setShowLoadDialog}
         savedWorkflows={savedWorkflows}
-        onLoad={handleLoadWorkflow}
+        onSaveWorkflow={handleSaveWorkflow}
+        onLoadWorkflow={handleLoadWorkflow}
+        onSaveStep={handleSaveStep}
       />
     </div>
   );

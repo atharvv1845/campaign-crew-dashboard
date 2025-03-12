@@ -12,9 +12,11 @@ interface FlowNodeActionsProps {
   addNode: (type: string) => { setNodeData: (data: any) => void };
   setShowNodeModal: (show: boolean) => void;
   deleteNode: (nodeId: string) => void;
+  setNodeType: (type: string) => void;
+  setSelectedNode: (node: string | null) => void;
 }
 
-const FlowNodeActions: React.FC<FlowNodeActionsProps> = ({
+const FlowNodeActions = ({
   nodeType,
   nodeData,
   setNodeData,
@@ -23,8 +25,10 @@ const FlowNodeActions: React.FC<FlowNodeActionsProps> = ({
   updateNode,
   addNode,
   setShowNodeModal,
-  deleteNode
-}) => {
+  deleteNode,
+  setNodeType,
+  setSelectedNode
+}: FlowNodeActionsProps) => {
   const handleAddNode = (type: 'message' | 'delay' | 'condition') => {
     setNodeType(type);
     setSelectedNode(null);

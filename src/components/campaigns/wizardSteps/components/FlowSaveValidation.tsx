@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { toast } from '@/hooks/use-toast';
 
 interface FlowSaveValidationProps {
@@ -9,13 +10,13 @@ interface FlowSaveValidationProps {
   onNext: () => void;
 }
 
-const FlowSaveValidation: React.FC<FlowSaveValidationProps> = ({
+const FlowSaveValidation = ({
   nodes,
   edges,
   validateFlow,
   setFormData,
   onNext
-}) => {
+}: FlowSaveValidationProps) => {
   const saveFlowToFormData = () => {
     // Make sure we have at least one node
     if (nodes.length === 0) {

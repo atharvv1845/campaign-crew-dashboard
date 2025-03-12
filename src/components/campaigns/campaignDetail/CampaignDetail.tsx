@@ -19,31 +19,14 @@ const CampaignDetail: React.FC = () => {
   useEffect(() => {
     if (!id) return;
 
-    // Simulate API call to fetch campaign data
-    setTimeout(() => {
-      const foundCampaign = campaignData.find(c => c.id === parseInt(id));
-      
-      if (foundCampaign) {
-        // Create dummy leads if they don't exist as objects already
-        if (typeof foundCampaign.leads === 'number') {
-          const dummyLeads = Array.from({ length: foundCampaign.leads }, (_, i) => ({
-            id: i + 1,
-            name: `Lead ${i + 1}`,
-            email: `lead${i + 1}@example.com`,
-            company: `Company ${i + 1}`,
-            status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
-            lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            campaignId: parseInt(id)
-          }));
-          
-          foundCampaign.leadsData = dummyLeads;
-        }
-        
-        setCampaign(foundCampaign);
-      }
-      
-      setLoading(false);
-    }, 500);
+    // Find the campaign by ID from our actual campaign data
+    const foundCampaign = campaignData.find(c => c.id === parseInt(id));
+    
+    if (foundCampaign) {
+      setCampaign(foundCampaign);
+    }
+    
+    setLoading(false);
   }, [id]);
 
   if (loading) {
@@ -124,7 +107,7 @@ const CampaignDetail: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {typeof campaign.leads === 'number' ? campaign.leads : campaign.leads.length}
+              {campaign.leadsData ? campaign.leadsData.length : campaign.leads}
             </div>
           </CardContent>
         </Card>

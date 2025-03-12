@@ -2,6 +2,7 @@
 import React from 'react';
 import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data for recent campaigns
 const campaigns = [
@@ -44,11 +45,28 @@ const campaigns = [
 ];
 
 const RecentCampaigns: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate('/campaigns');
+  };
+
+  const handleCampaignClick = (campaignId: number) => {
+    navigate(`/campaigns/${campaignId}`);
+  };
+
+  const handleCreateCampaign = () => {
+    navigate('/campaigns');
+  };
+
   return (
     <div className="glass-card rounded-xl">
       <div className="p-6 flex justify-between items-center border-b border-border">
         <h3 className="text-lg font-medium">Recent Campaigns</h3>
-        <button className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
+        <button 
+          className="text-sm text-primary font-medium flex items-center gap-1 hover:underline"
+          onClick={handleViewAll}
+        >
           View All <ArrowRight className="h-4 w-4" />
         </button>
       </div>
@@ -58,7 +76,12 @@ const RecentCampaigns: React.FC = () => {
           <div key={campaign.id} className="p-5 hover:bg-muted/20 transition-colors">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h4 className="font-medium text-base">{campaign.name}</h4>
+                <h4 
+                  className="font-medium text-base text-primary hover:underline cursor-pointer"
+                  onClick={() => handleCampaignClick(campaign.id)}
+                >
+                  {campaign.name}
+                </h4>
                 <div className="flex items-center gap-2 mt-1">
                   <span className={cn(
                     "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
@@ -113,7 +136,10 @@ const RecentCampaigns: React.FC = () => {
       </div>
       
       <div className="p-5 border-t border-border bg-muted/10 flex justify-center">
-        <button className="bg-primary text-primary-foreground font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-primary/90 transition-colors flex items-center gap-2">
+        <button 
+          className="bg-primary text-primary-foreground font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-primary/90 transition-colors flex items-center gap-2"
+          onClick={handleCreateCampaign}
+        >
           Create New Campaign <ArrowRight className="h-4 w-4" />
         </button>
       </div>

@@ -18,12 +18,26 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
     navigate(`/campaigns/${campaign.id}`);
   };
 
+  const handleNameClick = (e: React.MouseEvent) => {
+    // Prevent the row click event from firing
+    e.stopPropagation();
+    // Navigate to campaign detail page
+    navigate(`/campaigns/${campaign.id}`);
+  };
+
   return (
     <tr 
       className="border-b border-border hover:bg-muted/40 cursor-pointer transition-colors"
       onClick={handleRowClick}
     >
-      <td className="p-4 font-medium">{campaign.name}</td>
+      <td className="p-4">
+        <button 
+          onClick={handleNameClick}
+          className="font-medium text-primary hover:underline text-left"
+        >
+          {campaign.name}
+        </button>
+      </td>
       <td className="p-4">
         <CampaignStatusBadge status={campaign.status} />
       </td>

@@ -13,9 +13,9 @@ import WizardProgress from './wizardSteps/WizardProgress';
 import LeadImport from './wizardSteps/LeadImport';
 import MessageFlow from './wizardSteps/MessageFlow';
 
-// Re-export types for backward compatibility
-export { type CampaignFormData, type LeadData } from './types/campaignTypes';
-export { availableChannels } from './constants/channels';
+// Import types directly from the type file
+import { type CampaignFormData, type LeadData } from './types/campaignTypes';
+import { availableChannels } from './constants/channels';
 
 interface CreateCampaignProps {
   onClose: (campaign?: CampaignFormData) => void;

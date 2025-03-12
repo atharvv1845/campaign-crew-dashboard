@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -7,7 +6,7 @@ import OverviewTab from '../tabs/OverviewTab';
 import LeadsTab from '../tabs/LeadsTab';
 import MessagesTab from '../tabs/MessagesTab';
 import ReportsTab from '../tabs/ReportsTab';
-import { getTabs, enhanceCampaign, convertImportedLeads } from '../tabs/helpers/tabHelpers';
+import { getTabs, convertImportedLeads } from '../tabs/helpers/tabHelpers';
 import { useToast } from '@/hooks/use-toast';
 
 interface CampaignTabsProps {
@@ -26,43 +25,50 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const [view, setView] = useState<'table' | 'kanban'>('table');
   const { toast } = useToast();
   
-  // Get leads from campaign data
   const getLeadsForCampaign = (): Lead[] => {
-    console.log('Campaign object:', campaign);
+    console.log('Processing campaign leads:', campaign);
     
-    // Check if campaign has direct leads property that is an array
-    if (campaign.leads && Array.isArray(campaign.leads)) {
-      console.log('Found leads array in campaign:', campaign.leads.length);
-      
-      // If these are already in the Lead format, use them directly
-      if (campaign.leads.length > 0 && campaign.leads[0].hasOwnProperty('name') && campaign.leads[0].hasOwnProperty('company')) {
-        console.log('Leads are already in correct format');
-        return campaign.leads as Lead[];
-      }
-      
-      // Otherwise convert them from the imported format
-      console.log('Converting imported leads to Lead format');
-      return convertImportedLeads({
-        ...campaign,
-        importedLeads: campaign.leads
-      });
+    // Check if campaign.leads is a number (indicating count) or array
+    if (typeof campaign.leads === 'number') {
+      console.log('Leads property is a number, no actual lead data found');
+      return [];
     }
     
-    // No leads found, return empty array
-    console.log('No leads found in campaign, returning empty array');
+    // If we have an array of leads
+    if (Array.isArray(campaign.leads)) {
+      console.log('Found leads array:', campaign.leads.length);
+      
+      // Convert each lead to ensure proper format
+      return campaign.leads.map((lead: any, index: number) => ({
+        id: lead.id || index + 1,
+        name: lead.firstName ? `${lead.firstName} ${lead.lastName || ''}` : lead.name || '',
+        email: lead.email || '',
+        company: lead.company || '',
+        currentStage: lead.status || lead.currentStage || 'New',
+        lastContacted: lead.lastContacted || '',
+        followUpDate: lead.followUpDate || '',
+        notes: lead.notes || '',
+        assignedTo: lead.assignedTo || '',
+        linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
+        twitter: lead.twitter || lead.socialProfiles?.twitter || '',
+        whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
+        facebook: lead.facebook || lead.socialProfiles?.facebook || '',
+        instagram: lead.instagram || lead.socialProfiles?.instagram || ''
+      }));
+    }
+    
+    console.log('No valid leads data found');
     return [];
   };
   
   const campaignLeads = getLeadsForCampaign();
   
   useEffect(() => {
-    console.log('Campaign Leads:', campaignLeads);
+    console.log('Processed Campaign Leads:', campaignLeads);
   }, [campaign]);
   
-  // Enhance campaign with stages data if needed
   const enhancedCampaign = enhanceCampaign(campaign);
 
-  // Generate tabs based on campaign information
   const tabs = getTabs(campaign, campaignLeads);
 
   return (

@@ -19,7 +19,7 @@ export interface CampaignData {
     nodes: any[];
     edges: any[];
   };
-  leadsData?: any[]; // Add this property to store actual lead objects
+  leadsData?: any[]; // Detailed lead objects
 }
 
 // Update available channels for outreach

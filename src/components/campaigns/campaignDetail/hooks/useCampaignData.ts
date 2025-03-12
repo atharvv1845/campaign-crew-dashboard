@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { campaignData } from '../../campaignData';
@@ -52,10 +51,20 @@ export const useCampaignData = (id: string | undefined) => {
           if (foundCampaign) {
             console.log('Displaying campaign:', foundCampaign);
             
-            // Ensure leads is always an array of lead objects
-            const leadsData = Array.isArray(foundCampaign.leads) 
-              ? foundCampaign.leads 
-              : foundCampaign.leadsData || [];
+            // Process leads data appropriately
+            let leadsData = [];
+            
+            // If we have proper lead objects in leadsData, use those
+            if (foundCampaign.leadsData && Array.isArray(foundCampaign.leadsData)) {
+              leadsData = foundCampaign.leadsData;
+            } 
+            // If leads is an array of lead objects, use those
+            else if (Array.isArray(foundCampaign.leads) && 
+                     foundCampaign.leads.length > 0 && 
+                     typeof foundCampaign.leads[0] !== 'number') {
+              leadsData = foundCampaign.leads;
+            }
+            // Otherwise, leadsData remains an empty array
               
             // Ensure all required fields are present to prevent errors
             const sanitizedCampaign = {

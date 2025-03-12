@@ -29,68 +29,55 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const getLeadsForCampaign = (): Lead[] => {
     console.log('Processing campaign leads:', campaign);
     
-    // Check if campaign.leads exists and is a number (count of leads)
-    if (typeof campaign.leads === 'number') {
-      console.log('Found leads count:', campaign.leads, 'but no actual lead objects');
-      // Generate placeholder leads for demonstration
-      return Array.from({ length: campaign.leads }, (_, index) => ({
-        id: index + 1,
-        name: `Lead #${index + 1}`,
-        company: 'Sample Company',
-        email: `lead${index + 1}@example.com`,
-        currentStage: 'New Lead',
-        lastContacted: '',
-        // You may add more default properties as needed
-      }));
-    }
-    
-    if (!campaign.leads) {
-      console.log('No leads data found');
-      return [];
-    }
-    
-    if (Array.isArray(campaign.leads)) {
-      console.log('Found leads array:', campaign.leads.length);
-      
-      return campaign.leads.map((lead: any, index: number) => {
-        // Generate a display name based on available fields
-        let displayName = '';
-        
-        if (lead.name) {
-          displayName = lead.name;
-        } else if (lead.firstName && lead.lastName) {
-          displayName = `${lead.firstName} ${lead.lastName}`;
-        } else if (lead.firstName) {
-          displayName = lead.firstName;
-        } else if (lead.lastName) {
-          displayName = lead.lastName;
-        } else if (lead.fullName) {
-          displayName = lead.fullName;
-        } else {
-          displayName = `Lead #${index + 1}`;
-        }
-        
+    // First check if there are actual lead objects in leadsData array
+    if (campaign.leadsData && Array.isArray(campaign.leadsData) && campaign.leadsData.length > 0) {
+      console.log('Found actual lead objects in leadsData:', campaign.leadsData.length);
+      return campaign.leadsData.map((lead: any, index: number) => {
+        // Ensure each lead has the required properties
         return {
           ...lead,
-          id: lead.id || `lead-${index}`,
-          name: displayName,
-          currentStage: lead.currentStage || lead.status || lead.statusName || 'New',
-          // Ensure platform links are accessible
+          id: lead.id || index + 1,
+          name: lead.name || (lead.firstName && lead.lastName ? `${lead.firstName} ${lead.lastName}` : 
+                 (lead.firstName || lead.lastName || `Lead #${index + 1}`)),
+          currentStage: lead.currentStage || lead.status || 'New Lead',
+          // Make sure platform links are accessible
           linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
           twitter: lead.twitter || lead.socialProfiles?.twitter || '',
           facebook: lead.facebook || lead.socialProfiles?.facebook || '',
           instagram: lead.instagram || lead.socialProfiles?.instagram || '',
           whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
-          // Date fields
-          firstContacted: lead.firstContacted || lead.createdAt || '',
-          lastContacted: lead.lastContacted || lead.lastContact || '',
-          followUpDate: lead.followUpDate || lead.nextFollowUp || '',
-          // Team assignee
-          assignedTo: lead.assignedTo || lead.teamMember || '',
         };
       });
     }
     
+    // Check if campaign.leads is an array of lead objects
+    if (Array.isArray(campaign.leads) && campaign.leads.length > 0 && typeof campaign.leads[0] !== 'number') {
+      console.log('Found leads array with objects:', campaign.leads.length);
+      return campaign.leads.map((lead: any, index: number) => {
+        // Same mapping logic as above
+        return {
+          ...lead,
+          id: lead.id || index + 1,
+          name: lead.name || (lead.firstName && lead.lastName ? `${lead.firstName} ${lead.lastName}` : 
+                 (lead.firstName || lead.lastName || `Lead #${index + 1}`)),
+          currentStage: lead.currentStage || lead.status || 'New Lead',
+        };
+      });
+    }
+    
+    // If we still haven't found actual lead data, check if we have a numeric lead count
+    if (typeof campaign.leads === 'number' && campaign.leads > 0) {
+      console.log('No actual lead data found, but a lead count exists:', campaign.leads);
+      toast({
+        title: "No detailed lead data",
+        description: "Only lead count is available. Import leads or add them manually for detailed information.",
+      });
+      
+      // At this point, we can return an empty array to avoid showing placeholder data
+      return [];
+    }
+    
+    console.log('No leads data found');
     return [];
   };
   

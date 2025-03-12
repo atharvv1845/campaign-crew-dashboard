@@ -18,6 +18,7 @@ const LeadsTab: React.FC<LeadsTabProps> = ({
   setView, 
   updateCampaign 
 }) => {
+  // Use the leadsData directly without any transformation
   return (
     <div className="space-y-6">
       <LeadTracking 

@@ -5,15 +5,18 @@ import CampaignTable from './CampaignTable';
 import CampaignFilters from './CampaignFilters';
 import CreateCampaign from './CreateCampaign';
 import { campaignData } from './campaignData';
+import { useToast } from '@/hooks/use-toast';
 
 const CampaignList: React.FC = () => {
+  const { toast } = useToast();
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [campaigns, setCampaigns] = useState(campaignData);
   
-  // Update campaigns when campaignData changes or when a modal closes
+  // Update campaigns when campaignData changes or when modal closes
   useEffect(() => {
+    console.log("Refreshing campaign list data, found:", campaignData.length);
     setCampaigns([...campaignData]);
   }, [showCreateCampaign]);
   
@@ -34,6 +37,11 @@ const CampaignList: React.FC = () => {
     // Force refresh of campaign data
     setCampaigns([...campaignData]);
     setShowCreateCampaign(false);
+    
+    toast({
+      title: "Success",
+      description: "Campaign has been successfully created."
+    });
   };
   
   return (

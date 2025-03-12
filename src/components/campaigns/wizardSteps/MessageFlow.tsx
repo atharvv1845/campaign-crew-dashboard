@@ -8,6 +8,7 @@ import FlowControlsToolbar from './FlowControlsToolbar';
 import FlowNodeEditor from './FlowNodeEditor';
 import FlowCanvas from './components/FlowCanvas';
 import FlowNavigation from './components/FlowNavigation';
+import { toast } from '@/hooks/use-toast';
 
 interface MessageFlowProps {
   formData: CampaignFormData;
@@ -58,24 +59,27 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
 
   // Update parent formData whenever nodes or edges change
   useEffect(() => {
-    // Update messageFlow in formData
-    setFormData(prev => ({
-      ...prev,
-      messageFlow: {
-        nodes,
-        edges
-      }
-    }));
+    if (nodes.length > 0) {
+      console.log("Updating messageFlow in formData with nodes:", nodes);
+      // Update messageFlow in formData
+      setFormData(prev => ({
+        ...prev,
+        messageFlow: {
+          nodes,
+          edges
+        }
+      }));
 
-    // Also update flows for compatibility with older code
-    setFormData(prev => ({
-      ...prev,
-      flows: nodes.map(node => ({
-        id: node.id,
-        type: node.type,
-        data: node.data
-      }))
-    }));
+      // Also update flows for compatibility with older code
+      setFormData(prev => ({
+        ...prev,
+        flows: nodes.map(node => ({
+          id: node.id,
+          type: node.type,
+          data: node.data
+        }))
+      }));
+    }
   }, [nodes, edges, setFormData]);
 
   const { addNode, updateNode, deleteNode } = useNodeOperations({
@@ -139,20 +143,37 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
   };
 
   const saveFlowToFormData = () => {
+    // Make sure we have at least one node
+    if (nodes.length === 0) {
+      toast({
+        title: "Warning",
+        description: "Please add at least one message to the flow before proceeding.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     validateFlow(nodes, edges);
     
-    setFormData({
-      ...formData,
+    // Explicitly update the formData with the latest nodes and edges
+    setFormData(prev => ({
+      ...prev,
       messageFlow: {
-        nodes,
-        edges
+        nodes: [...nodes],
+        edges: [...edges]
       },
       flows: nodes.map(node => ({
         id: node.id,
         type: node.type,
         data: node.data
       }))
+    }));
+    
+    console.log("Saving flow data to formData:", {
+      nodes: nodes.length,
+      edges: edges.length
     });
+    
     onNext();
   };
 

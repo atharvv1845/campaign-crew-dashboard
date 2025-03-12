@@ -4,6 +4,7 @@ import { Check, AlertTriangle } from 'lucide-react';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 interface ReviewLaunchProps {
   formData: CampaignFormData;
@@ -28,6 +29,24 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
       const channel = availableChannels.find(c => c.id === channelId);
       return channel ? channel.name : channelId;
     }).join(', ');
+  };
+
+  const handleSubmit = () => {
+    console.log("Submitting campaign with data:", formData);
+    console.log("Message flow nodes:", formData.messageFlow?.nodes?.length);
+    
+    // Validate the message flow once more
+    if (!formData.messageFlow || !formData.messageFlow.nodes || formData.messageFlow.nodes.length === 0) {
+      toast({
+        title: "Warning",
+        description: "No message flow found. Please add at least one message step.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Proceed with submission
+    onSubmit();
   };
 
   return (
@@ -131,7 +150,7 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
           Back
         </Button>
         
-        <Button onClick={onSubmit}>
+        <Button onClick={handleSubmit}>
           {isReadyToLaunch ? 'Launch Campaign' : 'Save as Draft'}
         </Button>
       </div>

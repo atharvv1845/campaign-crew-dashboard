@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { Node, Edge } from 'reactflow';
 import { MessageStepData, DelayStepData, ConditionStepData } from '../types/campaignTypes';
@@ -40,6 +41,9 @@ export function useNodeOperations({
             ...data,
             label: data.label || `${type.charAt(0).toUpperCase() + type.slice(1)} ${newNodeId}`
           },
+          // Add source and target handles to allow connecting from multiple points
+          sourcePosition: 'bottom',
+          targetPosition: 'top',
         };
 
         console.log("Added new node:", newNode);
@@ -71,6 +75,12 @@ export function useNodeOperations({
             source: sourceNodeId,
             target: newNodeId,
             animated: true,
+            type: 'smoothstep',
+            style: { stroke: '#3b82f6', strokeWidth: 2 },
+            markerEnd: {
+              type: 'arrowclosed',
+              color: '#3b82f6',
+            },
           };
           
           setEdges(prevEdges => [...prevEdges, newEdge]);
@@ -154,6 +164,12 @@ export function useNodeOperations({
         source: sourceNode,
         target: targetNode,
         animated: true,
+        type: 'smoothstep',
+        style: { stroke: '#3b82f6', strokeWidth: 2 },
+        markerEnd: {
+          type: 'arrowclosed',
+          color: '#3b82f6',
+        },
       };
       
       // Add this new edge only if it doesn't already exist

@@ -1,13 +1,13 @@
 
 import React from 'react';
-import ReactFlow, { Background, Controls, NodeTypes, Panel } from 'reactflow';
+import ReactFlow, { Background, Controls, NodeTypes, Panel, ConnectionLineType, ConnectionMode } from 'reactflow';
 import 'reactflow/dist/style.css';
 import MessageNode from '../flowNodes/MessageNode';
 import DelayNode from '../flowNodes/DelayNode';
 import ConditionNode from '../flowNodes/ConditionNode';
 import FlowStatistics from './FlowStatistics';
 import { Button } from '@/components/ui/button';
-import { Mail, Clock, GitBranch } from 'lucide-react';
+import { Mail, Clock, GitBranch, ArrowRight } from 'lucide-react';
 
 const nodeTypes: NodeTypes = {
   messageNode: MessageNode,
@@ -78,6 +78,17 @@ const FlowCanvas: React.FC<FlowCanvasProps> = ({
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
+        connectionLineType={ConnectionLineType.SmoothStep}
+        connectionMode={ConnectionMode.Loose}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          animated: true,
+          style: { stroke: '#3b82f6', strokeWidth: 2 },
+          markerEnd: {
+            type: 'arrowclosed',
+            color: '#3b82f6',
+          },
+        }}
         fitView
         className="bg-white"
       >

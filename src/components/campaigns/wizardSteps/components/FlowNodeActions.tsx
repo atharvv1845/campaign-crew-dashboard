@@ -78,6 +78,7 @@ const FlowNodeActions = ({
   const handleDeleteNode = () => {
     if (selectedNode) {
       deleteNode(selectedNode);
+      setShowNodeModal(false);
     }
   };
 

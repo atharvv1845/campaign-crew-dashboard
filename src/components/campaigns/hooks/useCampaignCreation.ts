@@ -11,7 +11,13 @@ const defaultFormData: CampaignFormData = {
   channels: [],
   leads: [],
   flows: [],
-  stages: [],
+  stages: [
+    { id: "1", name: "New Lead", description: "Initial outreach not yet started" },
+    { id: "2", name: "Contacted", description: "First contact made" },
+    { id: "3", name: "Interested", description: "Showed interest" },
+    { id: "4", name: "Meeting", description: "Meeting scheduled" },
+    { id: "5", name: "Qualified", description: "Ready for opportunity" }
+  ],
   team: [],
   messageFlow: {
     nodes: [],
@@ -36,7 +42,7 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
         channels: existingCampaign.channels?.map((c: string) => c.toLowerCase()) || [],
         leads: [], // We would need to fetch leads data
         flows: [], // We would need to fetch message flow data
-        stages: [], // We would need to fetch stages data
+        stages: existingCampaign.stages || defaultFormData.stages, 
         team: existingCampaign.teamMembers || [],
         messageFlow: existingCampaign.messageFlow || {
           nodes: [],
@@ -91,10 +97,19 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
     // Create a sanitized version of messageFlow to avoid circular references
     const messageFlow = formData.messageFlow ? {
       nodes: formData.messageFlow.nodes.map(node => ({
-        ...node,
-        data: { ...node.data } // Create a deep copy of the data
+        id: node.id,
+        type: node.type,
+        position: { ...node.position },
+        data: { ...node.data }
       })),
-      edges: formData.messageFlow.edges ? [...formData.messageFlow.edges] : []
+      edges: formData.messageFlow.edges ? formData.messageFlow.edges.map(edge => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        animated: edge.animated,
+        sourceHandle: edge.sourceHandle,
+        targetHandle: edge.targetHandle
+      })) : []
     } : { nodes: [], edges: [] };
     
     const newCampaign = {
@@ -116,30 +131,40 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
       createdAt: new Date().toISOString().slice(0, 10),
       contacted: 0,
       messageFlow: messageFlow,
+      stages: formData.stages || [],
     };
 
-    if (existingCampaign) {
-      // Find and update existing campaign
-      const index = campaignData.findIndex(c => c.id === existingCampaign.id);
-      if (index !== -1) {
-        campaignData[index] = { ...campaignData[index], ...newCampaign };
+    try {
+      if (existingCampaign) {
+        // Find and update existing campaign
+        const index = campaignData.findIndex(c => c.id === existingCampaign.id);
+        if (index !== -1) {
+          campaignData[index] = { ...campaignData[index], ...newCampaign };
+          toast({
+            title: "Campaign Updated",
+            description: `${formData.name} has been updated.`
+          });
+        }
+      } else {
+        // Add new campaign to the list
+        campaignData.push(newCampaign);
+        console.log("Added new campaign:", newCampaign);
         toast({
-          title: "Campaign Updated",
-          description: `${formData.name} has been updated.`
+          title: "Campaign Created",
+          description: `${formData.name} has been created successfully.`
         });
       }
-    } else {
-      // Add new campaign to the list
-      campaignData.push(newCampaign);
-      console.log("Added new campaign:", newCampaign);
+
+      // Close the form with animation
+      handleClose();
+    } catch (error) {
+      console.error("Error saving campaign:", error);
       toast({
-        title: "Campaign Created",
-        description: `${formData.name} has been created successfully.`
+        title: "Error",
+        description: "There was a problem saving your campaign. Please try again.",
+        variant: "destructive"
       });
     }
-
-    // Close the form with animation
-    handleClose();
   }, [formData, existingCampaign, toast, handleClose]);
 
   return {

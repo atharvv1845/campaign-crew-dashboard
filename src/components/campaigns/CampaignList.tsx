@@ -18,7 +18,9 @@ const CampaignList: React.FC = () => {
   // Update campaigns when campaignData changes or when modal closes
   useEffect(() => {
     console.log("Refreshing campaign list data, found:", campaignData.length);
-    setCampaigns([...campaignData]);
+    // Create a deep copy to avoid reference issues
+    const campaignsCopy = campaignData.map(campaign => ({...campaign}));
+    setCampaigns(campaignsCopy);
   }, [showCreateCampaign, refreshTrigger]);
   
   // Filter campaigns based on search term and status
@@ -36,7 +38,6 @@ const CampaignList: React.FC = () => {
   
   const handleCampaignCreated = () => {
     // Force refresh of campaign data
-    setCampaigns([...campaignData]);
     setRefreshTrigger(prev => prev + 1);
     setShowCreateCampaign(false);
     
@@ -44,6 +45,10 @@ const CampaignList: React.FC = () => {
       title: "Success",
       description: "Campaign has been successfully created."
     });
+  };
+  
+  const refreshList = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
   
   return (
@@ -70,7 +75,7 @@ const CampaignList: React.FC = () => {
         <div className="h-full overflow-y-auto pb-4">
           <CampaignTable 
             campaigns={filteredCampaigns}
-            refreshList={() => setRefreshTrigger(prev => prev + 1)} 
+            refreshList={refreshList} 
           />
         </div>
       </div>

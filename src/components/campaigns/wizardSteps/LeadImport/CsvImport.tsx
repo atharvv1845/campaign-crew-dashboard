@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, FileCheck, X, Download } from 'lucide-react';
 import { CampaignFormData } from '../../types/campaignTypes';
@@ -17,6 +16,7 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [csvMapping, setCsvMapping] = useState<Record<string, string>>({});
   const [csvPreview, setCsvPreview] = useState<any[]>([]);
+  const [importedLeads, setImportedLeads] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { generateId } = useLeadImport();
@@ -181,7 +181,7 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         }
         
         // Only add if we have the minimum required fields
-        if (leadData.firstName && leadData.lastName && leadData.email) {
+        if (leadData.firstName && leadData.email) {
           newLeads.push(leadData);
         }
       }
@@ -192,7 +192,15 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         leads: [...prev.leads, ...newLeads]
       }));
       
-      // Reset CSV state
+      // Update imported leads for display
+      setImportedLeads(newLeads);
+      
+      toast({
+        title: "Leads Imported",
+        description: `Successfully imported ${newLeads.length} leads from CSV.`,
+      });
+      
+      // Reset CSV state but keep imported leads visible
       setCsvFile(null);
       setCsvHeaders([]);
       setCsvMapping({});
@@ -296,6 +304,64 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
             >
               Import Leads
             </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Display imported leads */}
+      {importedLeads.length > 0 && (
+        <div className="mt-6 border border-border rounded-lg">
+          <div className="bg-muted/20 px-4 py-3 border-b border-border">
+            <h4 className="font-medium">Imported Leads ({importedLeads.length})</h4>
+          </div>
+          <div className="p-4 max-h-[300px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/10">
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Company</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {importedLeads.map((lead) => (
+                  <tr key={lead.id}>
+                    <td className="px-4 py-2">{`${lead.firstName} ${lead.lastName}`}</td>
+                    <td className="px-4 py-2">{lead.email}</td>
+                    <td className="px-4 py-2">{lead.company || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      
+      {/* Display all leads from form data */}
+      {formData.leads.length > 0 && !csvFile && importedLeads.length === 0 && (
+        <div className="mt-6 border border-border rounded-lg">
+          <div className="bg-muted/20 px-4 py-3 border-b border-border">
+            <h4 className="font-medium">All Leads ({formData.leads.length})</h4>
+          </div>
+          <div className="p-4 max-h-[300px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/10">
+                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Company</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {formData.leads.map((lead) => (
+                  <tr key={lead.id}>
+                    <td className="px-4 py-2">{`${lead.firstName} ${lead.lastName}`}</td>
+                    <td className="px-4 py-2">{lead.email}</td>
+                    <td className="px-4 py-2">{lead.company || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, FileText } from 'lucide-react';
 import CampaignTableRow from './CampaignTableRow';
 import { CampaignData } from './campaignData';
 
@@ -41,8 +41,14 @@ const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList })
           <tbody className="divide-y divide-border bg-card">
             {campaigns.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-4 text-center text-muted-foreground">
-                  No campaigns found
+                <td colSpan={8} className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-3 text-muted-foreground">
+                    <FileText className="h-10 w-10 opacity-40" />
+                    <div className="text-sm">No campaigns found</div>
+                    <div className="text-xs max-w-xs text-center">
+                      Create your first campaign by clicking the "Create Campaign" button above.
+                    </div>
+                  </div>
                 </td>
               </tr>
             ) : (

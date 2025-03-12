@@ -47,7 +47,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
   } = useMessageFlowState(formData, setFormData, onNext);
 
   // Use the FlowNodeActions hook to get the action handlers
-  const nodeActions = FlowNodeActions({
+  const { handleAddNode, handleSaveNode, handleDeleteNode } = FlowNodeActions({
     nodeType,
     nodeData,
     setNodeData,
@@ -62,7 +62,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
   });
 
   // Use the FlowSaveValidation hook to get the saveFlowToFormData function
-  const flowValidation = FlowSaveValidation({
+  const { saveFlowToFormData } = FlowSaveValidation({
     nodes,
     edges,
     validateFlow,
@@ -72,7 +72,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <FlowControlsToolbar onAddNode={nodeActions.handleAddNode} />
+      <FlowControlsToolbar onAddNode={handleAddNode} />
 
       <FlowCanvas
         nodes={nodes}
@@ -90,11 +90,11 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
         nodeData={nodeData}
         setNodeData={setNodeData}
         selectedNode={selectedNode}
-        onSave={nodeActions.handleSaveNode}
-        onDelete={nodeActions.handleDeleteNode}
+        onSave={handleSaveNode}
+        onDelete={handleDeleteNode}
       />
 
-      <FlowNavigation onNext={flowValidation.saveFlowToFormData} onBack={onBack} />
+      <FlowNavigation onNext={saveFlowToFormData} onBack={onBack} />
     </div>
   );
 };

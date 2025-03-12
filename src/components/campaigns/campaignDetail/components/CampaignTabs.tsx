@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
 import TabsLayout from '../tabs/TabsLayout';
 import OverviewTab from '../tabs/OverviewTab';
@@ -38,9 +38,12 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const tabs = getTabs(campaign, campaignLeads);
 
   return (
-    <TabsLayout tabs={tabs} defaultValue="overview">
+    <TabsLayout 
+      tabs={tabs} 
+      defaultValue="overview"
+    >
       <TabsContent value="overview">
-        <OverviewTab campaign={campaign} updateCampaign={updateCampaign} />
+        <OverviewTab campaign={enhancedCampaign} leadsData={campaignLeads} updateCampaign={updateCampaign} />
       </TabsContent>
 
       <TabsContent value="leads">
@@ -54,18 +57,19 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       </TabsContent>
 
       <TabsContent value="messages">
-        <MessagesTab campaign={campaign} updateCampaign={updateCampaign} />
+        <MessagesTab campaign={enhancedCampaign} />
       </TabsContent>
 
       <TabsContent value="reports">
-        <ReportsTab campaign={campaign} />
+        <ReportsTab campaign={enhancedCampaign} leadsData={campaignLeads} />
       </TabsContent>
 
       <TabsContent value="settings">
         <SettingsTab 
-          campaign={campaign}
+          campaign={enhancedCampaign}
           onExportCampaign={handleExportCampaign}
           onImportCampaign={handleImportCampaign}
+          updateCampaign={updateCampaign}
         />
       </TabsContent>
     </TabsLayout>

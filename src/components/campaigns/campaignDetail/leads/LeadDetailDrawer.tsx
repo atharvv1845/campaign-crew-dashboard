@@ -23,6 +23,8 @@ import { Lead, Campaign } from './types';
 import DetailsTab from './components/drawer/DetailsTab';
 import InteractionsTab from './components/drawer/InteractionsTab';
 import { Check, X } from 'lucide-react';
+import { useInteractions } from './hooks/useInteractions';
+import { useToastNotifications } from './hooks/useToastNotifications';
 
 interface LeadDetailDrawerProps {
   lead: Lead;
@@ -42,6 +44,8 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedLead, setEditedLead] = useState<Lead>(lead);
+  const { interactions, logInteraction } = useInteractions(lead.id);
+  const { notifyContactLogged } = useToastNotifications();
 
   const handleEdit = () => {
     setEditedLead(lead);
@@ -65,6 +69,20 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
 
   const handleInputChange = (field: keyof Lead, value: string) => {
     setEditedLead(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLogInteraction = (type: 'email' | 'call' | 'meeting' | 'message', description: string) => {
+    logInteraction(type, description);
+    notifyContactLogged();
+    
+    // Also update lastContacted in the lead data
+    if (onUpdateLead) {
+      const today = new Date().toISOString().split('T')[0];
+      onUpdateLead({
+        ...lead,
+        lastContacted: today
+      });
+    }
   };
 
   return (
@@ -194,7 +212,11 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
             </TabsContent>
             
             <TabsContent value="interactions">
-              <InteractionsTab lead={lead} />
+              <InteractionsTab 
+                lead={lead}
+                interactions={interactions}
+                onLogInteraction={handleLogInteraction}
+              />
             </TabsContent>
             
             <TabsContent value="history">

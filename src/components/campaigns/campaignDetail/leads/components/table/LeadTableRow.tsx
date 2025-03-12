@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Mail, Calendar, Edit, Check, X, MoreHorizontal } from 'lucide-react';
-import StageBadge from '../../badges/StageBadge';
+import StageBadge from '@/components/campaigns/campaignDetail/badges/StageBadge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import {

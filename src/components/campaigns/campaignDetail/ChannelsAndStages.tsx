@@ -9,14 +9,17 @@ interface ChannelsAndStagesProps {
     channels: string[];
     leads: number;
     stages: Array<{
-      id: number;
+      id: number | string;
       name: string;
-      count: number;
+      count?: number;
     }>;
   };
 }
 
 const ChannelsAndStages: React.FC<ChannelsAndStagesProps> = ({ campaign }) => {
+  // Ensure leads is a number to prevent NaN when calculating percentages
+  const totalLeads = typeof campaign.leads === 'number' ? campaign.leads : 0;
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Channels */}
@@ -56,20 +59,27 @@ const ChannelsAndStages: React.FC<ChannelsAndStagesProps> = ({ campaign }) => {
       <div className="glass-card p-4 rounded-xl">
         <h3 className="text-sm font-medium mb-3">Lead Stages</h3>
         <div className="space-y-3">
-          {campaign.stages.map(stage => (
-            <div key={stage.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <StageBadge stage={stage.name} />
-                <span className="text-sm">{stage.name}</span>
+          {campaign.stages && campaign.stages.map(stage => {
+            // Ensure count is a number and has a default value of 0
+            const count = typeof stage.count === 'number' ? stage.count : 0;
+            // Calculate percentage safely
+            const percentage = totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0;
+            
+            return (
+              <div key={stage.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <StageBadge stage={stage.name} />
+                  <span className="text-sm">{stage.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{count.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({percentage}%)
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{stage.count.toLocaleString()}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({Math.round((stage.count / campaign.leads) * 100)}%)
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

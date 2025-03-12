@@ -15,7 +15,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
 
   const handleRowClick = () => {
     if (campaign?.id) {
-      console.log("Navigating to campaign details:", campaign.id);
+      console.log("Navigating to campaign details:", campaign.id, "with data:", campaign);
       navigate(`/campaigns/${campaign.id}`);
     }
   };
@@ -23,9 +23,16 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
   // Make sure all campaign data has default values to prevent errors
   const safeCampaign = {
     ...campaign,
+    name: campaign?.name || 'Untitled Campaign',
     channels: campaign?.channels || [],
     teamMembers: campaign?.teamMembers || [],
-    createdAt: campaign?.createdAt || new Date().toISOString().slice(0, 10)
+    createdAt: campaign?.createdAt || new Date().toISOString().slice(0, 10),
+    leads: campaign?.leads || 0,
+    responses: campaign?.responses || 0,
+    positive: campaign?.positive || 0,
+    negative: campaign?.negative || 0,
+    conversion: campaign?.conversion || '0%',
+    stages: campaign?.stages || []
   };
 
   return (

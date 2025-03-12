@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -88,33 +89,43 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
       return;
     }
 
-    // Generate new campaign ID
-    const campaignId = existingCampaign 
-      ? existingCampaign.id 
-      : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
-    
-    console.log("Creating campaign with ID:", campaignId);
-    
-    const newCampaign = {
-      id: campaignId,
-      name: formData.name,
-      description: formData.description,
-      status: 'Active',
-      type: 'Email',
-      channels: formData.channels,
-      leads: formData.leads.length,
-      responses: 0,
-      positive: 0,
-      negative: 0,
-      conversion: '0%',
-      teamMembers: formData.team,
-      createdAt: new Date().toISOString().slice(0, 10),
-      contacted: 0,
-      messageFlow: formData.messageFlow || { nodes: [], edges: [] },
-      stages: formData.stages
-    };
-
     try {
+      // Generate new campaign ID
+      const campaignId = existingCampaign 
+        ? existingCampaign.id 
+        : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
+      
+      console.log("Creating campaign with ID:", campaignId);
+      
+      // Create normalized stages data with counts for the campaign data structure
+      const normalizedStages = formData.stages.map(stage => ({
+        id: stage.id,
+        name: stage.name,
+        description: stage.description || "",
+        color: stage.color || "bg-blue-500",
+        count: 0 // Initialize count to zero
+      }));
+      
+      // Create a new, properly formatted campaign object
+      const newCampaign = {
+        id: campaignId,
+        name: formData.name,
+        description: formData.description,
+        status: 'Active',
+        type: 'Email',
+        channels: formData.channels,
+        leads: formData.leads.length,
+        responses: 0,
+        positive: 0,
+        negative: 0,
+        conversion: '0%',
+        teamMembers: formData.team,
+        createdAt: new Date().toISOString().slice(0, 10),
+        contacted: 0,
+        messageFlow: formData.messageFlow || { nodes: [], edges: [] },
+        stages: normalizedStages
+      };
+
       if (existingCampaign) {
         // Update existing campaign
         const index = campaignData.findIndex(c => c.id === existingCampaign.id);

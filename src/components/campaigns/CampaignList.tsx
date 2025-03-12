@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -21,13 +22,6 @@ const CampaignList: React.FC = () => {
   
   const refreshList = () => {
     console.log("Manually refreshing campaign list");
-    setCampaigns([...campaignData]); // Directly update campaigns state
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-  useEffect(() => {
-    console.log("Refreshing campaign list data, found:", campaignData.length, "campaigns");
-    
     const sanitizedCampaigns = campaignData.map(campaign => ({
       id: campaign.id,
       name: campaign.name || 'Untitled Campaign',
@@ -48,6 +42,12 @@ const CampaignList: React.FC = () => {
     }));
     
     setCampaigns(sanitizedCampaigns);
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  useEffect(() => {
+    console.log("Refreshing campaign list data, found:", campaignData.length, "campaigns");
+    refreshList();
   }, [refreshTrigger, showCreateCampaign]);
   
   const handleCampaignCreated = (campaign: CampaignFormData) => {
@@ -62,11 +62,6 @@ const CampaignList: React.FC = () => {
       title: "Success",
       description: "Campaign has been successfully created."
     });
-    
-    setTimeout(() => {
-      console.log("Navigating to newly created campaign:", newCampaignId);
-      navigate(`/campaigns/${newCampaignId}`);
-    }, 1000);
   };
   
   const filteredCampaigns = campaigns.filter(campaign => {

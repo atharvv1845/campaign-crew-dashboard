@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Campaigns from "./pages/Campaigns";
 import CampaignDetail from "./pages/CampaignDetail";
+import CampaignManagement from "./pages/CampaignManagement";
 import Leads from "./pages/Leads";
 import Messaging from "./pages/Messaging";
 import NotFound from "./pages/NotFound";
@@ -38,10 +39,19 @@ const App = () => (
             path="/campaigns"
             element={
               <MainLayout>
-                <Campaigns />
+                <CampaignManagement />
               </MainLayout>
             }
             data-testid="campaigns-route"
+          />
+          
+          <Route
+            path="/campaigns/list"
+            element={
+              <MainLayout>
+                <Campaigns />
+              </MainLayout>
+            }
           />
           
           <Route

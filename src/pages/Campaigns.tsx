@@ -1,11 +1,11 @@
 
 import React from 'react';
-import CampaignList from '@/components/campaigns/CampaignList';
+import CampaignManagement from './CampaignManagement';
 
 const Campaigns: React.FC = () => {
   return (
     <div className="h-[calc(100vh-6rem)]">
-      <CampaignList />
+      <CampaignManagement />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -67,7 +68,19 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     console.log('Processed Campaign Leads:', campaignLeads);
   }, [campaign]);
   
-  const enhancedCampaign = enhanceCampaign(campaign);
+  // Create an enhanced campaign with default stages if needed
+  const enhancedCampaign = {
+    ...campaign,
+    stages: campaign.stages || [
+      { id: 1, name: 'New', count: 0 },
+      { id: 2, name: 'Contacted', count: 0 },
+      { id: 3, name: 'Interested', count: 0 },
+      { id: 4, name: 'Qualified', count: 0 },
+      { id: 5, name: 'Meeting', count: 0 },
+      { id: 6, name: 'Closed', count: 0 },
+      { id: 7, name: 'Lost', count: 0 },
+    ]
+  };
 
   const tabs = getTabs(campaign, campaignLeads);
 

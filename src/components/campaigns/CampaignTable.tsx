@@ -7,14 +7,21 @@ import { CampaignData } from './campaignData';
 interface CampaignTableProps {
   campaigns: CampaignData[];
   refreshList?: () => void;
+  onCampaignClick?: (campaignId: number) => void;
 }
 
-const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList }) => {
+const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList, onCampaignClick }) => {
   const [, setRefreshTable] = useState(0); // Used to force re-render when status changes
 
   const handleStatusChange = () => {
     setRefreshTable(prev => prev + 1); // Force re-render
     if (refreshList) refreshList();
+  };
+
+  const handleRowClick = (campaignId: number) => {
+    if (onCampaignClick) {
+      onCampaignClick(campaignId);
+    }
   };
 
   return (
@@ -57,6 +64,7 @@ const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList })
                   key={campaign.id}
                   campaign={campaign} 
                   onStatusChange={handleStatusChange}
+                  onRowClick={() => handleRowClick(campaign.id)}
                 />
               ))
             )}

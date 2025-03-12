@@ -8,13 +8,16 @@ import ChannelBadge from './ChannelBadge';
 interface CampaignTableRowProps {
   campaign: any;
   onStatusChange: () => void;
+  onRowClick?: () => void;
 }
 
-const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusChange }) => {
+const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusChange, onRowClick }) => {
   const navigate = useNavigate();
 
   const handleRowClick = () => {
-    if (campaign?.id) {
+    if (onRowClick) {
+      onRowClick();
+    } else if (campaign?.id) {
       console.log("Navigating to campaign details:", campaign.id, "with data:", campaign);
       navigate(`/campaigns/${campaign.id}`);
     }

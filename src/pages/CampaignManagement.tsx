@@ -90,6 +90,11 @@ const CampaignManagement: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
   
+  const handleCampaignClick = (campaignId: number) => {
+    console.log("Navigating to campaign details:", campaignId);
+    navigate(`/campaigns/${campaignId}`);
+  };
+  
   return (
     <div className="space-y-6 h-[calc(100vh-6rem)] flex flex-col p-6">
       <div className="flex justify-between items-center">
@@ -193,11 +198,12 @@ const CampaignManagement: React.FC = () => {
           </div>
           
           {/* Campaign Table */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden cursor-pointer">
             <div className="h-full overflow-y-auto pb-4">
               <CampaignTable 
                 campaigns={filteredCampaigns}
                 refreshList={refreshCampaigns} 
+                onCampaignClick={handleCampaignClick}
               />
             </div>
           </div>

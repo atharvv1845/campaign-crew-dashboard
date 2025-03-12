@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -6,7 +7,7 @@ import OverviewTab from '../tabs/OverviewTab';
 import LeadsTab from '../tabs/LeadsTab';
 import MessagesTab from '../tabs/MessagesTab';
 import ReportsTab from '../tabs/ReportsTab';
-import { getTabs, getMockLeads, enhanceCampaign, convertImportedLeads } from '../tabs/helpers/tabHelpers';
+import { getTabs, enhanceCampaign, convertImportedLeads } from '../tabs/helpers/tabHelpers';
 import { useToast } from '@/hooks/use-toast';
 
 interface CampaignTabsProps {
@@ -25,11 +26,11 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const [view, setView] = useState<'table' | 'kanban'>('table');
   const { toast } = useToast();
   
-  // Get leads from campaign data if available, or use mock data as fallback
+  // Get leads from campaign data
   const getLeadsForCampaign = (): Lead[] => {
     console.log('Campaign object:', campaign);
     
-    // First check if campaign has direct leads property that is an array
+    // Check if campaign has direct leads property that is an array
     if (campaign.leads && Array.isArray(campaign.leads)) {
       console.log('Found leads array in campaign:', campaign.leads.length);
       
@@ -47,10 +48,9 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       });
     }
     
-    // Fallback to mock leads if no imported leads
-    console.log('No leads found in campaign, using mock data');
-    const mockLeads = getMockLeads();
-    return mockLeads.filter(lead => lead.campaignId === campaign.id);
+    // No leads found, return empty array
+    console.log('No leads found in campaign, returning empty array');
+    return [];
   };
   
   const campaignLeads = getLeadsForCampaign();

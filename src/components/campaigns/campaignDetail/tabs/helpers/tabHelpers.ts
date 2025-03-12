@@ -1,6 +1,5 @@
 
 import { Lead } from '../../leads/types';
-import { Icon } from 'lucide-react';
 
 interface Campaign {
   id: number;
@@ -40,57 +39,7 @@ export const getTabs = (campaign: Campaign, campaignLeads: Lead[]): TabConfig[] 
   return tabs;
 };
 
-export const getMockLeads = (): Lead[] => {
-  return [
-    {
-      id: 1,
-      name: 'John Smith',
-      company: 'Tech Corp',
-      email: 'john@techcorp.com',
-      linkedin: 'linkedin.com/in/johnsmith',
-      lastContacted: '2023-10-01',
-      currentStage: 'Contacted',
-      assignedTo: 'Sarah Lee',
-      campaignId: 8
-    },
-    {
-      id: 2,
-      name: 'Emily Johnson',
-      company: 'Creative Solutions',
-      email: 'emily@creativesolutions.com',
-      linkedin: 'linkedin.com/in/emilyjohnson',
-      whatsapp: '+1234567890',
-      lastContacted: '2023-10-03',
-      currentStage: 'New',
-      assignedTo: 'John Smith',
-      campaignId: 8
-    },
-    {
-      id: 3,
-      name: 'Michael Brown',
-      company: 'Innovative Inc',
-      email: 'michael@innovative.com',
-      lastContacted: '2023-09-28',
-      currentStage: 'Interested',
-      assignedTo: 'Sarah Lee',
-      followUpDate: '2023-10-15',
-      campaignId: 8
-    },
-    // Add more leads to match the total of 18
-    ...Array.from({ length: 15 }, (_, i) => ({
-      id: i + 4,
-      name: `Lead ${i + 4}`,
-      company: `Company ${i + 4}`,
-      email: `lead${i + 4}@example.com`,
-      lastContacted: '2023-10-05',
-      currentStage: 'New Lead',
-      assignedTo: 'user1',
-      campaignId: 8
-    }))
-  ];
-};
-
-// Enhanced function to convert imported leads to the Lead format
+// Convert imported leads to the Lead format
 export const convertImportedLeads = (campaignData: any): Lead[] => {
   console.log('Converting leads for campaign ID:', campaignData.id);
   
@@ -123,7 +72,7 @@ export const convertImportedLeads = (campaignData: any): Lead[] => {
       assignedTo: lead.assignedTo || 'Unassigned',
       followUpDate: lead.followUpDate || '',
       notes: lead.notes || '',
-      campaignId: campaignData.id || 8
+      campaignId: campaignData.id || 0
     };
     
     console.log(`Converted lead: ${convertedLead.name} (ID: ${convertedLead.id})`);
@@ -133,13 +82,13 @@ export const convertImportedLeads = (campaignData: any): Lead[] => {
 
 export const enhanceCampaign = (campaign: any) => {
   const stagesData = campaign.stages || [
-    { id: 1, name: 'New', count: 5 },
-    { id: 2, name: 'Contacted', count: 12 },
-    { id: 3, name: 'Interested', count: 8 },
-    { id: 4, name: 'Qualified', count: 4 },
-    { id: 5, name: 'Meeting', count: 2 },
-    { id: 6, name: 'Closed', count: 1 },
-    { id: 7, name: 'Lost', count: 3 },
+    { id: 1, name: 'New', count: 0 },
+    { id: 2, name: 'Contacted', count: 0 },
+    { id: 3, name: 'Interested', count: 0 },
+    { id: 4, name: 'Qualified', count: 0 },
+    { id: 5, name: 'Meeting', count: 0 },
+    { id: 6, name: 'Closed', count: 0 },
+    { id: 7, name: 'Lost', count: 0 },
   ];
 
   return {

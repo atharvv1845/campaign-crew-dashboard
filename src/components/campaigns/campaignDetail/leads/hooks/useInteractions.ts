@@ -1,63 +1,76 @@
 
-import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Interaction } from '../types/interactions';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Interaction, InteractionType } from '../types/interactions';
 
 export const useInteractions = (leadId: number) => {
+  const { toast } = useToast();
   const [interactions, setInteractions] = useState<Interaction[]>([]);
 
-  // In a real app, this would fetch interactions from an API
-  useEffect(() => {
-    // This is just mock data - in a real app, we'd fetch from an API
-    const mockInteractions: Interaction[] = [
-      {
-        id: '1',
-        type: 'email',
-        date: '2023-10-05',
-        description: 'Sent initial outreach email about our new product.',
-        user: 'Sarah Lee',
-        leadId: 1
-      },
-      {
-        id: '2',
-        type: 'call',
-        date: '2023-10-07',
-        description: 'Follow-up call discussing pricing options.',
-        user: 'John Smith',
-        leadId: 1
-      },
-      {
-        id: '3',
-        type: 'meeting',
-        date: '2023-10-12',
-        description: 'Demo meeting with team members.',
-        user: 'Sarah Lee',
-        leadId: 2
-      }
-    ];
-
-    // Filter interactions for this specific lead
-    const leadInteractions = mockInteractions.filter(interaction => interaction.leadId === leadId);
-    setInteractions(leadInteractions);
-  }, [leadId]);
-
-  const logInteraction = (type: 'email' | 'call' | 'meeting' | 'message', description: string) => {
+  const addEmailInteraction = (content: string) => {
     const newInteraction: Interaction = {
-      id: uuidv4(),
-      type,
-      date: new Date().toISOString().split('T')[0],
-      description,
-      user: 'Current User', // In a real app, this would be the current user
-      leadId
+      id: Date.now(), // Generate a unique ID
+      type: InteractionType.Email,
+      content,
+      timestamp: new Date().toISOString(),
+      leadId: leadId
     };
-
     setInteractions(prev => [newInteraction, ...prev]);
-
-    // In a real app, this would make an API call to save the interaction
-    console.log('Logged new interaction:', newInteraction);
-    
     return newInteraction;
   };
 
-  return { interactions, logInteraction };
+  const addCallInteraction = (content: string) => {
+    const newInteraction: Interaction = {
+      id: Date.now(),
+      type: InteractionType.Call,
+      content,
+      timestamp: new Date().toISOString(),
+      leadId: leadId
+    };
+    setInteractions(prev => [newInteraction, ...prev]);
+    return newInteraction;
+  };
+
+  const addMessageInteraction = (content: string) => {
+    const newInteraction: Interaction = {
+      id: Date.now(),
+      type: InteractionType.Message,
+      content,
+      timestamp: new Date().toISOString(),
+      leadId: leadId
+    };
+    setInteractions(prev => [newInteraction, ...prev]);
+    return newInteraction;
+  };
+
+  const logInteraction = (type: InteractionType, content: string) => {
+    let interaction;
+    switch (type) {
+      case InteractionType.Email:
+        interaction = addEmailInteraction(content);
+        break;
+      case InteractionType.Call:
+        interaction = addCallInteraction(content);
+        break;
+      case InteractionType.Message:
+        interaction = addMessageInteraction(content);
+        break;
+    }
+
+    if (interaction) {
+      toast({
+        title: "Interaction Logged",
+        description: `${type} interaction has been recorded.`
+      });
+    }
+
+    return interaction;
+  };
+
+  return {
+    interactions,
+    logInteraction
+  };
 };
+
+export default useInteractions;

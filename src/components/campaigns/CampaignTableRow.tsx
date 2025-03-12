@@ -15,6 +15,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
 
   const handleRowClick = () => {
     if (campaign?.id) {
+      console.log("Navigating to campaign details:", campaign.id);
       navigate(`/campaigns/${campaign.id}`);
     }
   };

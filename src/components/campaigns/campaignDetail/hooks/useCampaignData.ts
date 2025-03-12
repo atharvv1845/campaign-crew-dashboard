@@ -2,9 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { campaignData } from '../../campaignData';
+import { useNavigate } from 'react-router-dom';
 
 export const useCampaignData = (id: string | undefined) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [campaign, setCampaign] = useState<any>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -27,6 +29,9 @@ export const useCampaignData = (id: string | undefined) => {
           if (!foundCampaign && campaignData.length > 0) {
             console.log('Campaign not found for id:', id, 'showing first campaign instead');
             foundCampaign = campaignData[0];
+            
+            // Update the URL to match the campaign we're showing
+            navigate(`/campaigns/${foundCampaign.id}`, { replace: true });
           }
           
           if (foundCampaign) {
@@ -56,7 +61,7 @@ export const useCampaignData = (id: string | undefined) => {
     if (id) {
       fetchCampaign();
     }
-  }, [id, toast, refreshTrigger]);
+  }, [id, toast, refreshTrigger, navigate]);
 
   const updateCampaign = (updatedData: Partial<any>) => {
     if (!campaign) return;

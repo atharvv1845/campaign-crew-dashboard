@@ -12,6 +12,29 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
   csvMapping, 
   onMappingChange 
 }) => {
+  // Mapping options for CSV columns
+  const mappingOptions = [
+    { value: 'name', label: 'Full Name' },
+    { value: 'firstName', label: 'First Name' },
+    { value: 'lastName', label: 'Last Name' },
+    { value: 'email', label: 'Email' },
+    { value: 'company', label: 'Company' },
+    { value: 'title', label: 'Job Title' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'currentStage', label: 'Stage' },
+    { value: 'assignedTo', label: 'Assigned To' },
+    { value: 'notes', label: 'Notes' },
+    { value: 'linkedin', label: 'LinkedIn' },
+    { value: 'twitter', label: 'Twitter' },
+    { value: 'facebook', label: 'Facebook' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'whatsapp', label: 'WhatsApp' },
+    { value: 'lastContacted', label: 'Last Contact Date' },
+    { value: 'firstContacted', label: 'First Contact Date' },
+    { value: 'followUpDate', label: 'Next Follow Up Date' },
+    { value: 'source', label: 'Lead Source' },
+  ];
+
   return (
     <div className="border border-border rounded-lg overflow-hidden">
       <div className="bg-muted/20 px-4 py-3 border-b border-border">
@@ -36,24 +59,11 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                     className="w-full px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="">-- Select Field --</option>
-                    <option value="name">Name</option>
-                    <option value="firstName">First Name</option>
-                    <option value="lastName">Last Name</option>
-                    <option value="email">Email</option>
-                    <option value="company">Company</option>
-                    <option value="title">Title</option>
-                    <option value="currentStage">Status</option>
-                    <option value="assignedTo">Assigned To</option>
-                    <option value="notes">Notes</option>
-                    <option value="platformLinks">Platform Links</option>
-                    <option value="linkedin">LinkedIn</option>
-                    <option value="twitter">Twitter</option>
-                    <option value="facebook">Facebook</option>
-                    <option value="instagram">Instagram</option>
-                    <option value="whatsapp">WhatsApp</option>
-                    <option value="lastContacted">Last Contact</option>
-                    <option value="firstContacted">First Contact</option>
-                    <option value="followUpDate">Next Follow Up</option>
+                    {mappingOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
                 </td>
               </tr>

@@ -78,13 +78,6 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
     }
   };
 
-  // Always display these core fields
-  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
-  
-  const displayColumn = (fieldName: string): boolean => {
-    return coreFields.includes(fieldName) || populatedFields.includes(fieldName);
-  };
-
   // Get the lead's display name based on available information
   const getLeadName = () => {
     if (lead.name) return lead.name;
@@ -116,15 +109,30 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
           />
         </td>
       )}
-      <td className="py-3 px-6">{getLeadName()}</td>
       
-      {displayColumn('socialProfiles') && (
+      {populatedFields.includes('name') && (
+        <td className="py-3 px-6">{getLeadName()}</td>
+      )}
+      
+      {populatedFields.includes('socialProfiles') && (
         <td className="py-3 px-6">
           <LeadPlatformIcons lead={lead} />
         </td>
       )}
       
-      {displayColumn('firstContacted') && (
+      {populatedFields.includes('email') && (
+        <td className="py-3 px-6">{lead.email || '-'}</td>
+      )}
+      
+      {populatedFields.includes('company') && (
+        <td className="py-3 px-6">{lead.company || '-'}</td>
+      )}
+      
+      {populatedFields.includes('title') && (
+        <td className="py-3 px-6">{lead.title || '-'}</td>
+      )}
+      
+      {populatedFields.includes('firstContacted') && (
         <td className="py-3 px-6">
           <LeadDatePicker
             date={firstContacted}
@@ -134,7 +142,7 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
         </td>
       )}
       
-      {displayColumn('lastContacted') && (
+      {populatedFields.includes('lastContacted') && (
         <td className="py-3 px-6">
           <LeadDatePicker
             date={lastContacted}
@@ -144,7 +152,7 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
         </td>
       )}
       
-      {displayColumn('followUpDate') && (
+      {populatedFields.includes('followUpDate') && (
         <td className="py-3 px-6">
           <LeadDatePicker
             date={followUpDate}
@@ -154,7 +162,7 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
         </td>
       )}
       
-      {displayColumn('currentStage') && (
+      {populatedFields.includes('currentStage') && (
         <td className="py-3 px-6">
           <LeadStageSelector
             currentStage={lead.currentStage}
@@ -164,11 +172,11 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
         </td>
       )}
       
-      {displayColumn('assignedTo') && (
+      {populatedFields.includes('assignedTo') && (
         <td className="py-3 px-6">{lead.assignedTo || 'N/A'}</td>
       )}
       
-      {displayColumn('notes') && (
+      {populatedFields.includes('notes') && (
         <td className="py-3 px-6">
           <span className="line-clamp-1 max-w-[150px]">{lead.notes || 'No notes'}</span>
         </td>

@@ -21,11 +21,21 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
   populatedFields = []
 }) => {
   // Always display these core fields
-  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
+  const coreFields = ['name', 'currentStage', 'assignedTo'];
   
-  const displayColumn = (fieldName: string): boolean => {
-    return coreFields.includes(fieldName) || populatedFields.includes(fieldName);
-  };
+  // Add contact date fields if they exist in the data
+  const dateFields = ['firstContacted', 'lastContacted', 'followUpDate'].filter(
+    field => populatedFields.includes(field)
+  );
+  
+  // Get all fields that should be displayed
+  const fieldsToDisplay = [
+    ...coreFields,
+    ...dateFields,
+    ...populatedFields.filter(
+      field => !coreFields.includes(field) && !dateFields.includes(field)
+    )
+  ];
 
   return (
     <tr className="bg-muted/10 text-sm">
@@ -38,37 +48,50 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         </th>
       )}
       
-      {/* Always show name column */}
-      <th className="py-3 px-6 text-left font-medium">Name</th>
+      {/* Dynamically render header columns based on available fields */}
+      {fieldsToDisplay.includes('name') && (
+        <th className="py-3 px-6 text-left font-medium">Name</th>
+      )}
       
-      {/* Show social platforms column */}
-      {displayColumn('socialProfiles') && (
+      {populatedFields.includes('socialProfiles') && (
         <th className="py-3 px-6 text-left font-medium">Platforms</th>
       )}
       
-      {/* Always show these core date fields */}
-      {displayColumn('firstContacted') && (
-        <th className="py-3 px-6 text-left font-medium">First Contacted</th>
+      {populatedFields.includes('email') && (
+        <th className="py-3 px-6 text-left font-medium">Email</th>
       )}
       
-      {displayColumn('lastContacted') && (
-        <th className="py-3 px-6 text-left font-medium">Last Contacted</th>
+      {populatedFields.includes('company') && (
+        <th className="py-3 px-6 text-left font-medium">Company</th>
       )}
       
-      {displayColumn('followUpDate') && (
-        <th className="py-3 px-6 text-left font-medium">Next Follow Up</th>
+      {populatedFields.includes('title') && (
+        <th className="py-3 px-6 text-left font-medium">Title</th>
       )}
       
-      {/* Always show these core management fields */}
-      {displayColumn('currentStage') && (
+      {dateFields.map(field => {
+        const labels = {
+          firstContacted: 'First Contacted',
+          lastContacted: 'Last Contacted',
+          followUpDate: 'Next Follow Up'
+        };
+        
+        return (
+          <th key={field} className="py-3 px-6 text-left font-medium">
+            {labels[field as keyof typeof labels]}
+          </th>
+        );
+      })}
+      
+      {fieldsToDisplay.includes('currentStage') && (
         <th className="py-3 px-6 text-left font-medium">Stage</th>
       )}
       
-      {displayColumn('assignedTo') && (
+      {fieldsToDisplay.includes('assignedTo') && (
         <th className="py-3 px-6 text-left font-medium">Assigned To</th>
       )}
       
-      {displayColumn('notes') && (
+      {populatedFields.includes('notes') && (
         <th className="py-3 px-6 text-left font-medium">Notes</th>
       )}
       

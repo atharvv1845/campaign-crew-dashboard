@@ -22,7 +22,7 @@ const LeadsTab: React.FC<LeadsTabProps> = ({
     <div className="space-y-6">
       <LeadTracking 
         campaign={campaign} 
-        leadsData={leadsData}
+        leadsData={leadsData || []}
         view={view}
         setView={setView}
         updateCampaign={updateCampaign}

@@ -44,49 +44,32 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     }
   };
 
-  // Get all possible fields to display
-  const allPossibleFields = [
-    'socialProfiles', 'notes', 'email', 'linkedin', 'twitter',
-    'facebook', 'instagram', 'whatsapp'
-  ];
-  
-  // Core fields that should always be displayed
-  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
-  
   // Determine which fields are populated
   const getPopulatedFields = () => {
-    const fieldCounts: Record<string, number> = {};
+    const fields = new Set<string>();
     
-    // Initialize counts for all fields we want to show
-    allPossibleFields.forEach(field => {
-      fieldCounts[field] = 0;
-    });
-    
-    // Count how many leads have each field populated
     leads.forEach(lead => {
-      // Check standard fields
+      // Check each property of the lead
       Object.entries(lead).forEach(([key, value]) => {
-        if (value && value !== '' && value !== 'N/A' && fieldCounts[key] !== undefined) {
-          fieldCounts[key] = (fieldCounts[key] || 0) + 1;
+        if (
+          // Only add fields that have a value and aren't internal fields
+          value && 
+          value !== '' && 
+          key !== 'id' && 
+          key !== 'campaignId'
+        ) {
+          fields.add(key);
         }
       });
       
-      // Special handling for socialProfiles
-      const hasSocialProfiles = lead.linkedin || lead.twitter || lead.facebook || 
-                               lead.instagram || lead.whatsapp || lead.email;
-      
-      if (hasSocialProfiles) {
-        fieldCounts['socialProfiles'] = (fieldCounts['socialProfiles'] || 0) + 1;
+      // Special handling for social profiles
+      if (lead.linkedin || lead.twitter || lead.facebook || 
+          lead.instagram || lead.whatsapp || lead.email) {
+        fields.add('socialProfiles');
       }
     });
     
-    // Return fields that have data in at least one lead (excluding core fields which are handled separately)
-    return [
-      'socialProfiles',  // Always include socialProfiles
-      ...Object.entries(fieldCounts)
-        .filter(([key, count]) => count > 0 && key !== 'socialProfiles')
-        .map(([key]) => key)
-    ];
+    return Array.from(fields);
   };
 
   const populatedFields = getPopulatedFields();
@@ -122,7 +105,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
               ))
             ) : (
               <tr>
-                <td colSpan={9} className="py-6 text-center text-muted-foreground">
+                <td colSpan={populatedFields.length + 2} className="py-6 text-center text-muted-foreground">
                   No leads found for this campaign
                 </td>
               </tr>

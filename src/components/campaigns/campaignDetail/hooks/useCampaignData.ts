@@ -52,6 +52,11 @@ export const useCampaignData = (id: string | undefined) => {
           if (foundCampaign) {
             console.log('Displaying campaign:', foundCampaign);
             
+            // Ensure leads is always an array of lead objects
+            const leadsData = Array.isArray(foundCampaign.leads) 
+              ? foundCampaign.leads 
+              : foundCampaign.leadsData || [];
+              
             // Ensure all required fields are present to prevent errors
             const sanitizedCampaign = {
               ...foundCampaign,
@@ -62,6 +67,7 @@ export const useCampaignData = (id: string | undefined) => {
               teamMembers: foundCampaign.teamMembers || [],
               createdAt: foundCampaign.createdAt || new Date().toISOString().slice(0, 10),
               leads: foundCampaign.leads || 0,
+              leadsData: leadsData,
               responses: foundCampaign.responses || 0,
               positive: foundCampaign.positive || 0,
               negative: foundCampaign.negative || 0,

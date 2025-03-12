@@ -3,7 +3,7 @@ import React from 'react';
 import { toast } from '@/hooks/use-toast';
 
 interface FlowNodeActionsProps {
-  nodeType: string;
+  nodeType: 'message' | 'delay' | 'condition';
   nodeData: any;
   setNodeData: (data: any) => void;
   selectedNode: string | null;
@@ -12,7 +12,7 @@ interface FlowNodeActionsProps {
   addNode: (type: string) => { setNodeData: (data: any) => void };
   setShowNodeModal: (show: boolean) => void;
   deleteNode: (nodeId: string) => void;
-  setNodeType: (type: string) => void;
+  setNodeType: React.Dispatch<React.SetStateAction<'message' | 'delay' | 'condition'>>;
   setSelectedNode: (node: string | null) => void;
 }
 

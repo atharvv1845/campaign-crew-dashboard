@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -26,56 +25,17 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const [view, setView] = useState<'table' | 'kanban'>('table');
   const { toast } = useToast();
   
-  // This function properly processes leads data in different formats
   const getLeadsForCampaign = (): Lead[] => {
     console.log('Processing campaign leads:', campaign);
     
-    // Case 1: If campaign.leads is a number (indicating count) or undefined/null
     if (!campaign.leads || typeof campaign.leads === 'number') {
-      console.log('No actual lead data found, showing placeholder leads');
-      
-      // Return two placeholder demo leads to demonstrate the functionality
-      return [
-        {
-          id: 1001,
-          name: "John Smith",
-          email: "john.smith@example.com",
-          company: "Acme Corp",
-          currentStage: "New",
-          lastContacted: "2023-10-15",
-          followUpDate: "2023-10-25",
-          notes: "Interested in our product features",
-          assignedTo: "Alex",
-          linkedin: "https://linkedin.com/in/johnsmith",
-          twitter: "",
-          whatsapp: "",
-          facebook: "",
-          instagram: ""
-        },
-        {
-          id: 1002,
-          name: "Sarah Johnson",
-          email: "sarah.j@techcompany.co",
-          company: "Tech Company",
-          currentStage: "Contacted",
-          lastContacted: "2023-10-18",
-          followUpDate: "2023-10-28",
-          notes: "Had initial call, schedule follow-up",
-          assignedTo: "Taylor",
-          linkedin: "https://linkedin.com/in/sarahjohnson",
-          twitter: "https://twitter.com/sarahj",
-          whatsapp: "",
-          facebook: "",
-          instagram: ""
-        }
-      ];
+      console.log('No actual lead data found');
+      return [];
     }
     
-    // Case 2: If we have an array of leads
     if (Array.isArray(campaign.leads)) {
       console.log('Found leads array:', campaign.leads.length);
       
-      // Convert each lead to ensure proper format
       return campaign.leads.map((lead: any, index: number) => ({
         id: lead.id || index + 1,
         name: lead.firstName ? `${lead.firstName} ${lead.lastName || ''}` : lead.name || '',
@@ -94,7 +54,6 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       }));
     }
     
-    console.log('No valid leads data found, returning placeholders');
     return [];
   };
   
@@ -104,7 +63,6 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     console.log('Processed Campaign Leads:', campaignLeads);
   }, [campaign]);
   
-  // Create an enhanced campaign with default stages if needed
   const enhancedCampaign = {
     ...campaign,
     stages: campaign.stages || [

@@ -1,11 +1,10 @@
 
-import React from 'react';
-import { useMessageFlowState } from './hooks/useMessageFlowState';
-import FlowControlsToolbar from './FlowControlsToolbar';
-import FlowNodeEditor from './FlowNodeEditor';
+import React, { useState } from 'react';
 import FlowCanvas from './components/FlowCanvas';
-import FlowNavigation from './components/FlowNavigation';
+import FlowNodeEditor from './FlowNodeEditor';
+import { useMessageFlowState } from './hooks/useMessageFlowState';
 import FlowNodeActions from './components/FlowNodeActions';
+import FlowNavigation from './components/FlowNavigation';
 import FlowSaveValidation from './components/FlowSaveValidation';
 import { CampaignFormData } from '../types/campaignTypes';
 
@@ -20,7 +19,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
   formData,
   setFormData,
   onNext,
-  onBack
+  onBack,
 }) => {
   const {
     nodes,
@@ -29,12 +28,6 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
     showNodeModal,
     nodeType,
     nodeData,
-    setNodes,
-    setEdges,
-    setSelectedNode,
-    setShowNodeModal,
-    setNodeType,
-    setNodeData,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -43,10 +36,13 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
     validateMessageData,
     addNode,
     updateNode,
-    deleteNode
+    deleteNode,
+    setShowNodeModal,
+    setNodeType,
+    setNodeData,
+    setSelectedNode
   } = useMessageFlowState(formData, setFormData, onNext);
 
-  // Use the FlowNodeActions hook to get the action handlers
   const { handleAddNode, handleSaveNode, handleDeleteNode } = FlowNodeActions({
     nodeType,
     nodeData,
@@ -61,7 +57,6 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
     setSelectedNode
   });
 
-  // Use the FlowSaveValidation hook to get the saveFlowToFormData function
   const { saveFlowToFormData } = FlowSaveValidation({
     nodes,
     edges,
@@ -69,29 +64,31 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
     setFormData,
     onNext
   });
-
-  console.log("Current message flow nodes:", nodes);
+  
+  const handleAddNodeType = (type: 'message' | 'delay' | 'condition') => {
+    handleAddNode(type);
+  };
 
   return (
-    <div className="h-full flex flex-col space-y-4">
-      <div className="bg-muted/10 p-4 rounded-lg">
-        <h3 className="text-lg font-medium mb-2">Message Flow</h3>
-        <p className="text-sm text-muted-foreground">
-          Create a sequence of messages, delays, and conditions to automate your campaign flow.
-        </p>
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">Message Flow</h2>
+      <p className="text-muted-foreground">
+        Design your campaign message sequence by adding messages, delays, and conditions.
+      </p>
+
+      <div className="h-[500px] flex flex-col">
+        <FlowCanvas
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={handleNodeClick}
+          onAddNodeType={handleAddNodeType}
+        />
       </div>
-      
-      <FlowControlsToolbar onAddNode={handleAddNode} />
 
-      <FlowCanvas
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={handleNodeClick}
-      />
-
+      {/* Node editor dialog */}
       <FlowNodeEditor
         open={showNodeModal}
         onOpenChange={setShowNodeModal}
@@ -103,7 +100,12 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
         onDelete={handleDeleteNode}
       />
 
-      <FlowNavigation onNext={saveFlowToFormData} onBack={onBack} />
+      {/* Navigation buttons */}
+      <FlowNavigation
+        onBack={onBack}
+        onNext={saveFlowToFormData}
+        nextLabel="Save & Continue"
+      />
     </div>
   );
 };

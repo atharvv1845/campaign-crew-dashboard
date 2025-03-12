@@ -1,3 +1,4 @@
+
 import { Node, Edge } from 'reactflow';
 
 // Campaign form data structure

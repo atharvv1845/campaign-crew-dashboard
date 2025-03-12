@@ -31,8 +31,16 @@ export const processLeadData = (
       const mappingKey = mapping[header];
       const value = values[index] || '';
       
+      // Handle full name mapping first
       if (mappingKey === 'fullName' && value) {
         fullName = value;
+        const nameParts = value.split(' ');
+        if (nameParts.length >= 2) {
+          leadData.firstName = nameParts[0];
+          leadData.lastName = nameParts.slice(1).join(' ');
+        } else {
+          leadData.firstName = value;
+        }
       } else if (mappingKey === 'firstName') {
         leadData.firstName = value;
       } else if (mappingKey === 'lastName') {
@@ -49,26 +57,17 @@ export const processLeadData = (
         leadData.assignedTo = value;
       } else if (mappingKey === 'notes') {
         leadData.notes = value;
-      } else if (['linkedin', 'twitter', 'facebook', 'instagram'].includes(mappingKey)) {
-        leadData.socialProfiles = {
-          ...leadData.socialProfiles,
-          [mappingKey]: value
-        };
+      } else if (['linkedin', 'twitter', 'facebook', 'instagram', 'whatsapp'].includes(mappingKey)) {
+        leadData.socialProfiles[mappingKey] = value;
       }
     });
+
+    // Set name property for display
+    leadData.name = fullName || 
+                   (leadData.firstName && leadData.lastName 
+                    ? `${leadData.firstName} ${leadData.lastName}` 
+                    : leadData.firstName || leadData.lastName || `Lead #${leadData.id}`);
     
-    if (fullName && (!leadData.firstName || !leadData.lastName)) {
-      const nameParts = fullName.split(' ');
-      if (nameParts.length >= 2) {
-        leadData.firstName = leadData.firstName || nameParts[0];
-        leadData.lastName = leadData.lastName || nameParts.slice(1).join(' ');
-      } else {
-        leadData.firstName = leadData.firstName || fullName;
-        leadData.lastName = leadData.lastName || '';
-      }
-    }
-    
-    // Remove the validation that requires firstName and email
     newLeads.push(leadData);
   }
   

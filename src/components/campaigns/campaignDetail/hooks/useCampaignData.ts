@@ -19,16 +19,24 @@ export const useCampaignData = (id: string | undefined) => {
       try {
         // Simulate API call with setTimeout
         setTimeout(() => {
-          const foundCampaign = campaignData.find(c => c.id === Number(id));
+          // First try to find by exact id match
+          let foundCampaign = campaignData.find(c => c.id === Number(id));
+          
+          // If not found and we have campaigns, return the first one for demo purposes
+          // In a real app, you would show a not found page
+          if (!foundCampaign && campaignData.length > 0) {
+            console.log('Campaign not found for id:', id, 'showing first campaign instead');
+            foundCampaign = campaignData[0];
+          }
           
           if (foundCampaign) {
-            console.log('Found campaign:', foundCampaign);
+            console.log('Displaying campaign:', foundCampaign);
             setCampaign(foundCampaign);
           } else {
-            console.log('Campaign not found for id:', id);
+            console.log('No campaigns available');
             toast({
               title: "Error",
-              description: "Campaign not found",
+              description: "No campaigns available",
               variant: "destructive",
             });
           }

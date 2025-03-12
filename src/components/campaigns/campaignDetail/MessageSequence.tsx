@@ -1,99 +1,41 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import SequenceHeader from './components/SequenceHeader';
-import { SaveWorkflowDialog, LoadWorkflowDialog } from './components/WorkflowDialogs';
-import { useMessageSequence } from './hooks/useMessageSequence';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import StructuredView from './views/StructuredView';
 import FlowView from './views/FlowView';
-import EditStepDialog from './components/EditStepDialog';
 
-const MessageSequence: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('structured');
-  
-  const {
-    sequence,
-    editingStep,
-    editingStepData,
-    showSaveDialog,
-    showLoadDialog,
-    workflowName,
-    savedWorkflows,
-    setWorkflowName,
-    setShowSaveDialog,
-    setShowLoadDialog,
-    setEditingStep,
-    setEditingStepData,
-    handleAddStep,
-    handleEditStep,
-    handleUpdateStep,
-    handleDeleteStep,
-    handleMoveStep,
-    handleSaveWorkflow,
-    handleLoadWorkflow
-  } = useMessageSequence();
+interface MessageSequenceProps {
+  campaign: any;
+  updateCampaign?: (data: any) => void;
+}
 
+const MessageSequence: React.FC<MessageSequenceProps> = ({ campaign, updateCampaign }) => {
   return (
-    <div className="space-y-6">
-      <SequenceHeader 
-        onSaveClick={() => setShowSaveDialog(true)}
-        onLoadClick={() => setShowLoadDialog(true)}
-      />
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Message Sequence</h2>
+        <Button>
+          <Plus className="h-4 w-4 mr-1" />
+          Add Message
+        </Button>
+      </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+      <Tabs defaultValue="structured">
+        <TabsList>
           <TabsTrigger value="structured">Structured View</TabsTrigger>
           <TabsTrigger value="flow">Flow View</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="structured" className="mt-4">
-          <StructuredView 
-            steps={sequence}
-            onUpdateSteps={(newSteps) => {
-              newSteps.forEach((step, index) => {
-                step.id = step.id || index + 1;
-              });
-              sequence.splice(0, sequence.length, ...newSteps);
-            }}
-          />
+        <TabsContent value="structured">
+          <StructuredView campaign={campaign} updateCampaign={updateCampaign} />
         </TabsContent>
         
-        <TabsContent value="flow" className="mt-4">
-          <FlowView 
-            sequence={sequence}
-            onEdit={handleEditStep}
-            onDelete={handleDeleteStep}
-            onMove={handleMoveStep}
-            onAddStep={handleAddStep}
-          />
+        <TabsContent value="flow">
+          <FlowView campaign={campaign} updateCampaign={updateCampaign} />
         </TabsContent>
       </Tabs>
-      
-      {/* Edit Step Dialog */}
-      <EditStepDialog
-        open={editingStep !== null}
-        onOpenChange={(open) => !open && setEditingStep(null)}
-        editingStepData={editingStepData}
-        setEditingStepData={setEditingStepData}
-        onSave={handleUpdateStep}
-      />
-      
-      {/* Save Workflow Dialog */}
-      <SaveWorkflowDialog
-        open={showSaveDialog}
-        onOpenChange={setShowSaveDialog}
-        workflowName={workflowName}
-        setWorkflowName={setWorkflowName}
-        onSave={handleSaveWorkflow}
-      />
-      
-      {/* Load Workflow Dialog */}
-      <LoadWorkflowDialog
-        open={showLoadDialog}
-        onOpenChange={setShowLoadDialog}
-        savedWorkflows={savedWorkflows}
-        onLoad={handleLoadWorkflow}
-      />
     </div>
   );
 };

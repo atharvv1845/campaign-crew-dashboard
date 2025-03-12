@@ -1,14 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SequenceHeader from './components/SequenceHeader';
-import SequenceList from './components/SequenceList';
-import StepActionButtons from './components/StepActionButtons';
-import StepEditDialog from './components/StepEditDialog';
 import { SaveWorkflowDialog, LoadWorkflowDialog } from './components/WorkflowDialogs';
 import { useMessageSequence } from './hooks/useMessageSequence';
-import StructuredMessageWorkflow from './StructuredMessageWorkflow';
+import StructuredView from './views/StructuredView';
+import FlowView from './views/FlowView';
+import EditStepDialog from './components/EditStepDialog';
 
 const MessageSequence: React.FC = () => {
   const [activeTab, setActiveTab] = useState('structured');
@@ -49,7 +47,7 @@ const MessageSequence: React.FC = () => {
         </TabsList>
         
         <TabsContent value="structured" className="mt-4">
-          <StructuredMessageWorkflow 
+          <StructuredView 
             steps={sequence}
             onUpdateSteps={(newSteps) => {
               newSteps.forEach((step, index) => {
@@ -61,21 +59,18 @@ const MessageSequence: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="flow" className="mt-4">
-          <div className="space-y-4">
-            <SequenceList 
-              sequence={sequence}
-              onEdit={handleEditStep}
-              onDelete={handleDeleteStep}
-              onMove={handleMoveStep}
-            />
-            
-            <StepActionButtons onAddStep={handleAddStep} />
-          </div>
+          <FlowView 
+            sequence={sequence}
+            onEdit={handleEditStep}
+            onDelete={handleDeleteStep}
+            onMove={handleMoveStep}
+            onAddStep={handleAddStep}
+          />
         </TabsContent>
       </Tabs>
       
       {/* Edit Step Dialog */}
-      <StepEditDialog
+      <EditStepDialog
         open={editingStep !== null}
         onOpenChange={(open) => !open && setEditingStep(null)}
         editingStepData={editingStepData}

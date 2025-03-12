@@ -13,7 +13,7 @@ import { MessageStep } from '../hooks/useMessageSequence';
 import MessageStepForm from './forms/MessageStepForm';
 import DelayStepForm from './forms/DelayStepForm';
 
-interface StepEditDialogProps {
+interface EditStepDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingStepData: MessageStep | null;
@@ -21,7 +21,7 @@ interface StepEditDialogProps {
   onSave: () => void;
 }
 
-const StepEditDialog: React.FC<StepEditDialogProps> = ({
+const EditStepDialog: React.FC<EditStepDialogProps> = ({
   open,
   onOpenChange,
   editingStepData,
@@ -67,4 +67,4 @@ const StepEditDialog: React.FC<StepEditDialogProps> = ({
   );
 };
 
-export default StepEditDialog;
+export default EditStepDialog;

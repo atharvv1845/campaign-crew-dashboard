@@ -6,6 +6,7 @@ import { MoreHorizontal, Calendar, Edit2, Mail, Phone, MessageSquare, Linkedin, 
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import StageBadge from '../../../badges/StageBadge';
 import { Lead, Campaign } from '../../types';
 import {
@@ -16,8 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { availableChannels } from '../../../../constants/channels';
-import { cn } from '@/lib/utils';
 
 interface LeadTableRowProps {
   lead: Lead;
@@ -65,6 +64,15 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
     }
   };
 
+  const handleStageChange = (stage: string) => {
+    if (onUpdateLead) {
+      onUpdateLead({
+        ...lead,
+        currentStage: stage
+      });
+    }
+  };
+
   // Get platform icons
   const renderPlatformIcons = () => {
     const platforms = [];
@@ -106,8 +114,30 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
     );
   };
 
+  // Available stages for the dropdown
+  const stages = campaign?.stages?.map(stage => stage.name) || [
+    'Not Contacted',
+    'Contacted',
+    'Replied',
+    'Follow-Up Needed',
+    'Positive',
+    'Negative'
+  ];
+
   return (
     <tr className="hover:bg-muted/10">
+      {onSelectLead && (
+        <td className="py-3 px-3">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) => {
+              if (onSelectLead) {
+                onSelectLead(lead.id, !!checked);
+              }
+            }}
+          />
+        </td>
+      )}
       <td className="py-3 px-6">{lead.name}</td>
       <td className="py-3 px-6">{renderPlatformIcons()}</td>
       <td className="py-3 px-6">
@@ -127,6 +157,7 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
               selected={date}
               onSelect={handleDateSelect}
               initialFocus
+              className="pointer-events-auto"
             />
           </PopoverContent>
         </Popover>
@@ -148,12 +179,28 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
               selected={followUpDate}
               onSelect={handleFollowUpSelect}
               initialFocus
+              className="pointer-events-auto"
             />
           </PopoverContent>
         </Popover>
       </td>
       <td className="py-3 px-6">
-        <StageBadge stage={lead.currentStage} />
+        <Select defaultValue={lead.currentStage} onValueChange={handleStageChange}>
+          <SelectTrigger className="w-[160px] h-8 border-none bg-transparent p-0">
+            <SelectValue>
+              <StageBadge stage={lead.currentStage} />
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {stages.map(stage => (
+              <SelectItem key={stage} value={stage}>
+                <div className="flex items-center gap-2">
+                  <StageBadge stage={stage} />
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </td>
       <td className="py-3 px-6">{lead.assignedTo || 'N/A'}</td>
       <td className="py-3 px-6">

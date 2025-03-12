@@ -21,19 +21,16 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
   const { toast } = useToast();
   const { generateId } = useLeadImport();
   
-  // Trigger file input click
   const handleFileButtonClick = () => {
     fileInputRef.current?.click();
   };
   
-  // Handle CSV file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
     setCsvFile(file);
     
-    // Parse CSV file
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
@@ -42,7 +39,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
       
       setCsvHeaders(headers);
       
-      // Initialize mapping with suggestions
       const initialMapping: Record<string, string> = {};
       headers.forEach(header => {
         const lowerHeader = header.toLowerCase();
@@ -73,7 +69,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
       
       setCsvMapping(initialMapping);
       
-      // Create preview of first 5 rows
       const preview = [];
       for (let i = 1; i < Math.min(6, lines.length); i++) {
         if (lines[i].trim()) {
@@ -94,7 +89,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
     reader.readAsText(file);
   };
   
-  // Handle mapping changes
   const handleMappingChange = (header: string, value: string) => {
     setCsvMapping(prev => ({
       ...prev,
@@ -102,7 +96,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
     }));
   };
   
-  // Import leads from CSV based on mapping
   const importCsvLeads = () => {
     if (!csvFile) return;
     
@@ -114,7 +107,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
       
       const newLeads: any[] = [];
       
-      // Start from line 1 (skip headers)
       for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
         
@@ -129,7 +121,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
           socialProfiles: {}
         };
         
-        // Process full name if mapping exists
         let fullName = '';
         
         headers.forEach((header, index) => {
@@ -149,7 +140,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
           } else if (mappingKey === 'phone') {
             leadData.phone = value;
           } else if (mappingKey === 'status') {
-            // Find matching stage
             const stage = formData.stages.find(s => 
               s.name.toLowerCase() === value.toLowerCase()
             );
@@ -168,7 +158,6 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
           }
         });
         
-        // Process full name if needed
         if (fullName && (!leadData.firstName || !leadData.lastName)) {
           const nameParts = fullName.split(' ');
           if (nameParts.length >= 2) {
@@ -180,19 +169,16 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
           }
         }
         
-        // Only add if we have the minimum required fields
         if (leadData.firstName && leadData.email) {
           newLeads.push(leadData);
         }
       }
       
-      // Add imported leads to form data
       setFormData(prev => ({
         ...prev,
         leads: [...prev.leads, ...newLeads]
       }));
       
-      // Update imported leads for display
       setImportedLeads(newLeads);
       
       toast({
@@ -200,17 +186,12 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         description: `Successfully imported ${newLeads.length} leads from CSV.`,
       });
       
-      // Reset CSV state but keep imported leads visible
-      setCsvFile(null);
-      setCsvHeaders([]);
-      setCsvMapping({});
       setCsvPreview([]);
     };
     
     reader.readAsText(csvFile);
   };
   
-  // Download CSV template
   const downloadTemplate = () => {
     const headers = ['First Name', 'Last Name', 'Email', 'Company', 'Phone', 'LinkedIn', 'Twitter', 'Status', 'Assigned To', 'Notes'];
     const csvContent = headers.join(',') + '\n';
@@ -269,21 +250,26 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
               </span>
             </div>
             <button
-              onClick={() => setCsvFile(null)}
+              onClick={() => {
+                setCsvFile(null);
+                setCsvHeaders([]);
+                setCsvMapping({});
+                setCsvPreview([]);
+              }}
               className="text-muted-foreground hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
           
-          {/* Mapping interface */}
-          <CsvMapping 
-            csvHeaders={csvHeaders}
-            csvMapping={csvMapping}
-            onMappingChange={handleMappingChange}
-          />
+          {csvHeaders.length > 0 && (
+            <CsvMapping 
+              csvHeaders={csvHeaders}
+              csvMapping={csvMapping}
+              onMappingChange={handleMappingChange}
+            />
+          )}
           
-          {/* Preview */}
           {csvPreview.length > 0 && (
             <CsvPreview 
               csvHeaders={csvHeaders}
@@ -308,40 +294,10 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         </div>
       )}
       
-      {/* Display imported leads */}
-      {importedLeads.length > 0 && (
+      {formData.leads.length > 0 && (
         <div className="mt-6 border border-border rounded-lg">
           <div className="bg-muted/20 px-4 py-3 border-b border-border">
-            <h4 className="font-medium">Imported Leads ({importedLeads.length})</h4>
-          </div>
-          <div className="p-4 max-h-[300px] overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-muted/10">
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Company</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {importedLeads.map((lead) => (
-                  <tr key={lead.id}>
-                    <td className="px-4 py-2">{`${lead.firstName} ${lead.lastName}`}</td>
-                    <td className="px-4 py-2">{lead.email}</td>
-                    <td className="px-4 py-2">{lead.company || '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      
-      {/* Display all leads from form data */}
-      {formData.leads.length > 0 && !csvFile && importedLeads.length === 0 && (
-        <div className="mt-6 border border-border rounded-lg">
-          <div className="bg-muted/20 px-4 py-3 border-b border-border">
-            <h4 className="font-medium">All Leads ({formData.leads.length})</h4>
+            <h4 className="font-medium">Imported Leads ({formData.leads.length})</h4>
           </div>
           <div className="p-4 max-h-[300px] overflow-y-auto">
             <table className="w-full text-sm">

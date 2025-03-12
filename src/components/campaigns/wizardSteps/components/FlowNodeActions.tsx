@@ -73,17 +73,21 @@ const FlowNodeActions = ({
     }
     
     try {
+      console.log("Saving node:", selectedNode ? "update existing" : "add new", nodeType, nodeData);
+      
       if (selectedNode) {
-        // Update existing node
-        updateNode(selectedNode, nodeType, {...nodeData});
+        // Update existing node - create a deep copy to avoid reference issues
+        const nodeDataCopy = JSON.parse(JSON.stringify(nodeData));
+        updateNode(selectedNode, nodeType, nodeDataCopy);
         toast({
           title: "Success",
           description: "Node updated successfully"
         });
       } else {
-        // Add new node
+        // Add new node - create a deep copy to avoid reference issues
+        const nodeDataCopy = JSON.parse(JSON.stringify(nodeData));
         const nodeHandler = addNode(nodeType);
-        nodeHandler.setNodeData({...nodeData});
+        nodeHandler.setNodeData(nodeDataCopy);
         toast({
           title: "Success",
           description: "New node added to flow"

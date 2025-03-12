@@ -22,11 +22,16 @@ export function useNodeOperations({
       type,
       setNodeData: (data: MessageStepData | DelayStepData | ConditionStepData) => {
         const newNodeId = (nodes.length + 1).toString();
+        
+        // Calculate position based on existing nodes
         let position = { 
           x: 250, 
-          y: nodes.length > 0 ? nodes[nodes.length - 1].position.y + 150 : 100 
+          y: nodes.length > 0 
+            ? Math.max(...nodes.map(n => n.position.y)) + 150 
+            : 100 
         };
 
+        // Create the new node with provided data and appropriate type
         let newNode: Node = {
           id: newNodeId,
           type: `${type}Node`,
@@ -37,17 +42,37 @@ export function useNodeOperations({
           },
         };
 
+        console.log("Added new node:", newNode);
+        
+        // Add the new node to the nodes array
         setNodes(prevNodes => [...prevNodes, newNode]);
 
         // Create edge from last node to new node if there are existing nodes
         if (nodes.length > 0) {
-          const lastNodeId = nodes[nodes.length - 1].id;
+          // Find the appropriate source node (usually the last node without outgoing edges)
+          let sourceNodeId = nodes[nodes.length - 1].id;
+          
+          // Check if the source node already has outgoing edges
+          const hasOutgoingEdge = edges.some(edge => edge.source === sourceNodeId);
+          
+          // If it has outgoing edges, find the last node in the chain
+          if (hasOutgoingEdge) {
+            const lastTargetNodes = edges
+              .filter(edge => !edges.some(e => e.source === edge.target))
+              .map(edge => edge.target);
+              
+            if (lastTargetNodes.length > 0) {
+              sourceNodeId = lastTargetNodes[0];
+            }
+          }
+          
           const newEdge: Edge = {
-            id: `e${lastNodeId}-${newNodeId}`,
-            source: lastNodeId,
+            id: `e${sourceNodeId}-${newNodeId}`,
+            source: sourceNodeId,
             target: newNodeId,
             animated: true,
           };
+          
           setEdges(prevEdges => [...prevEdges, newEdge]);
         }
       }

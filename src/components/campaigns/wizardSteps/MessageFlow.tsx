@@ -70,8 +70,17 @@ const MessageFlow: React.FC<MessageFlowProps> = ({
     onNext
   });
 
+  console.log("Current message flow nodes:", nodes);
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col space-y-4">
+      <div className="bg-muted/10 p-4 rounded-lg">
+        <h3 className="text-lg font-medium mb-2">Message Flow</h3>
+        <p className="text-sm text-muted-foreground">
+          Create a sequence of messages, delays, and conditions to automate your campaign flow.
+        </p>
+      </div>
+      
       <FlowControlsToolbar onAddNode={handleAddNode} />
 
       <FlowCanvas

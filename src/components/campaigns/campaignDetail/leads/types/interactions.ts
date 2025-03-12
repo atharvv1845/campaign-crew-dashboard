@@ -1,4 +1,6 @@
 
+import { Lead, Campaign } from '../types';
+
 export enum InteractionType {
   Email = 'email',
   Call = 'call',

@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import CampaignHeader from './CampaignHeader';
 import CampaignLoading from './components/CampaignLoading';
 import CampaignNotFound from './components/CampaignNotFound';
@@ -11,9 +11,15 @@ import CreateCampaign from '../CreateCampaign';
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { loading, campaign, refreshCampaign, updateCampaign } = useCampaignData(id);
   const { handleEditCampaign, handleExportCampaign, handleImportCampaign } = useCampaignActions();
   const [showEditCampaign, setShowEditCampaign] = useState(false);
+
+  // Force a refresh when loading a new campaign
+  useEffect(() => {
+    refreshCampaign();
+  }, [id]);
 
   // Handle edit campaign modal
   const handleEditCampaignClick = () => {

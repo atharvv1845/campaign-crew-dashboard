@@ -25,6 +25,7 @@ import InteractionsTab from './components/drawer/InteractionsTab';
 import { Check, X } from 'lucide-react';
 import { useInteractions } from './hooks/useInteractions';
 import { useToastNotifications } from './hooks/useToastNotifications';
+import { InteractionType } from './types/interactions';
 
 interface LeadDetailDrawerProps {
   lead: Lead;
@@ -72,7 +73,7 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
   };
 
   const handleLogInteraction = (type: 'email' | 'call' | 'meeting' | 'message', description: string) => {
-    logInteraction(type, description);
+    logInteraction(type as InteractionType, description);
     notifyContactLogged();
     
     // Also update lastContacted in the lead data

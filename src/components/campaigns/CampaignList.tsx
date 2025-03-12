@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import CampaignTable from './CampaignTable';
 import CampaignFilters from './CampaignFilters';
 import CreateCampaign from './CreateCampaign';
@@ -11,6 +12,7 @@ import { CampaignFormData, LeadData } from './types/campaignTypes';
 
 const CampaignList: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -51,10 +53,15 @@ const CampaignList: React.FC = () => {
   });
   
   const handleCampaignCreated = (campaign: CampaignFormData) => {
+    // Find the new campaign in the campaignData array
+    const newCampaignId = campaignData[campaignData.length - 1].id;
+    
     // Force refresh of campaign data
     setRefreshTrigger(prev => prev + 1);
+    
     // Close the campaign creation modal
     setShowCreateCampaign(false);
+    
     // Set the created campaign to show the summary
     setCreatedCampaign(campaign);
     
@@ -62,6 +69,11 @@ const CampaignList: React.FC = () => {
       title: "Success",
       description: "Campaign has been successfully created."
     });
+    
+    // Navigate to the new campaign after a short delay
+    setTimeout(() => {
+      navigate(`/campaigns/${newCampaignId}`);
+    }, 1000);
   };
   
   const refreshList = () => {

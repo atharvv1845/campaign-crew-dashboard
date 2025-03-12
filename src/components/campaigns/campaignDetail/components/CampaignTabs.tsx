@@ -43,7 +43,8 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       linkedin: 'linkedin.com/in/johnsmith',
       lastContacted: '2023-10-01',
       currentStage: 'Contacted',
-      assignedTo: 'Sarah Lee'
+      assignedTo: 'Sarah Lee',
+      campaignId: 1
     },
     {
       id: 2,
@@ -54,7 +55,8 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       whatsapp: '+1234567890',
       lastContacted: '2023-10-03',
       currentStage: 'New',
-      assignedTo: 'John Smith'
+      assignedTo: 'John Smith',
+      campaignId: 1
     },
     {
       id: 3,
@@ -64,9 +66,23 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       lastContacted: '2023-09-28',
       currentStage: 'Interested',
       assignedTo: 'Sarah Lee',
-      followUpDate: '2023-10-15'
+      followUpDate: '2023-10-15',
+      campaignId: 2
+    },
+    {
+      id: 4,
+      name: 'Campaign 7 Lead',
+      company: 'Test Company',
+      email: 'test@example.com',
+      lastContacted: '2023-10-05',
+      currentStage: 'New Lead',
+      assignedTo: 'user1',
+      campaignId: 7
     }
   ];
+
+  // Filter leads to only show leads for this campaign
+  const campaignLeads = mockLeads.filter(lead => lead.campaignId === campaign.id);
 
   const stagesData = campaign.stages || [
     { id: 1, name: 'New', count: 5 },
@@ -131,7 +147,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       <TabsContent value="leads" className="space-y-6">
         <LeadTracking 
           campaign={enhancedCampaign} 
-          leadsData={mockLeads}
+          leadsData={campaignLeads}
           view={view}
           setView={setView}
           updateCampaign={updateCampaign}

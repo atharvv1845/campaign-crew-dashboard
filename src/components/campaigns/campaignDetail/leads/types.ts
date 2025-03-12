@@ -14,6 +14,7 @@ export interface Lead {
   assignedTo: string;
   followUpDate?: string;
   notes?: string;
+  campaignId?: number;
   // Optional fields for backward compatibility
   title?: string;
   status?: string;

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import LeadTableHeader from './LeadTableHeader';
 import LeadTableRow from './LeadTableRow';
@@ -47,26 +48,36 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     <div className="glass-card rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <LeadTableHeader 
-            hasSelection={!!onSelectLead}
-            onSelectAll={handleSelectAll}
-            allSelected={leads.length > 0 && selectedLeads.length === leads.length}
-            leads={leads}
-            selectedLeads={selectedLeads}
-          />
+          <thead>
+            <LeadTableHeader 
+              hasSelection={!!onSelectLead}
+              onSelectAll={handleSelectAll}
+              allSelected={leads.length > 0 && selectedLeads.length === leads.length}
+              leads={leads}
+              selectedLeads={selectedLeads}
+            />
+          </thead>
           <tbody className="divide-y divide-border bg-card">
-            {leads.map(lead => (
-              <LeadTableRow
-                key={lead.id}
-                lead={lead}
-                campaign={campaign}
-                onSelectLead={onSelectLead}
-                isSelected={selectedLeads.includes(lead.id)}
-                onLeadClick={onLeadClick}
-                onUpdateLead={handleUpdateLead}
-                onOpen={onLeadClick || (() => {})}
-              />
-            ))}
+            {leads.length > 0 ? (
+              leads.map(lead => (
+                <LeadTableRow
+                  key={lead.id}
+                  lead={lead}
+                  campaign={campaign}
+                  onSelectLead={onSelectLead}
+                  isSelected={selectedLeads.includes(lead.id)}
+                  onLeadClick={onLeadClick}
+                  onUpdateLead={handleUpdateLead}
+                  onOpen={onLeadClick || (() => {})}
+                />
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="py-6 text-center text-muted-foreground">
+                  No leads found for this campaign
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

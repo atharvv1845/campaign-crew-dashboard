@@ -1,17 +1,13 @@
 
 import React, { useEffect } from 'react';
-import ReactFlow, { Background, Controls, NodeTypes, Panel } from 'reactflow';
-import 'reactflow/dist/style.css';
-import { Button } from '@/components/ui/button';
 import { CampaignFormData } from '../types/campaignTypes';
-import MessageNode from './flowNodes/MessageNode';
-import DelayNode from './flowNodes/DelayNode';
-import ConditionNode from './flowNodes/ConditionNode';
-import FlowNodeEditor from './FlowNodeEditor';
 import { useFlowState } from '../hooks/useFlowState';
 import { useNodeOperations } from '../hooks/useNodeOperations';
+import { useFlowValidation } from './hooks/useFlowValidation';
 import FlowControlsToolbar from './FlowControlsToolbar';
-import { toast } from '@/hooks/use-toast';
+import FlowNodeEditor from './FlowNodeEditor';
+import FlowCanvas from './components/FlowCanvas';
+import FlowNavigation from './components/FlowNavigation';
 
 interface MessageFlowProps {
   formData: CampaignFormData;
@@ -35,12 +31,6 @@ const initialNodes = [
 
 const initialEdges = [];
 
-const nodeTypes: NodeTypes = {
-  messageNode: MessageNode,
-  delayNode: DelayNode,
-  conditionNode: ConditionNode,
-};
-
 const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext, onBack }) => {
   const {
     nodes,
@@ -63,6 +53,8 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     initialNodes: formData.messageFlow?.nodes?.length ? formData.messageFlow.nodes : initialNodes, 
     initialEdges: formData.messageFlow?.edges?.length ? formData.messageFlow.edges : initialEdges 
   });
+
+  const { validateFlow, validateMessageData } = useFlowValidation();
 
   // Update parent formData whenever nodes or edges change
   useEffect(() => {
@@ -127,17 +119,8 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
   };
 
   const handleSaveNode = () => {
-    // Validate required fields based on node type
-    if (nodeType === 'message') {
-      const messageData = nodeData as any;
-      if (!messageData.message) {
-        toast({
-          title: "Validation Error",
-          description: "Message content is required",
-          variant: "destructive"
-        });
-        return;
-      }
+    if (!validateMessageData(nodeType, nodeData)) {
+      return;
     }
     
     if (selectedNode) {
@@ -156,12 +139,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
   };
 
   const saveFlowToFormData = () => {
-    if (nodes.length === 0) {
-      toast({
-        title: "Warning",
-        description: "Your message flow is empty. Consider adding at least one message step.",
-      });
-    }
+    validateFlow(nodes, edges);
     
     setFormData({
       ...formData,
@@ -182,26 +160,14 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     <div className="h-full flex flex-col">
       <FlowControlsToolbar onAddNode={handleAddNode} />
 
-      <div className="border rounded-md flex-1 min-h-[400px]">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={handleNodeClick}
-          nodeTypes={nodeTypes}
-          fitView
-        >
-          <Background />
-          <Controls />
-          <Panel position="top-right">
-            <div className="bg-white dark:bg-slate-800 p-2 rounded shadow-md text-xs">
-              {nodes.length} nodes | {edges.length} connections
-            </div>
-          </Panel>
-        </ReactFlow>
-      </div>
+      <FlowCanvas
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeClick={handleNodeClick}
+      />
 
       <FlowNodeEditor
         open={showNodeModal}
@@ -214,14 +180,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
         onDelete={handleDeleteNode}
       />
 
-      <div className="flex justify-between mt-6">
-        <Button variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button onClick={saveFlowToFormData}>
-          Next
-        </Button>
-      </div>
+      <FlowNavigation onNext={saveFlowToFormData} onBack={onBack} />
     </div>
   );
 };

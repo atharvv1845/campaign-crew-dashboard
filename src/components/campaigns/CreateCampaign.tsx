@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,7 +13,7 @@ import LeadImport from './wizardSteps/LeadImport';
 import MessageFlow from './wizardSteps/MessageFlow';
 
 // Re-export types for backward compatibility
-export { type CampaignFormData, type LeadData, type FlowData } from './types/campaignTypes';
+export { type CampaignFormData, type LeadData } from './types/campaignTypes';
 export { availableChannels } from './constants/channels';
 
 interface CreateCampaignProps {

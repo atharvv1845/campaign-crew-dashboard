@@ -56,17 +56,9 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
     }
   };
   
-  // Add a new lead manually - only require email for simplicity
+  // Add a new lead manually - no required fields
   const addLead = (andAnother: boolean = false) => {
-    if (!currentLead.email) {
-      // Show validation error
-      toast({
-        title: "Validation Error",
-        description: "Email is required",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Remove validation that requires email
     
     const newLead: LeadData = {
       id: generateId(),

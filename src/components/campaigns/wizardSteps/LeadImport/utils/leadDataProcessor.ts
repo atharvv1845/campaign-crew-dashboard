@@ -68,9 +68,8 @@ export const processLeadData = (
       }
     }
     
-    if (leadData.firstName && leadData.email) {
-      newLeads.push(leadData);
-    }
+    // Remove the validation that requires firstName and email
+    newLeads.push(leadData);
   }
   
   return newLeads;

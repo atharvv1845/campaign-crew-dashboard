@@ -56,7 +56,7 @@ const LeadForm: React.FC<LeadFormProps> = ({
         
         {/* Contact methods */}
         <div>
-          <label className="block text-sm font-medium mb-1">Email <span className="text-primary">*</span></label>
+          <label className="block text-sm font-medium mb-1">Email</label>
           <input
             type="email"
             name="email"
@@ -64,7 +64,6 @@ const LeadForm: React.FC<LeadFormProps> = ({
             onChange={handleLeadInputChange}
             placeholder="Email"
             className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            required
           />
         </div>
         

@@ -35,7 +35,7 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         </th>
       )}
       
-      {/* Always show name */}
+      {/* Always show name column, even if names are optional */}
       <th className="py-3 px-6 text-left font-medium">Name</th>
       
       {/* Only show columns with data */}

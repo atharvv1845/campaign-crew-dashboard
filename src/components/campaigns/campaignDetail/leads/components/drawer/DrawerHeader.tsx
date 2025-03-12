@@ -9,14 +9,19 @@ interface DrawerHeaderProps {
 }
 
 const DrawerHeader: React.FC<DrawerHeaderProps> = ({ lead, isEditing }) => {
+  // Handle display when name or email is missing
+  const displayName = lead.name || 
+                     (lead.firstName && lead.lastName ? `${lead.firstName} ${lead.lastName}` : 
+                     lead.firstName || lead.lastName || `Lead #${lead.id}`);
+  
   return (
     <SheetHeader className="pb-4">
       <SheetTitle className="text-xl">
-        {isEditing ? 'Edit Lead' : lead.name}
+        {isEditing ? 'Edit Lead' : displayName}
       </SheetTitle>
       {!isEditing && (
         <div className="text-sm text-muted-foreground">
-          {lead.company} • {lead.email}
+          {lead.company ? `${lead.company} • ` : ''}{lead.email || 'No email provided'}
         </div>
       )}
     </SheetHeader>

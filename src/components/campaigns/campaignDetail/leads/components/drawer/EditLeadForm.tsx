@@ -30,24 +30,27 @@ const EditLeadForm: React.FC<EditLeadFormProps> = ({
           <Label htmlFor="name">Name</Label>
           <Input 
             id="name" 
-            value={editedLead.name} 
+            value={editedLead.name || ''} 
             onChange={(e) => onInputChange('name', e.target.value)}
+            placeholder="Lead name"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="company">Company</Label>
           <Input 
             id="company" 
-            value={editedLead.company} 
+            value={editedLead.company || ''} 
             onChange={(e) => onInputChange('company', e.target.value)}
+            placeholder="Company name"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input 
             id="email" 
-            value={editedLead.email} 
+            value={editedLead.email || ''} 
             onChange={(e) => onInputChange('email', e.target.value)}
+            placeholder="Email address"
           />
         </div>
         <div className="space-y-2">
@@ -56,12 +59,13 @@ const EditLeadForm: React.FC<EditLeadFormProps> = ({
             id="linkedin" 
             value={editedLead.linkedin || ''} 
             onChange={(e) => onInputChange('linkedin', e.target.value)}
+            placeholder="LinkedIn profile"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="currentStage">Current Stage</Label>
           <Select 
-            value={editedLead.currentStage} 
+            value={editedLead.currentStage || ''} 
             onValueChange={(value) => onInputChange('currentStage', value)}
           >
             <SelectTrigger>
@@ -79,7 +83,7 @@ const EditLeadForm: React.FC<EditLeadFormProps> = ({
         <div className="space-y-2">
           <Label htmlFor="assignedTo">Assigned To</Label>
           <Select 
-            value={editedLead.assignedTo} 
+            value={editedLead.assignedTo || ''} 
             onValueChange={(value) => onInputChange('assignedTo', value)}
           >
             <SelectTrigger>
@@ -101,6 +105,7 @@ const EditLeadForm: React.FC<EditLeadFormProps> = ({
             rows={4} 
             value={editedLead.notes || ''} 
             onChange={(e) => onInputChange('notes', e.target.value)}
+            placeholder="Add notes about this lead"
           />
         </div>
       </div>

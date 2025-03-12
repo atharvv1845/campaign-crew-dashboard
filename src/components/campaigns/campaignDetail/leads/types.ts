@@ -1,18 +1,18 @@
 
 export interface Lead {
   id: number;
-  name: string;
-  company: string;
-  email: string;
+  name?: string; // Making name optional
+  company?: string; // Making company optional
+  email?: string; // Making email optional
   linkedin?: string;
   whatsapp?: string | null;
   twitter?: string | null;
   instagram?: string | null;
   facebook?: string | null;
   firstContacted?: string;
-  lastContacted: string;
-  currentStage: string;
-  assignedTo: string;
+  lastContacted?: string; // Making lastContacted optional
+  currentStage?: string; // Making currentStage optional
+  assignedTo?: string; // Making assignedTo optional
   followUpDate?: string;
   notes?: string;
   campaignId?: number;

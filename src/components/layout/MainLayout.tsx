@@ -9,6 +9,11 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
+interface SidebarProps {
+  expanded: boolean;
+  onToggle: () => void;
+}
+
 const getPageTitle = (pathname: string): string => {
   const path = pathname.split('/')[1];
   if (!path) return 'Dashboard';

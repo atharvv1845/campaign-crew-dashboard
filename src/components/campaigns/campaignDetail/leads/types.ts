@@ -25,6 +25,10 @@ export interface Lead {
     instagram?: string;
     whatsapp?: string;
   };
+  // New tracking fields
+  firstContactDate?: string;
+  nextFollowUpDate?: string;
+  assignedTeamMember?: string;
 }
 
 export interface CampaignStage {

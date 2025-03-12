@@ -17,22 +17,31 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Search, MoreHorizontal, Edit, Trash2, Calendar as CalendarIcon, User } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
-import { Lead } from './types';
+import { Lead, Campaign } from './types';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 interface LeadTableProps {
   leads: Lead[];
+  campaign?: Campaign; // Optional campaign object for stages/team members
   onStatusChange: (leadId: number | string, status: string) => void;
 }
 
-const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
+const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const leadsPerPage = 10;
@@ -50,6 +59,58 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
   
   const handleStatusChange = (leadId: number | string, status: string) => {
     onStatusChange(leadId, status);
+  };
+
+  const handleDateChange = (leadId: number | string, field: 'firstContactDate' | 'lastContact' | 'nextFollowUpDate', date: Date) => {
+    // Format date to ISO string and slice to get YYYY-MM-DD
+    const formattedDate = date.toISOString().split('T')[0];
+    // Call onStatusChange to maintain consistency in API (we're extending its functionality)
+    // In a real app, you would create a separate function for this or modify onStatusChange
+    onStatusChange(leadId, field + ':::' + formattedDate);
+  };
+
+  const handleTeamMemberChange = (leadId: number | string, teamMember: string) => {
+    // Similar to handleDateChange, using the same handler for consistency
+    onStatusChange(leadId, 'assignedTeamMember:::' + teamMember);
+  };
+  
+  const DatePickerPopover = ({ 
+    value, 
+    onChange, 
+    label 
+  }: { 
+    value?: string, 
+    onChange: (date: Date) => void, 
+    label: string 
+  }) => {
+    const date = value ? new Date(value) : undefined;
+    
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "w-full justify-start text-left text-xs font-normal",
+              !date && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-3 w-3" />
+            {date ? format(date, 'PPP') : label}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(date) => date && onChange(date)}
+            initialFocus
+            className="p-3 pointer-events-auto"
+          />
+        </PopoverContent>
+      </Popover>
+    );
   };
   
   return (
@@ -74,8 +135,11 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
               <TableHead>Lead Name</TableHead>
               <TableHead>Email/Phone</TableHead>
               <TableHead>Company</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>First Contact</TableHead>
               <TableHead>Last Contact</TableHead>
+              <TableHead>Next Follow-Up</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Assigned To</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -86,36 +150,120 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
                   <TableCell className="font-medium">{lead.name}</TableCell>
                   <TableCell>{lead.email || lead.phone || '-'}</TableCell>
                   <TableCell>{lead.company || '-'}</TableCell>
+                  
+                  {/* First Contact Date */}
+                  <TableCell>
+                    <DatePickerPopover
+                      value={lead.firstContactDate}
+                      onChange={(date) => handleDateChange(lead.id, 'firstContactDate', date)}
+                      label="Set date"
+                    />
+                  </TableCell>
+                  
+                  {/* Last Contact Date */}
+                  <TableCell>
+                    <DatePickerPopover
+                      value={lead.lastContact}
+                      onChange={(date) => handleDateChange(lead.id, 'lastContact', date)}
+                      label="Set date"
+                    />
+                  </TableCell>
+                  
+                  {/* Next Follow-Up Date */}
+                  <TableCell>
+                    <DatePickerPopover
+                      value={lead.nextFollowUpDate}
+                      onChange={(date) => handleDateChange(lead.id, 'nextFollowUpDate', date)}
+                      label="Schedule"
+                    />
+                  </TableCell>
+                  
+                  {/* Status Dropdown */}
                   <TableCell>
                     <Select 
                       defaultValue={lead.status} 
                       onValueChange={(value) => handleStatusChange(lead.id, value)}
                     >
-                      <SelectTrigger className="w-[160px]">
+                      <SelectTrigger className="w-[140px] h-8 text-xs">
                         <SelectValue>
                           <StatusBadge status={lead.status} />
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Pending">
-                          <StatusBadge status="Pending" />
-                        </SelectItem>
-                        <SelectItem value="Contacted">
-                          <StatusBadge status="Contacted" />
-                        </SelectItem>
-                        <SelectItem value="Interested">
-                          <StatusBadge status="Interested" />
-                        </SelectItem>
-                        <SelectItem value="Not Interested">
-                          <StatusBadge status="Not Interested" />
-                        </SelectItem>
-                        <SelectItem value="Converted">
-                          <StatusBadge status="Converted" />
-                        </SelectItem>
+                        {campaign?.stages ? (
+                          campaign.stages.map((stage) => (
+                            <SelectItem key={stage.id} value={stage.name}>
+                              <StatusBadge status={stage.name} />
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <>
+                            <SelectItem value="Pending">
+                              <StatusBadge status="Pending" />
+                            </SelectItem>
+                            <SelectItem value="Contacted">
+                              <StatusBadge status="Contacted" />
+                            </SelectItem>
+                            <SelectItem value="Interested">
+                              <StatusBadge status="Interested" />
+                            </SelectItem>
+                            <SelectItem value="Not Interested">
+                              <StatusBadge status="Not Interested" />
+                            </SelectItem>
+                            <SelectItem value="Converted">
+                              <StatusBadge status="Converted" />
+                            </SelectItem>
+                          </>
+                        )}
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell>{lead.lastContact || '-'}</TableCell>
+                  
+                  {/* Team Member Assignment */}
+                  <TableCell>
+                    <Select 
+                      defaultValue={lead.assignedTeamMember} 
+                      onValueChange={(value) => handleTeamMemberChange(lead.id, value)}
+                    >
+                      <SelectTrigger className="w-[120px] h-8 text-xs">
+                        <SelectValue placeholder="Assign">
+                          <div className="flex items-center gap-2">
+                            <User className="h-3 w-3" />
+                            {lead.assignedTeamMember || "Assign"}
+                          </div>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {campaign?.teamMembers ? (
+                          campaign.teamMembers.map((member, index) => (
+                            <SelectItem key={index} value={member}>
+                              <div className="flex items-center gap-2">
+                                <User className="h-3 w-3" />
+                                {member}
+                              </div>
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <>
+                            <SelectItem value="John Doe">
+                              <div className="flex items-center gap-2">
+                                <User className="h-3 w-3" />
+                                John Doe
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="Jane Smith">
+                              <div className="flex items-center gap-2">
+                                <User className="h-3 w-3" />
+                                Jane Smith
+                              </div>
+                            </SelectItem>
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  
+                  {/* Actions */}
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -138,7 +286,7 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, onStatusChange }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-24">
+                <TableCell colSpan={9} className="text-center h-24">
                   No leads found.
                 </TableCell>
               </TableRow>

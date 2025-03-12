@@ -51,6 +51,22 @@ const CampaignDetail: React.FC = () => {
         foundCampaign.leadsData = [];
       }
       
+      // Ensure campaign stages exist
+      if (!foundCampaign.stages) {
+        foundCampaign.stages = [
+          { id: 1, name: 'Pending', count: 0 },
+          { id: 2, name: 'Contacted', count: 0 },
+          { id: 3, name: 'Interested', count: 0 },
+          { id: 4, name: 'Not Interested', count: 0 },
+          { id: 5, name: 'Converted', count: 0 }
+        ];
+      }
+      
+      // Ensure team members exist
+      if (!foundCampaign.teamMembers) {
+        foundCampaign.teamMembers = ['John Doe', 'Jane Smith', 'Mike Johnson'];
+      }
+      
       setCampaign(foundCampaign);
     }
     
@@ -84,22 +100,46 @@ const CampaignDetail: React.FC = () => {
     navigate('/campaigns');
   };
 
-  const handleUpdateLeadStatus = (leadId: number | string, newStatus: string) => {
-    // Update in local state first (optimistic update)
-    const updatedLeadsData = campaign.leadsData.map((lead: Lead) => 
-      lead.id === leadId ? { ...lead, status: newStatus } : lead
-    );
-    
-    setCampaign(prev => ({
-      ...prev,
-      leadsData: updatedLeadsData
-    }));
-    
-    // Show success message
-    toast({
-      title: "Lead status updated",
-      description: `Lead status has been changed to ${newStatus}`,
-    });
+  const handleUpdateLead = (leadId: number | string, value: string) => {
+    // Check if this is a special field update (contains ':::')
+    if (value.includes(':::')) {
+      const [field, fieldValue] = value.split(':::');
+      
+      // Update lead with the new field value
+      const updatedLeadsData = campaign.leadsData.map((lead: Lead) => {
+        if (lead.id === leadId) {
+          return { ...lead, [field]: fieldValue };
+        }
+        return lead;
+      });
+      
+      setCampaign(prev => ({
+        ...prev,
+        leadsData: updatedLeadsData
+      }));
+      
+      // Show success message
+      toast({
+        title: "Lead updated",
+        description: `Lead ${field} has been updated`,
+      });
+    } else {
+      // This is a regular status update
+      const updatedLeadsData = campaign.leadsData.map((lead: Lead) => 
+        lead.id === leadId ? { ...lead, status: value } : lead
+      );
+      
+      setCampaign(prev => ({
+        ...prev,
+        leadsData: updatedLeadsData
+      }));
+      
+      // Show success message
+      toast({
+        title: "Lead status updated",
+        description: `Lead status has been changed to ${value}`,
+      });
+    }
   };
 
   return (
@@ -166,7 +206,8 @@ const CampaignDetail: React.FC = () => {
           {campaign.leadsData && campaign.leadsData.length > 0 ? (
             <LeadTable 
               leads={campaign.leadsData} 
-              onStatusChange={handleUpdateLeadStatus} 
+              campaign={campaign}
+              onStatusChange={handleUpdateLead} 
             />
           ) : (
             <div className="text-center py-12">

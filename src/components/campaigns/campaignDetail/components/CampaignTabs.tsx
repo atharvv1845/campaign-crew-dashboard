@@ -22,16 +22,18 @@ interface CampaignTabsProps {
   campaign: any;
   handleExportCampaign: () => void;
   handleImportCampaign: () => void;
+  updateCampaign?: (data: any) => void;
 }
 
 const CampaignTabs: React.FC<CampaignTabsProps> = ({ 
   campaign, 
   handleExportCampaign,
-  handleImportCampaign 
+  handleImportCampaign,
+  updateCampaign
 }) => {
   const [view, setView] = useState<'table' | 'kanban'>('table');
   
-  // Mock leads data
+  // Mock leads data - in a real app, this would be fetched from an API
   const mockLeads: Lead[] = [
     {
       id: 1,
@@ -66,7 +68,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     }
   ];
 
-  const stagesData = [
+  const stagesData = campaign.stages || [
     { id: 1, name: 'New', count: 5 },
     { id: 2, name: 'Contacted', count: 12 },
     { id: 3, name: 'Interested', count: 8 },
@@ -94,7 +96,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       <TabsContent value="overview" className="space-y-6">
         <StatCards campaign={campaign} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <CampaignDescription campaign={campaign} />
+          <CampaignDescription campaign={campaign} updateCampaign={updateCampaign} />
           <ChannelsAndStages campaign={campaign} />
         </div>
         <Separator />
@@ -132,11 +134,12 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
           leadsData={mockLeads}
           view={view}
           setView={setView}
+          updateCampaign={updateCampaign}
         />
       </TabsContent>
 
       <TabsContent value="messages" className="space-y-6">
-        <MessageSequence />
+        <MessageSequence campaign={campaign} updateCampaign={updateCampaign} />
       </TabsContent>
 
       <TabsContent value="reports" className="space-y-6">

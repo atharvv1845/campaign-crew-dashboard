@@ -7,6 +7,8 @@ interface MessageNodeProps {
   data: {
     label: string;
     message: string;
+    channel?: string;
+    subject?: string;
   };
   id: string;
 }
@@ -19,7 +21,17 @@ function MessageNode({ data, id }: MessageNodeProps) {
           <Mail className="w-4 h-4 mr-2 text-primary" />
           <span className="font-medium text-sm">{data.label}</span>
         </div>
+        {data.channel && (
+          <div className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full capitalize">
+            {data.channel}
+          </div>
+        )}
       </div>
+      {data.subject && (
+        <div className="text-xs font-medium mb-1">
+          Subject: {data.subject}
+        </div>
+      )}
       <div className="text-xs text-muted-foreground border-t border-border pt-2 mt-1">
         {data.message}
       </div>

@@ -3,15 +3,17 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { SheetClose } from "@/components/ui/sheet";
+import { Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Lead, Campaign } from '../../types';
 
 interface DetailsTabProps {
   lead: Lead;
   campaign: Campaign;
+  onEdit?: () => void;
 }
 
-const DetailsTab: React.FC<DetailsTabProps> = ({ lead, campaign }) => {
+const DetailsTab: React.FC<DetailsTabProps> = ({ lead, campaign, onEdit }) => {
   const { toast } = useToast();
 
   return (
@@ -69,17 +71,16 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ lead, campaign }) => {
       </div>
       
       <div className="flex justify-end gap-2 pt-4">
-        <Button 
-          variant="outline" 
-          onClick={() => {
-            toast({
-              title: "Lead updated",
-              description: "Lead information has been updated.",
-            });
-          }}
-        >
-          Update Details
-        </Button>
+        {onEdit && (
+          <Button 
+            variant="outline" 
+            onClick={onEdit}
+            className="flex items-center"
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            Edit Details
+          </Button>
+        )}
         <SheetClose asChild>
           <Button variant="ghost">Close</Button>
         </SheetClose>

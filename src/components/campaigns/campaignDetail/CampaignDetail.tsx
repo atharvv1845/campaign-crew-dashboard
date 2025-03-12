@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CampaignHeader from './CampaignHeader';
 import CampaignLoading from './components/CampaignLoading';
@@ -7,11 +7,25 @@ import CampaignNotFound from './components/CampaignNotFound';
 import CampaignTabs from './components/CampaignTabs';
 import { useCampaignData } from './hooks/useCampaignData';
 import { useCampaignActions } from './hooks/useCampaignActions';
+import CreateCampaign from '../CreateCampaign';
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { loading, campaign } = useCampaignData(id);
-  const { handleEditCampaign, handleExportCampaign, handleImportCampaign } = useCampaignActions();
+  const { loading, campaign, refreshCampaign, updateCampaign } = useCampaignData(id);
+  const { handleExportCampaign, handleImportCampaign } = useCampaignActions();
+  const [showEditCampaign, setShowEditCampaign] = useState(false);
+
+  // Handle edit campaign modal
+  const handleEditCampaign = () => {
+    setShowEditCampaign(true);
+  };
+
+  const handleCloseEditCampaign = (updatedCampaign?: any) => {
+    setShowEditCampaign(false);
+    if (updatedCampaign) {
+      refreshCampaign();
+    }
+  };
 
   if (loading) {
     return <CampaignLoading />;
@@ -51,7 +65,15 @@ const CampaignDetail: React.FC = () => {
         campaign={safeCampaign}
         handleExportCampaign={handleExportCampaign}
         handleImportCampaign={handleImportCampaign}
+        updateCampaign={updateCampaign}
       />
+
+      {showEditCampaign && (
+        <CreateCampaign 
+          onClose={handleCloseEditCampaign} 
+          existingCampaign={safeCampaign}
+        />
+      )}
     </div>
   );
 };

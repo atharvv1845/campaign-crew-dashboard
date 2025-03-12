@@ -7,6 +7,11 @@ export const useCampaignData = (id: string | undefined) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [campaign, setCampaign] = useState<any>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const refreshCampaign = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -43,7 +48,28 @@ export const useCampaignData = (id: string | undefined) => {
     if (id) {
       fetchCampaign();
     }
-  }, [id, toast]);
+  }, [id, toast, refreshTrigger]);
 
-  return { loading, campaign };
+  const updateCampaign = (updatedData: Partial<any>) => {
+    if (!campaign) return;
+    
+    const campaignIndex = campaignData.findIndex(c => c.id === Number(id));
+    if (campaignIndex === -1) return;
+    
+    // Update the campaign in the global data
+    const updatedCampaign = {
+      ...campaignData[campaignIndex],
+      ...updatedData
+    };
+    
+    campaignData[campaignIndex] = updatedCampaign;
+    setCampaign(updatedCampaign);
+    
+    toast({
+      title: "Campaign Updated",
+      description: "The campaign has been updated successfully."
+    });
+  };
+
+  return { loading, campaign, refreshCampaign, updateCampaign };
 };

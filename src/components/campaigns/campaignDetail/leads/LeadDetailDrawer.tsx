@@ -1,99 +1,209 @@
 
 import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import {
-  Building2,
-  Mail,
-} from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import StageBadge from '../badges/StageBadge';
-import { DetailDrawerProps } from './types/interactions';
-import { useInteractions } from './hooks/useInteractions';
-import OverviewTab from './components/drawer/OverviewTab';
-import InteractionsTab from './components/drawer/InteractionsTab';
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { Lead, Campaign } from './types';
 import DetailsTab from './components/drawer/DetailsTab';
+import InteractionsTab from './components/drawer/InteractionsTab';
+import { Check, X } from 'lucide-react';
 
-const LeadDetailDrawer: React.FC<DetailDrawerProps> = ({
+interface LeadDetailDrawerProps {
+  lead: Lead;
+  open: boolean;
+  onClose: () => void;
+  campaign: Campaign;
+  onUpdateLead?: (lead: Lead) => void;
+}
+
+const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
   lead,
   open,
   onClose,
   campaign,
+  onUpdateLead
 }) => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const { interactions, logInteraction } = useInteractions();
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedLead, setEditedLead] = useState<Lead>(lead);
+
+  const handleEdit = () => {
+    setEditedLead(lead);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    if (onUpdateLead) {
+      onUpdateLead(editedLead);
+      toast({
+        title: "Lead Updated",
+        description: "Lead information has been updated successfully."
+      });
+    }
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (field: keyof Lead, value: string) => {
+    setEditedLead(prev => ({ ...prev, [field]: value }));
+  };
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-md md:max-w-lg w-full overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader className="pb-4">
-          <SheetTitle className="text-xl">{lead.name}</SheetTitle>
-          <SheetDescription className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-            <span>{lead.company}</span>
-            <StageBadge stage={lead.currentStage} />
-          </SheetDescription>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {lead.email && (
-              <a 
-                href={`mailto:${lead.email}`} 
-                className="flex items-center gap-1 text-sm text-primary hover:underline"
-              >
-                <Mail className="h-3.5 w-3.5" />
-                {lead.email}
-              </a>
-            )}
-            {lead.linkedin && (
-              <a 
-                href={lead.linkedin} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-sm text-indigo-500 hover:underline"
-              >
-                <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
-                LinkedIn
-              </a>
-            )}
-            {/* Add other social media links here */}
-          </div>
+          <SheetTitle className="text-xl">
+            {isEditing ? 'Edit Lead' : lead.name}
+          </SheetTitle>
+          {!isEditing && (
+            <div className="text-sm text-muted-foreground">
+              {lead.company} • {lead.email}
+            </div>
+          )}
         </SheetHeader>
-        
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid grid-cols-3 w-full">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="interactions">Interactions</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-          </TabsList>
-          
-          {/* Overview Tab */}
-          <TabsContent value="overview">
-            <OverviewTab 
-              lead={lead} 
-              interactions={interactions}
-              onViewAllInteractions={() => setActiveTab('interactions')}
-            />
-          </TabsContent>
-          
-          {/* Interactions Tab */}
-          <TabsContent value="interactions">
-            <InteractionsTab 
-              interactions={interactions} 
-              onLogInteraction={logInteraction}
-            />
-          </TabsContent>
-          
-          {/* Details Tab */}
-          <TabsContent value="details">
-            <DetailsTab lead={lead} campaign={campaign} />
-          </TabsContent>
-        </Tabs>
+
+        {isEditing ? (
+          <div className="mt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input 
+                  id="name" 
+                  value={editedLead.name} 
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input 
+                  id="company" 
+                  value={editedLead.company} 
+                  onChange={(e) => handleInputChange('company', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email" 
+                  value={editedLead.email} 
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Input 
+                  id="linkedin" 
+                  value={editedLead.linkedin || ''} 
+                  onChange={(e) => handleInputChange('linkedin', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="currentStage">Current Stage</Label>
+                <Select 
+                  value={editedLead.currentStage} 
+                  onValueChange={(value) => handleInputChange('currentStage', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campaign.stages?.map(stage => (
+                      <SelectItem key={stage.id} value={stage.name}>
+                        {stage.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="assignedTo">Assigned To</Label>
+                <Select 
+                  value={editedLead.assignedTo} 
+                  onValueChange={(value) => handleInputChange('assignedTo', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select team member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campaign.teamMembers?.map(member => (
+                      <SelectItem key={member} value={member}>
+                        {member}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea 
+                  id="notes" 
+                  rows={4} 
+                  value={editedLead.notes || ''} 
+                  onChange={(e) => handleInputChange('notes', e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleCancel}
+                className="flex items-center"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSave}
+                className="flex items-center"
+              >
+                <Check className="h-4 w-4 mr-1" />
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Tabs defaultValue="details" className="mt-4">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="interactions">Interactions</TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details">
+              <DetailsTab lead={lead} campaign={campaign} onEdit={handleEdit} />
+            </TabsContent>
+            
+            <TabsContent value="interactions">
+              <InteractionsTab lead={lead} />
+            </TabsContent>
+            
+            <TabsContent value="history">
+              <div className="text-center py-8 text-muted-foreground">
+                Lead history details will be displayed here.
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
       </SheetContent>
     </Sheet>
   );

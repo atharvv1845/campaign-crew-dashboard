@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, Calendar, Edit, Check, X, MoreHorizontal } from 'lucide-react';
 import StageBadge from '../badges/StageBadge';
@@ -47,6 +46,7 @@ interface LeadTableProps {
   onSelectLead?: (leadId: number, selected: boolean) => void;
   selectedLeads?: number[];
   campaign?: Campaign;
+  onUpdateLead?: (lead: Lead) => void;
 }
 
 const LeadTable: React.FC<LeadTableProps> = ({ 
@@ -54,7 +54,8 @@ const LeadTable: React.FC<LeadTableProps> = ({
   onLeadClick, 
   onSelectLead,
   selectedLeads = [],
-  campaign
+  campaign,
+  onUpdateLead
 }) => {
   const { toast } = useToast();
   const [editingLead, setEditingLead] = useState<number | null>(null);
@@ -66,8 +67,11 @@ const LeadTable: React.FC<LeadTableProps> = ({
   };
   
   const saveNote = (leadId: number) => {
-    // In a real app, this would save to the database
-    // For now, we just show a toast
+    const lead = leads.find(l => l.id === leadId);
+    if (lead && onUpdateLead) {
+      const updatedLead = { ...lead, notes: editNote };
+      onUpdateLead(updatedLead);
+    }
     setEditingLead(null);
     toast({
       title: "Note saved",
@@ -76,7 +80,11 @@ const LeadTable: React.FC<LeadTableProps> = ({
   };
   
   const updateLeadStage = (leadId: number, stage: string) => {
-    // In a real app, this would update the lead's stage in the database
+    const lead = leads.find(l => l.id === leadId);
+    if (lead && onUpdateLead) {
+      const updatedLead = { ...lead, currentStage: stage };
+      onUpdateLead(updatedLead);
+    }
     toast({
       title: "Stage updated",
       description: `Lead stage changed to ${stage}.`,
@@ -84,7 +92,11 @@ const LeadTable: React.FC<LeadTableProps> = ({
   };
   
   const updateLeadAssignment = (leadId: number, teamMember: string) => {
-    // In a real app, this would update the assigned team member in the database
+    const lead = leads.find(l => l.id === leadId);
+    if (lead && onUpdateLead) {
+      const updatedLead = { ...lead, assignedTo: teamMember };
+      onUpdateLead(updatedLead);
+    }
     toast({
       title: "Assignment changed",
       description: `Lead assigned to ${teamMember}.`,
@@ -92,10 +104,32 @@ const LeadTable: React.FC<LeadTableProps> = ({
   };
   
   const updateFollowUpDate = (leadId: number, date: Date) => {
-    // In a real app, this would update the follow-up date in the database
+    const lead = leads.find(l => l.id === leadId);
+    if (lead && onUpdateLead) {
+      const updatedLead = { 
+        ...lead, 
+        followUpDate: format(date, 'yyyy-MM-dd')
+      };
+      onUpdateLead(updatedLead);
+    }
     toast({
       title: "Follow-up date set",
       description: `Follow-up scheduled for ${format(date, 'MMMM dd, yyyy')}.`,
+    });
+  };
+
+  const logContact = (leadId: number) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead && onUpdateLead) {
+      const updatedLead = { 
+        ...lead, 
+        lastContacted: format(new Date(), 'yyyy-MM-dd')
+      };
+      onUpdateLead(updatedLead);
+    }
+    toast({
+      title: "Contact logged",
+      description: "Contact with this lead has been recorded.",
     });
   };
 
@@ -166,7 +200,6 @@ const LeadTable: React.FC<LeadTableProps> = ({
                         </svg>
                       </a>
                     )}
-                    {/* Additional contact methods */}
                     {lead.whatsapp && (
                       <a href={`https://wa.me/${lead.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400">
                         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -355,13 +388,7 @@ const LeadTable: React.FC<LeadTableProps> = ({
                       <DropdownMenuItem onClick={() => handleEditNote(lead)}>
                         Edit Notes
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => {
-                        // In a real app, this would log a contact entry
-                        toast({
-                          title: "Contact logged",
-                          description: "Contact with this lead has been recorded.",
-                        });
-                      }}>
+                      <DropdownMenuItem onClick={() => logContact(lead.id)}>
                         Log Contact
                       </DropdownMenuItem>
                     </DropdownMenuContent>

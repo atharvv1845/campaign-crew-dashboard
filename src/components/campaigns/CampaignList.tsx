@@ -33,7 +33,13 @@ const CampaignList: React.FC = () => {
       teamMembers: campaign.teamMembers || [],
       createdAt: campaign.createdAt || new Date().toISOString().slice(0, 10),
       leads: campaign.leads || 0,
-      responses: campaign.responses || 0
+      responses: campaign.responses || 0,
+      positive: campaign.positive || 0,
+      negative: campaign.negative || 0,
+      conversion: campaign.conversion || '0%',
+      contacted: campaign.contacted || 0,
+      stages: campaign.stages || [],
+      messageFlow: campaign.messageFlow || { nodes: [], edges: [] }
     }));
     
     setCampaigns(sanitizedCampaigns);
@@ -75,7 +81,7 @@ const CampaignList: React.FC = () => {
     setTimeout(() => {
       console.log("Navigating to newly created campaign:", newCampaignId);
       navigate(`/campaigns/${newCampaignId}`);
-    }, 1500); // Increased delay to ensure campaign is fully processed
+    }, 2000); // Increased delay to ensure campaign is fully processed
   };
   
   const refreshList = () => {

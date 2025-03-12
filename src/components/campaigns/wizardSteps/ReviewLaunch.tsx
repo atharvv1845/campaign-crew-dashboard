@@ -65,6 +65,10 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
       console.log("Warning: Campaign has no message flow but proceeding anyway for demo purposes");
     }
     
+    if (!isTeamComplete) {
+      console.log("Warning: Campaign has no team members but proceeding anyway for demo purposes");
+    }
+    
     // Proceed with submission
     onSubmit();
   };

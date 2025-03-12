@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface FlowSaveValidationProps {
   nodes: any[];
@@ -17,6 +17,8 @@ const FlowSaveValidation = ({
   setFormData,
   onNext
 }: FlowSaveValidationProps) => {
+  const { toast } = useToast();
+  
   const saveFlowToFormData = () => {
     // Make sure we have at least one node
     if (nodes.length === 0) {

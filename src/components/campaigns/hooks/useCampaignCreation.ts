@@ -149,7 +149,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
       } else {
         // Add new campaign to the list
         campaignData.push(newCampaign);
-        console.log("Added new campaign:", newCampaign);
+        console.log("Added new campaign:", newCampaign, "Total campaigns now:", campaignData.length);
         toast({
           title: "Campaign Created",
           description: `${formData.name} has been created successfully.`

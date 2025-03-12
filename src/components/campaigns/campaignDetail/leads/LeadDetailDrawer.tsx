@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Sheet,
@@ -23,6 +22,7 @@ import StageBadge from '../badges/StageBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { Lead, Campaign } from './types';
 
 interface Interaction {
   id: number;
@@ -30,33 +30,6 @@ interface Interaction {
   date: string;
   description: string;
   user: string;
-}
-
-interface Lead {
-  id: number;
-  name: string;
-  company: string;
-  email: string;
-  linkedin?: string;
-  whatsapp?: string | null;
-  twitter?: string | null;
-  instagram?: string | null;
-  facebook?: string | null;
-  lastContacted: string;
-  currentStage: string;
-  assignedTo: string;
-  followUpDate?: string;
-  notes?: string;
-}
-
-interface Campaign {
-  stages: Array<{
-    id: number;
-    name: string;
-    count: number;
-  }>;
-  leads: number;
-  teamMembers?: string[];
 }
 
 interface LeadDetailDrawerProps {

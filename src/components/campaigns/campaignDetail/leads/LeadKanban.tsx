@@ -1,24 +1,9 @@
-
 import React from 'react';
 import { Clock } from 'lucide-react';
-
-interface Stage {
-  id: number;
-  name: string;
-  count: number;
-}
-
-interface Lead {
-  id: number;
-  name: string;
-  company: string;
-  lastContacted: string;
-  currentStage: string;
-  assignedTo: string;
-}
+import { Lead, CampaignStage } from './types';
 
 interface LeadKanbanProps {
-  stages: Stage[];
+  stages: CampaignStage[];
   leads: Lead[];
   campaignLeads: number;
   onLeadClick?: (lead: Lead) => void;

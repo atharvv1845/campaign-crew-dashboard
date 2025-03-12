@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -9,14 +8,13 @@ import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
 import LeadTracking from './LeadTracking';
 import MessageSequence from './MessageSequence';
-import { OutreachSummary } from './outreachSummary/index';
+import OutreachSummary from './outreachSummary';
 import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
 import CampaignExportImport from './components/CampaignExportImport';
 import { campaignData } from '../campaignData';
 import { Lead } from './LeadTracking';
 
-// Mock leads data for the campaign
 const mockLeads: Lead[] = [
   {
     id: 1,
@@ -129,7 +127,6 @@ const CampaignDetail: React.FC = () => {
     );
   }
 
-  // Mock stages data based on campaign stages or default values
   const stagesData = [
     { id: 1, name: 'New', count: 5 },
     { id: 2, name: 'Contacted', count: 12 },
@@ -140,7 +137,6 @@ const CampaignDetail: React.FC = () => {
     { id: 7, name: 'Lost', count: 3 },
   ];
 
-  // Enhanced campaign with stages
   const enhancedCampaign = {
     ...campaign,
     stages: stagesData

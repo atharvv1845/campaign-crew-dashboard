@@ -1,146 +1,155 @@
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { CampaignFormData, defaultStages, CampaignData } from '../types/campaignTypes';
-import { campaignData } from '../campaignData';
+// Define the types for messageFlow
+type MessageFlowType = {
+  id: string;
+  name: string;
+  trigger: string;
+  timeDelay: number;
+  message: string;
+};
 
-export const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<CampaignFormData>(() => {
-    if (existingCampaign) {
-      return {
-        name: existingCampaign.name || '',
-        description: existingCampaign.description || '',
-        channels: existingCampaign.channels || [],
-        stages: existingCampaign.stages || [...defaultStages],
-        teamAssignments: existingCampaign.teamAssignments || {},
-        messages: existingCampaign.messages || {},
-        notes: existingCampaign.notes || '',
-        shareNotes: existingCampaign.shareNotes || false,
-        leads: existingCampaign.leads || [],
-        messageFlow: existingCampaign.messageFlow || { nodes: [], edges: [] },
-        stepFlows: existingCampaign.stepFlows || {},
-      };
-    }
-    
-    return {
-      name: '',
-      description: '',
-      channels: [],
-      stages: [...defaultStages],
-      teamAssignments: {},
-      messages: {},
-      notes: '',
-      shareNotes: false,
-      leads: [],
-      messageFlow: { nodes: [], edges: [] },
-      stepFlows: {},
-    };
+// Define the type for channels
+type ChannelType = 'email' | 'sms' | 'whatsapp';
+
+// Define the type for CampaignData
+export type CampaignData = {
+  id: number;
+  name: string;
+  type: string;
+  channels: ChannelType[];
+  leads: number;
+  responses: number;
+  createdAt: string;
+  status: string;
+  description: string;
+  messageFlow: MessageFlowType[];
+};
+
+const useCampaignCreation = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    type: '',
+    channels: [] as ChannelType[],
+    description: '',
+    messageFlow: [] as MessageFlowType[],
   });
-  const [exitAnimation, setExitAnimation] = useState(false);
+  const [campaigns, setCampaigns] = useState<CampaignData[]>([]);
+  const [nextId, setNextId] = useState(1);
 
-  useEffect(() => {
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleClose();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prevData => {
+      let updatedChannels = [...prevData.channels];
+      if (checked) {
+        updatedChannels.push(name as ChannelType);
+      } else {
+        updatedChannels = updatedChannels.filter(channel => channel !== name);
       }
+      return {
+        ...prevData,
+        channels: updatedChannels
+      };
+    });
+  };
+
+  const addMessageFlow = () => {
+    const newMessageFlow = {
+      id: uuidv4(),
+      name: '',
+      trigger: '',
+      timeDelay: 0,
+      message: ''
     };
-
-    document.addEventListener('keydown', handleEscapeKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, []);
-
-  const nextStep = () => {
-    if (currentStep < 6) {
-      setCurrentStep(currentStep + 1);
-    }
+    setFormData(prevData => ({
+      ...prevData,
+      messageFlow: [...prevData.messageFlow, newMessageFlow]
+    }));
   };
 
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+  const updateMessageFlow = (id: string, field: string, value: string | number) => {
+    setFormData(prevData => ({
+      ...prevData,
+      messageFlow: prevData.messageFlow.map(flow =>
+        flow.id === id ? { ...flow, [field]: value } : flow
+      )
+    }));
   };
 
-  const handleSubmit = () => {
-    if (existingCampaign) {
-      const campaignIndex = campaignData.findIndex(c => c.id === existingCampaign.id);
-      if (campaignIndex !== -1) {
-        // Update the existing campaign with type assertion
-        const updatedCampaign = {
-          ...campaignData[campaignIndex],
-          name: formData.name,
-          channels: formData.channels,
-          leads: formData.leads.length,
-          teamMembers: Object.values(formData.teamAssignments).flat(),
-          description: formData.description,
-          messageFlow: formData.messageFlow
-        } as CampaignData;
-        
-        campaignData[campaignIndex] = updatedCampaign;
-        
-        toast({
-          title: 'Campaign Updated',
-          description: `${formData.name} campaign has been updated successfully!`,
-        });
-      }
-    } else {
-      // Create a new campaign with a numeric ID
-      const newId = Math.max(0, ...campaignData.map(c => Number(c.id))) + 1;
-      
-      // Create new campaign with type assertion
-      const newCampaign = {
-        id: newId,
-        name: formData.name,
-        status: 'Active',
-        type: 'Email',
-        channels: formData.channels,
-        leads: formData.leads.length,
-        responses: 0,
-        positive: 0,
-        negative: 0,
-        conversion: '0%',
-        teamMembers: Object.values(formData.teamAssignments).flat(),
-        createdAt: new Date().toISOString().split('T')[0],
-        description: formData.description,
-        messageFlow: formData.messageFlow
-      } as CampaignData;
-
-      campaignData.unshift(newCampaign);
-      
-      toast({
-        title: 'Campaign Created',
-        description: `${formData.name} campaign has been created successfully!`,
-      });
-      
-      // After campaign is created, navigate to its details page
-      handleClose();
-      setTimeout(() => {
-        navigate(`/campaigns/${newId}`);
-      }, 300);
-    }
+  const deleteMessageFlow = (id: string) => {
+    setFormData(prevData => ({
+      ...prevData,
+      messageFlow: prevData.messageFlow.filter(flow => flow.id !== id)
+    }));
   };
 
-  const handleClose = () => {
-    setExitAnimation(true);
-    setTimeout(() => {
-      onClose();
-    }, 300);
+  const createCampaign = () => {
+    const newCampaign = {
+      ...formData,
+      id: nextId,
+      createdAt: new Date().toLocaleDateString(),
+      status: 'draft',
+      responses: 0,
+      messageFlow: formData.messageFlow || []
+    } as unknown as CampaignData; // use type assertion
+    setCampaigns([...campaigns, newCampaign]);
+    setNextId(nextId + 1);
+    // Reset form data after campaign creation
+    setFormData({
+      name: '',
+      type: '',
+      channels: [],
+      description: '',
+      messageFlow: []
+    });
+  };
+
+  const getCampaign = (campaignId: number) => {
+    const campaign = campaigns.find(campaign => campaign.id === campaignId);
+    return campaign || null;
+  };
+
+   const updateCampaign = (campaignId: number) => {
+    const updatedCampaign = {
+      ...formData,
+      id: campaignId,
+      messageFlow: formData.messageFlow || []
+    } as unknown as CampaignData; // use type assertion
+
+    setCampaigns(campaigns.map(campaign => campaign.id === campaignId ? updatedCampaign : campaign));
+  };
+
+  const deleteCampaign = (campaignId: number) => {
+    setCampaigns(campaigns.filter(campaign => campaign.id !== campaignId));
+  };
+
+  const setCampaignStatus = (campaignId: number, status: string) => {
+     setCampaigns(campaigns.map(campaign => campaign.id === campaignId ? {...campaign, status: status} : campaign));
   };
 
   return {
-    currentStep,
     formData,
-    setFormData,
-    nextStep,
-    prevStep,
-    handleSubmit,
-    handleClose,
-    exitAnimation
+    campaigns,
+    handleChange,
+    handleCheckboxChange,
+    addMessageFlow,
+    updateMessageFlow,
+    deleteMessageFlow,
+    createCampaign,
+    getCampaign,
+    updateCampaign,
+    deleteCampaign,
+    setCampaignStatus
   };
 };
+
+export default useCampaignCreation;

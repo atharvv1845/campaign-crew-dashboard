@@ -1,5 +1,6 @@
 
 import { Lead } from '../../leads/types';
+import { Icon } from 'lucide-react';
 
 interface Campaign {
   id: number;
@@ -12,6 +13,7 @@ interface Campaign {
 export interface TabConfig {
   value: string;
   label: string;
+  icon?: React.ComponentType<any>;
 }
 
 export const getTabs = (campaign: Campaign, campaignLeads: Lead[]): TabConfig[] => {
@@ -31,8 +33,7 @@ export const getTabs = (campaign: Campaign, campaignLeads: Lead[]): TabConfig[] 
   const tabs = [
     ...baseTabs,
     ...(hasChannels ? [{ value: "messages", label: "Messages" }] : []),
-    ...(hasLeadsOrResponses ? [{ value: "reports", label: "Reports" }] : []),
-    { value: "settings", label: "Settings" }
+    ...(hasLeadsOrResponses ? [{ value: "reports", label: "Reports" }] : [])
   ];
   
   return tabs;

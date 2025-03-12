@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -8,7 +9,7 @@ import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
 import LeadTracking from './LeadTracking';
 import MessageSequence from './MessageSequence';
-import { OutreachSummary } from './outreachSummary/index';
+import OutreachSummary from './outreachSummary';
 import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
 import CampaignExportImport from './components/CampaignExportImport';

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Sheet,
@@ -5,99 +6,27 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetClose,
 } from "@/components/ui/sheet";
 import {
-  Calendar,
-  Mail,
-  Phone,
   Building2,
-  Clock,
-  MessageSquare,
-  User,
-  Plus,
+  Mail,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import StageBadge from '../badges/StageBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { Lead, Campaign } from './types';
+import StageBadge from '../badges/StageBadge';
+import { DetailDrawerProps } from './types/interactions';
+import { useInteractions } from './hooks/useInteractions';
+import OverviewTab from './components/drawer/OverviewTab';
+import InteractionsTab from './components/drawer/InteractionsTab';
+import DetailsTab from './components/drawer/DetailsTab';
 
-interface Interaction {
-  id: number;
-  type: 'email' | 'call' | 'meeting' | 'message';
-  date: string;
-  description: string;
-  user: string;
-}
-
-interface LeadDetailDrawerProps {
-  lead: Lead;
-  open: boolean;
-  onClose: () => void;
-  campaign: Campaign;
-}
-
-const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
+const LeadDetailDrawer: React.FC<DetailDrawerProps> = ({
   lead,
   open,
   onClose,
   campaign,
 }) => {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
-  
-  // Mock interaction history
-  const [interactions, setInteractions] = useState<Interaction[]>([
-    {
-      id: 1,
-      type: 'email',
-      date: '2023-10-15',
-      description: 'Sent initial outreach email',
-      user: 'John Smith',
-    },
-    {
-      id: 2,
-      type: 'call',
-      date: '2023-10-18',
-      description: 'Had an introductory call about our product',
-      user: 'Sarah Lee',
-    },
-  ]);
-  
-  // Function to log a new interaction
-  const logInteraction = (type: 'email' | 'call' | 'meeting' | 'message', description: string) => {
-    const newInteraction: Interaction = {
-      id: interactions.length + 1,
-      type,
-      date: new Date().toISOString().split('T')[0],
-      description,
-      user: 'Current User', // In a real app, this would be the current user
-    };
-    
-    setInteractions([...interactions, newInteraction]);
-    
-    toast({
-      title: "Interaction logged",
-      description: `${type.charAt(0).toUpperCase() + type.slice(1)} has been recorded.`,
-    });
-  };
-  
-  const getInteractionIcon = (type: string) => {
-    switch (type) {
-      case 'email':
-        return <Mail className="h-4 w-4" />;
-      case 'call':
-        return <Phone className="h-4 w-4" />;
-      case 'meeting':
-        return <Calendar className="h-4 w-4" />;
-      case 'message':
-        return <MessageSquare className="h-4 w-4" />;
-      default:
-        return <MessageSquare className="h-4 w-4" />;
-    }
-  };
+  const { interactions, logInteraction } = useInteractions();
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
@@ -144,225 +73,25 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
           </TabsList>
           
           {/* Overview Tab */}
-          <TabsContent value="overview" className="mt-4 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Assigned To</h3>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <span>{lead.assignedTo}</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Last Contacted</h3>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>{lead.lastContacted}</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Follow-up Date</h3>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{lead.followUpDate || 'Not set'}</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Current Stage</h3>
-                <StageBadge stage={lead.currentStage} />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Notes</h3>
-              <div className="p-3 bg-muted/20 rounded-md text-sm">
-                {lead.notes || 'No notes available.'}
-              </div>
-            </div>
-            
-            <Separator />
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Recent Interactions</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-primary"
-                  onClick={() => setActiveTab('interactions')}
-                >
-                  View All
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {interactions.slice(-2).map(interaction => (
-                  <div key={interaction.id} className="flex items-start gap-3 p-2 bg-muted/10 rounded-md">
-                    <div className="mt-0.5">
-                      {getInteractionIcon(interaction.type)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">
-                          {interaction.type.charAt(0).toUpperCase() + interaction.type.slice(1)}
-                        </span>
-                        <span className="text-xs text-muted-foreground">{interaction.date}</span>
-                      </div>
-                      <p className="text-sm">{interaction.description}</p>
-                      <div className="text-xs text-muted-foreground mt-1">by {interaction.user}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button 
-                variant="default" 
-                className="flex-1"
-                onClick={() => {
-                  toast({
-                    title: "Email drafted",
-                    description: "Redirecting to email composer.",
-                  });
-                }}
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Send Email
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  toast({
-                    title: "Call initiated",
-                    description: "Opening call dialog.",
-                  });
-                }}
-              >
-                <Phone className="h-4 w-4 mr-2" />
-                Call
-              </Button>
-            </div>
+          <TabsContent value="overview">
+            <OverviewTab 
+              lead={lead} 
+              interactions={interactions}
+              onViewAllInteractions={() => setActiveTab('interactions')}
+            />
           </TabsContent>
           
           {/* Interactions Tab */}
-          <TabsContent value="interactions" className="mt-4 space-y-4">
-            <div className="flex justify-between">
-              <h3 className="text-base font-medium">Interaction History</h3>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  // In a real app, this would open a dialog to log a new interaction
-                  const type = 'call';
-                  const description = 'Had a follow-up call about pricing options';
-                  logInteraction(type, description);
-                }}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Log Interaction
-              </Button>
-            </div>
-            
-            <div className="space-y-3">
-              {interactions.map(interaction => (
-                <div key={interaction.id} className="flex items-start gap-3 p-3 bg-muted/10 rounded-md">
-                  <div className="mt-0.5">
-                    {getInteractionIcon(interaction.type)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">
-                        {interaction.type.charAt(0).toUpperCase() + interaction.type.slice(1)}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{interaction.date}</span>
-                    </div>
-                    <p className="text-sm">{interaction.description}</p>
-                    <div className="text-xs text-muted-foreground mt-1">by {interaction.user}</div>
-                  </div>
-                </div>
-              ))}
-              
-              {interactions.length === 0 && (
-                <div className="text-center py-6 text-muted-foreground">
-                  No interactions recorded yet.
-                </div>
-              )}
-            </div>
+          <TabsContent value="interactions">
+            <InteractionsTab 
+              interactions={interactions} 
+              onLogInteraction={logInteraction}
+            />
           </TabsContent>
           
           {/* Details Tab */}
-          <TabsContent value="details" className="mt-4 space-y-4">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">Name</h3>
-                  <div className="text-sm">{lead.name}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">Company</h3>
-                  <div className="text-sm">{lead.company}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">Email</h3>
-                  <div className="text-sm">{lead.email}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">LinkedIn</h3>
-                  <div className="text-sm">{lead.linkedin || 'Not available'}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">WhatsApp</h3>
-                  <div className="text-sm">{lead.whatsapp || 'Not available'}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">Twitter</h3>
-                  <div className="text-sm">{lead.twitter || 'Not available'}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">Instagram</h3>
-                  <div className="text-sm">{lead.instagram || 'Not available'}</div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xs font-medium text-muted-foreground">Facebook</h3>
-                  <div className="text-sm">{lead.facebook || 'Not available'}</div>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">Campaign Information</h3>
-                <div className="bg-muted/10 p-3 rounded-md">
-                  <p className="text-sm mb-1">
-                    <span className="font-medium">Current Stage:</span> {lead.currentStage}
-                  </p>
-                  <p className="text-sm mb-1">
-                    <span className="font-medium">Assigned To:</span> {lead.assignedTo}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Last Contacted:</span> {lead.lastContacted}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex justify-end gap-2 pt-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    toast({
-                      title: "Lead updated",
-                      description: "Lead information has been updated.",
-                    });
-                  }}
-                >
-                  Update Details
-                </Button>
-                <SheetClose asChild>
-                  <Button variant="ghost">Close</Button>
-                </SheetClose>
-              </div>
-            </div>
+          <TabsContent value="details">
+            <DetailsTab lead={lead} campaign={campaign} />
           </TabsContent>
         </Tabs>
       </SheetContent>

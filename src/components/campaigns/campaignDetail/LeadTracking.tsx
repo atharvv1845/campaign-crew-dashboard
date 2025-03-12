@@ -17,6 +17,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import LeadDetailDrawer from './leads/LeadDetailDrawer';
 
+// Consolidated Lead interface
 export interface Lead {
   id: number;
   name: string;
@@ -32,6 +33,7 @@ export interface Lead {
   assignedTo: string;
   followUpDate?: string;
   notes?: string;
+  // Optional fields for backward compatibility
   title?: string;
   status?: string;
   lastContact?: string;

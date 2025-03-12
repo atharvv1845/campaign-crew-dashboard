@@ -140,6 +140,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         const index = campaignData.findIndex(c => c.id === existingCampaign.id);
         if (index !== -1) {
           campaignData[index] = { ...campaignData[index], ...newCampaign };
+          console.log("Updated existing campaign:", campaignData[index]);
           toast({
             title: "Campaign Updated",
             description: `${formData.name} has been updated.`

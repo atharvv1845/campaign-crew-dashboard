@@ -75,7 +75,7 @@ const CampaignList: React.FC = () => {
     setTimeout(() => {
       console.log("Navigating to newly created campaign:", newCampaignId);
       navigate(`/campaigns/${newCampaignId}`);
-    }, 1000);
+    }, 1500); // Increased delay to ensure campaign is fully processed
   };
   
   const refreshList = () => {

@@ -4,7 +4,7 @@ import { Check, AlertTriangle } from 'lucide-react';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ReviewLaunchProps {
   formData: CampaignFormData;
@@ -13,6 +13,8 @@ interface ReviewLaunchProps {
 }
 
 export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, onBack }) => {
+  const { toast } = useToast();
+  
   // Check if all required sections are complete
   const isSetupComplete = formData.name.trim() !== '' && formData.channels.length > 0;
   const isLeadsComplete = formData.leads && formData.leads.length > 0;
@@ -34,38 +36,33 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
   const handleSubmit = () => {
     console.log("Submitting campaign with data:", formData);
     
-    // Check if leads exist and have required fields, including Google sheet imported leads
-    if (!formData.leads || formData.leads.length === 0) {
+    // Check if campaign name is provided
+    if (!formData.name || formData.name.trim() === '') {
       toast({
         title: "Warning",
-        description: "No leads found. Please import or add leads before launching.",
+        description: "Campaign name is required. Please provide a name before launching.",
         variant: "destructive"
       });
       return;
     }
     
-    // Validate that each lead has required fields
-    const invalidLeads = formData.leads.filter(lead => 
-      !lead.firstName || !lead.email
-    );
-    
-    if (invalidLeads.length > 0) {
+    // Check if channels are selected
+    if (!formData.channels || formData.channels.length === 0) {
       toast({
         title: "Warning",
-        description: `${invalidLeads.length} leads are missing required fields (name or email).`,
+        description: "Please select at least one channel for your campaign.",
         variant: "destructive"
       });
       return;
     }
     
-    // Validate the message flow
-    if (!formData.messageFlow || !formData.messageFlow.nodes || formData.messageFlow.nodes.length === 0) {
-      toast({
-        title: "Warning",
-        description: "No message flow found. Please add at least one message step.",
-        variant: "destructive"
-      });
-      return;
+    // For the demo, we'll allow campaign creation even if not all sections are complete
+    if (!isLeadsComplete) {
+      console.log("Warning: Campaign has no leads but proceeding anyway for demo purposes");
+    }
+    
+    if (!isMessagesComplete) {
+      console.log("Warning: Campaign has no message flow but proceeding anyway for demo purposes");
     }
     
     // Proceed with submission
@@ -173,7 +170,7 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
           Back
         </Button>
         
-        <Button onClick={handleSubmit}>
+        <Button onClick={handleSubmit} data-testid="launch-campaign-button">
           {isReadyToLaunch ? 'Launch Campaign' : 'Save as Draft'}
         </Button>
       </div>

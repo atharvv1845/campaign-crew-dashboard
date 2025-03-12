@@ -14,6 +14,11 @@ export interface CampaignData {
   createdAt: string;
   description?: string;
   contacted?: number;
+  stages?: any[];
+  messageFlow?: {
+    nodes: any[];
+    edges: any[];
+  };
 }
 
 // Update available channels for outreach

@@ -1,15 +1,29 @@
-
 export interface Lead {
   id: number;
   name: string;
   email?: string;
   phone?: string;
   company?: string;
+  title?: string;
   channel?: string;
   status: string;
   lastContact?: string;
   notes?: string;
   campaignId: number;
+  socialProfiles?: {
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    whatsapp?: string;
+  };
+  firstName?: string;
+  lastName?: string;
+  currentStage?: string;
+  assignedTo?: string;
+  followUpDate?: string;
+  lastContacted?: string;
+  firstContacted?: string;
 }
 
 export interface CampaignStage {

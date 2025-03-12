@@ -2,9 +2,10 @@
 import React from 'react';
 import { Phone, Mail, MessageSquare, Linkedin, Twitter, MessageCircle, Instagram, Facebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Lead } from '@/components/campaigns/campaignDetail/leads/types';
 
 interface LeadContactMethodsProps {
-  methods: string[];
+  lead: Lead;
   onMethodsChange?: (methods: string[]) => void;
   readOnly?: boolean;
 }
@@ -21,29 +22,38 @@ const icons = {
 };
 
 export const LeadContactMethods: React.FC<LeadContactMethodsProps> = ({
-  methods,
+  lead,
   onMethodsChange,
   readOnly = false,
 }) => {
-  const handleMethodToggle = (method: string) => {
-    if (readOnly || !onMethodsChange) return;
-    
-    const newMethods = methods.includes(method)
-      ? methods.filter(m => m !== method)
-      : [...methods, method];
-    
-    onMethodsChange(newMethods);
+  const getActiveMethods = () => {
+    const methods: string[] = [];
+    if (lead.phone) methods.push('phone');
+    if (lead.email) methods.push('email');
+    if (lead.socialProfiles?.linkedin) methods.push('linkedin');
+    if (lead.socialProfiles?.twitter) methods.push('twitter');
+    if (lead.socialProfiles?.instagram) methods.push('instagram');
+    if (lead.socialProfiles?.facebook) methods.push('facebook');
+    if (lead.socialProfiles?.whatsapp) methods.push('whatsapp');
+    return methods;
   };
+
+  const activeMethods = getActiveMethods();
 
   return (
     <div className="flex flex-wrap gap-2">
       {Object.entries(icons).map(([method, Icon]) => {
-        const isActive = methods.includes(method);
+        const isActive = activeMethods.includes(method);
+        const socialUrl = lead.socialProfiles?.[method as keyof typeof lead.socialProfiles];
         
-        return (
+        const button = (
           <button
             key={method}
-            onClick={() => handleMethodToggle(method)}
+            onClick={() => onMethodsChange?.(
+              activeMethods.includes(method) 
+                ? activeMethods.filter(m => m !== method)
+                : [...activeMethods, method]
+            )}
             disabled={readOnly}
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
@@ -54,9 +64,20 @@ export const LeadContactMethods: React.FC<LeadContactMethodsProps> = ({
             )}
           >
             <Icon className="h-4 w-4" />
-            <span className="capitalize">{method}</span>
+            {socialUrl ? socialUrl : <span className="capitalize">{method}</span>}
           </button>
         );
+
+        return socialUrl ? (
+          <a 
+            key={method} 
+            href={`https://${method}.com/${socialUrl}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            {button}
+          </a>
+        ) : button;
       })}
     </div>
   );

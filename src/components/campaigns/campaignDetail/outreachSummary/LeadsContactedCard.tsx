@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, UserCheck } from 'lucide-react';
 
 interface LeadsContactedCardProps {
   today: number;
@@ -9,38 +9,32 @@ interface LeadsContactedCardProps {
   thisMonth: number;
 }
 
-const LeadsContactedCard: React.FC<LeadsContactedCardProps> = ({
-  today,
-  thisWeek,
-  thisMonth,
+const LeadsContactedCard: React.FC<LeadsContactedCardProps> = ({ 
+  today, 
+  thisWeek, 
+  thisMonth 
 }) => {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-muted-foreground font-medium">Leads Contacted</CardTitle>
+        <CardTitle className="text-base font-medium flex items-center">
+          <UserCheck className="h-4 w-4 mr-2" />
+          Leads Contacted
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5 mr-1" />
-              <span className="text-xs">Today</span>
-            </div>
-            <p className="text-xl font-semibold">{today}</p>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-3xl font-semibold">{today}</p>
+            <p className="text-xs text-muted-foreground">Today</p>
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5 mr-1" />
-              <span className="text-xs">Week</span>
-            </div>
-            <p className="text-xl font-semibold">{thisWeek}</p>
+          <div>
+            <p className="text-3xl font-semibold">{thisWeek}</p>
+            <p className="text-xs text-muted-foreground">This Week</p>
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5 mr-1" />
-              <span className="text-xs">Month</span>
-            </div>
-            <p className="text-xl font-semibold">{thisMonth}</p>
+          <div>
+            <p className="text-3xl font-semibold">{thisMonth}</p>
+            <p className="text-xs text-muted-foreground">This Month</p>
           </div>
         </div>
       </CardContent>

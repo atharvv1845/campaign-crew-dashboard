@@ -1,3 +1,4 @@
+
 import { Lead } from '@/components/leads/LeadTableComponent';
 import { CampaignData } from '../campaignData';
 
@@ -21,11 +22,22 @@ export const campaignData: CampaignData & {
   negative: 75,
   conversion: "10%",
   createdAt: "Jan 15, 2023",
+  teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'],
   description: "This campaign targets SaaS companies with 50-200 employees in the North American market. The primary goal is to schedule demos with decision-makers in the marketing and sales departments."
 };
 
 // Mock leads data for the campaign
-export const leadsData: Lead[] = [
+export const leadsData: Array<{
+  id: number;
+  name: string;
+  email: string;
+  company: string;
+  title: string;
+  status: string;
+  campaign: string;
+  lastContact: string;
+  contactMethods?: string[];
+}> = [
   {
     id: 1,
     name: "John Smith",

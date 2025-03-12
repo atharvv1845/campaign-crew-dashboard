@@ -1,49 +1,63 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Users, Calendar } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, Users, Briefcase } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface CampaignStatusCardProps {
-  campaign: {
-    status: string;
-    createdAt: string;
-  };
+  campaign: any;
   teamMembers?: string[];
 }
 
-const CampaignStatusCard: React.FC<CampaignStatusCardProps> = ({ 
-  campaign, 
-  teamMembers = [] 
-}) => {
+const CampaignStatusCard: React.FC<CampaignStatusCardProps> = ({ campaign, teamMembers = [] }) => {
+  const { toast } = useToast();
+  
+  const handleAddTeamMember = () => {
+    toast({
+      title: "Add team member",
+      description: "Opening team member selection dialog.",
+    });
+  };
+  
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-muted-foreground font-medium">Campaign Status</CardTitle>
+        <CardTitle className="text-base font-medium flex items-center">
+          <Briefcase className="h-4 w-4 mr-2" />
+          Campaign Status
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <div className="flex items-center">
-              <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-              <span className="text-sm">Status</span>
-            </div>
-            <span className="font-medium">{campaign.status}</span>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">Created on</span>
+          </div>
+          <span className="text-sm">{campaign.createdAt}</span>
+        </div>
+        
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">Team Members</span>
           </div>
           
-          <div className="flex justify-between">
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-2 text-blue-500" />
-              <span className="text-sm">Team Members</span>
-            </div>
-            <span className="font-medium">{teamMembers?.length || 0}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            <div className="flex items-center">
-              <Calendar className="h-4 w-4 mr-2 text-indigo-500" />
-              <span className="text-sm">Created</span>
-            </div>
-            <span className="font-medium">{campaign.createdAt}</span>
+          <div className="flex flex-wrap gap-2">
+            {teamMembers.map((member, index) => (
+              <div key={index} className="text-xs bg-muted/20 px-2 py-1 rounded-full">
+                {member}
+              </div>
+            ))}
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-full h-6 text-xs"
+              onClick={handleAddTeamMember}
+            >
+              + Add
+            </Button>
           </div>
         </div>
       </CardContent>

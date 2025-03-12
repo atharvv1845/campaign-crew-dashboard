@@ -1,6 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ThumbsUp, ThumbsDown, Clock } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
 
 interface ResponseBreakdownCardProps {
   positiveResponses: number;
@@ -9,74 +11,66 @@ interface ResponseBreakdownCardProps {
   responseRate: number;
 }
 
-const ResponseBreakdownCard: React.FC<ResponseBreakdownCardProps> = ({
-  positiveResponses,
-  negativeResponses,
+const ResponseBreakdownCard: React.FC<ResponseBreakdownCardProps> = ({ 
+  positiveResponses, 
+  negativeResponses, 
   notReplied,
-  responseRate,
+  responseRate
 }) => {
-  const calculateProgress = (positive: number, negative: number, total: number) => {
-    return {
-      positive: (positive / total) * 100,
-      negative: (negative / total) * 100,
-      notReplied: ((total - positive - negative) / total) * 100,
-    };
-  };
+  const total = positiveResponses + negativeResponses + notReplied;
   
-  const progress = calculateProgress(
-    positiveResponses, 
-    negativeResponses, 
-    positiveResponses + negativeResponses + notReplied
-  );
-
+  // Calculate percentages for the chart
+  const positivePercent = Math.round((positiveResponses / total) * 100);
+  const negativePercent = Math.round((negativeResponses / total) * 100);
+  
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-muted-foreground font-medium">Response Breakdown</CardTitle>
+        <CardTitle className="text-base font-medium">
+          Response Breakdown
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-end justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-green-500 mr-2" />
-                <span className="text-sm">Positive</span>
-              </div>
-              <p className="text-lg font-semibold">{positiveResponses}</p>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <ThumbsUp className="h-4 w-4 text-green-500" />
+              <span className="text-sm">Positive</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-red-500 mr-2" />
-                <span className="text-sm">Negative</span>
-              </div>
-              <p className="text-lg font-semibold">{negativeResponses}</p>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-gray-300 mr-2" />
-                <span className="text-sm">No Reply</span>
-              </div>
-              <p className="text-lg font-semibold">{notReplied}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">{positiveResponses}</span>
+              <span className="text-xs text-muted-foreground">({positivePercent}%)</span>
             </div>
           </div>
           
-          <div className="w-full h-2 rounded-full bg-muted overflow-hidden flex">
-            <div
-              className="h-full bg-green-500"
-              style={{ width: `${progress.positive}%` }}
-            />
-            <div
-              className="h-full bg-red-500"
-              style={{ width: `${progress.negative}%` }}
-            />
-            <div
-              className="h-full bg-gray-300"
-              style={{ width: `${progress.notReplied}%` }}
-            />
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <ThumbsDown className="h-4 w-4 text-red-500" />
+              <span className="text-sm">Negative</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">{negativeResponses}</span>
+              <span className="text-xs text-muted-foreground">({negativePercent}%)</span>
+            </div>
           </div>
           
-          <div className="text-xs text-center text-muted-foreground">
-            {responseRate}% Response Rate
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">Not Replied</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">{notReplied}</span>
+              <span className="text-xs text-muted-foreground">({100 - positivePercent - negativePercent}%)</span>
+            </div>
+          </div>
+          
+          <div className="pt-3">
+            <div className="flex justify-between text-xs mb-1">
+              <span>Overall Response Rate</span>
+              <span>{responseRate}%</span>
+            </div>
+            <Progress value={responseRate} className="h-2" />
           </div>
         </div>
       </CardContent>

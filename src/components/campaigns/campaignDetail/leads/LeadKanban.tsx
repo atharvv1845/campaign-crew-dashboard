@@ -21,9 +21,10 @@ interface LeadKanbanProps {
   stages: Stage[];
   leads: Lead[];
   campaignLeads: number;
+  onLeadClick?: (lead: Lead) => void;
 }
 
-const LeadKanban: React.FC<LeadKanbanProps> = ({ stages, leads, campaignLeads }) => {
+const LeadKanban: React.FC<LeadKanbanProps> = ({ stages, leads, campaignLeads, onLeadClick }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 overflow-x-auto pb-4">
       {stages.map(stage => (
@@ -44,7 +45,8 @@ const LeadKanban: React.FC<LeadKanbanProps> = ({ stages, leads, campaignLeads })
               .map(lead => (
                 <div 
                   key={lead.id}
-                  className="p-3 bg-card border border-border rounded-lg hover:shadow-sm transition-shadow"
+                  className="p-3 bg-card border border-border rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
+                  onClick={() => onLeadClick && onLeadClick(lead)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <p className="text-sm font-medium">{lead.name}</p>

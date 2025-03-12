@@ -14,6 +14,23 @@ import OutreachSummary from './OutreachSummary';
 import MessageSequence from './MessageSequence';
 import CampaignReports from './CampaignReports';
 
+interface EnhancedLead {
+  id: number;
+  name: string;
+  company: string;
+  email: string;
+  linkedin?: string;
+  whatsapp?: string | null;
+  twitter?: string | null;
+  instagram?: string | null;
+  facebook?: string | null;
+  lastContacted: string;
+  currentStage: string;
+  assignedTo: string;
+  followUpDate?: string;
+  notes?: string;
+}
+
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -37,8 +54,11 @@ const CampaignDetail: React.FC = () => {
   };
   
   // Enhance mock leads data with follow-up dates and notes
-  const enhancedLeadsData = leadsData.map(lead => ({
+  const enhancedLeadsData: EnhancedLead[] = leadsData.map(lead => ({
     ...lead,
+    lastContacted: lead.lastContact,
+    currentStage: lead.status,
+    assignedTo: Math.random() > 0.5 ? 'John Smith' : 'Sarah Lee',
     followUpDate: Math.random() > 0.5 ? '2023-11-' + Math.floor(Math.random() * 30 + 1) : undefined,
     notes: Math.random() > 0.3 ? 'Last discussion about pricing options. Interested in Enterprise plan.' : '',
   }));

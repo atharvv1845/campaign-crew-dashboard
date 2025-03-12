@@ -3,73 +3,12 @@ import React, { useState } from 'react';
 import LeadFilters from './LeadFilters';
 import LeadTableComponent, { Lead } from './LeadTableComponent';
 
-// Mock lead data
-const leadData: Lead[] = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@example.com',
-    company: 'Acme Inc.',
-    title: 'Marketing Director',
-    status: 'Interested',
-    campaign: 'Q4 Product Launch',
-    lastContact: '2023-10-14',
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    email: 'michael.chen@example.com',
-    company: 'Tech Solutions Ltd.',
-    title: 'CTO',
-    status: 'Contacted',
-    campaign: 'Summer Sale Outreach',
-    lastContact: '2023-10-12',
-  },
-  {
-    id: 3,
-    name: 'Jessica Williams',
-    email: 'jessica.williams@example.com',
-    company: 'Global Enterprises',
-    title: 'CEO',
-    status: 'Not Interested',
-    campaign: 'Q4 Product Launch',
-    lastContact: '2023-10-10',
-  },
-  {
-    id: 4,
-    name: 'David Miller',
-    email: 'david.miller@example.com',
-    company: 'Miller Consulting',
-    title: 'Principal Consultant',
-    status: 'Responded',
-    campaign: 'Customer Feedback Survey',
-    lastContact: '2023-10-09',
-  },
-  {
-    id: 5,
-    name: 'Amanda Rodriguez',
-    email: 'amanda.r@example.com',
-    company: 'InnoTech',
-    title: 'Product Manager',
-    status: 'New',
-    campaign: 'Summer Sale Outreach',
-    lastContact: '2023-10-15',
-  },
-  {
-    id: 6,
-    name: 'Robert Kim',
-    email: 'robert.kim@example.com',
-    company: 'Kim Associates',
-    title: 'Senior Developer',
-    status: 'Interested',
-    campaign: 'Q4 Product Launch',
-    lastContact: '2023-10-11',
-  },
-];
-
 const LeadTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Statuses');
+  
+  // Empty leads data array instead of mock data
+  const leadData: Lead[] = [];
   
   // Filter leads based on search term and status
   const filteredLeads = leadData.filter(lead => {
@@ -96,8 +35,14 @@ const LeadTable: React.FC = () => {
         setStatusFilter={setStatusFilter}
       />
       
-      {/* Leads table */}
-      <LeadTableComponent leads={filteredLeads} />
+      {filteredLeads.length === 0 ? (
+        <div className="glass-card rounded-xl p-8 text-center">
+          <h3 className="text-lg font-medium mb-2">No Leads Available</h3>
+          <p className="text-muted-foreground">Add leads from campaign creation or import leads to get started.</p>
+        </div>
+      ) : (
+        <LeadTableComponent leads={filteredLeads} />
+      )}
     </div>
   );
 };

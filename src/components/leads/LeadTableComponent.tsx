@@ -13,7 +13,7 @@ export interface Lead {
   status: string;
   campaign: string;
   lastContact: string;
-  contactMethods?: string[]; // Add this new field
+  contactMethods?: string[];
 }
 
 interface LeadTableComponentProps {

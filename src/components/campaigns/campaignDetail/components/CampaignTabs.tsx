@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -36,11 +37,43 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     if (Array.isArray(campaign.leads)) {
       console.log('Found leads array:', campaign.leads.length);
       
-      return campaign.leads.map((lead: any, index: number) => ({
-        ...lead,
-        id: lead.id || `lead-${index}`,
-        currentStage: lead.status || lead.currentStage || 'New'
-      }));
+      return campaign.leads.map((lead: any, index: number) => {
+        // Generate a display name based on available fields
+        let displayName = '';
+        
+        if (lead.firstName && lead.lastName) {
+          displayName = `${lead.firstName} ${lead.lastName}`;
+        } else if (lead.firstName) {
+          displayName = lead.firstName;
+        } else if (lead.lastName) {
+          displayName = lead.lastName;
+        } else if (lead.fullName) {
+          displayName = lead.fullName;
+        } else if (lead.name) {
+          displayName = lead.name;
+        } else {
+          displayName = `Lead #${index + 1}`;
+        }
+        
+        return {
+          ...lead,
+          id: lead.id || `lead-${index}`,
+          name: displayName,
+          currentStage: lead.status || lead.currentStage || 'New',
+          // Ensure platform links are accessible
+          linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
+          twitter: lead.twitter || lead.socialProfiles?.twitter || '',
+          facebook: lead.facebook || lead.socialProfiles?.facebook || '',
+          instagram: lead.instagram || lead.socialProfiles?.instagram || '',
+          whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
+          // Date fields
+          firstContacted: lead.firstContacted || lead.createdAt || '',
+          lastContacted: lead.lastContacted || '',
+          followUpDate: lead.followUpDate || lead.nextFollowUp || '',
+          // Team assignee
+          assignedTo: lead.assignedTo || lead.teamMember || '',
+        };
+      });
     }
     
     return [];

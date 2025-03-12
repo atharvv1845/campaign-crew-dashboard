@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
@@ -28,12 +29,25 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
   onOpen,
   populatedFields = []
 }) => {
+  const [firstContacted, setFirstContacted] = useState<Date | undefined>(
+    lead.firstContacted ? new Date(lead.firstContacted) : undefined
+  );
   const [lastContacted, setLastContacted] = useState<Date | undefined>(
     lead.lastContacted ? new Date(lead.lastContacted) : undefined
   );
   const [followUpDate, setFollowUpDate] = useState<Date | undefined>(
     lead.followUpDate ? new Date(lead.followUpDate) : undefined
   );
+
+  const handleFirstContactSelect = (newDate: Date | undefined) => {
+    setFirstContacted(newDate);
+    if (onUpdateLead && newDate) {
+      onUpdateLead({
+        ...lead,
+        firstContacted: format(newDate, 'yyyy-MM-dd')
+      });
+    }
+  };
 
   const handleDateSelect = (newDate: Date | undefined) => {
     setLastContacted(newDate);
@@ -87,6 +101,16 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
       {displayColumn('socialProfiles') && (
         <td className="py-3 px-6">
           <LeadPlatformIcons lead={lead} />
+        </td>
+      )}
+      
+      {displayColumn('firstContacted') && (
+        <td className="py-3 px-6">
+          <LeadDatePicker
+            date={firstContacted}
+            onDateSelect={handleFirstContactSelect}
+            label="Set first contact"
+          />
         </td>
       )}
       

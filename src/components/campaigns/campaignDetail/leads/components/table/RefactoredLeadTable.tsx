@@ -44,21 +44,50 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     }
   };
 
-  // Filter out fields that have no data across all leads
+  // Get all possible fields to display
+  const allPossibleFields = [
+    'socialProfiles', 'firstContacted', 'lastContacted', 'followUpDate', 
+    'currentStage', 'assignedTo', 'notes', 'email', 'linkedin', 'twitter',
+    'facebook', 'instagram', 'whatsapp'
+  ];
+  
+  // Determine which fields are populated
   const getPopulatedFields = () => {
     const fieldCounts: Record<string, number> = {};
     
+    // Initialize counts for all fields we want to show
+    allPossibleFields.forEach(field => {
+      fieldCounts[field] = 0;
+    });
+    
     // Count how many leads have each field populated
     leads.forEach(lead => {
+      // Check standard fields
       Object.entries(lead).forEach(([key, value]) => {
-        if (value && value !== '' && value !== 'N/A' && key !== 'id') {
+        if (value && value !== '' && value !== 'N/A' && fieldCounts[key] !== undefined) {
           fieldCounts[key] = (fieldCounts[key] || 0) + 1;
         }
       });
+      
+      // Special handling for socialProfiles
+      const hasSocialProfiles = lead.linkedin || lead.twitter || lead.facebook || 
+                               lead.instagram || lead.whatsapp || lead.email;
+      
+      if (hasSocialProfiles) {
+        fieldCounts['socialProfiles'] = (fieldCounts['socialProfiles'] || 0) + 1;
+      }
     });
     
+    // Always include these fields even if empty
+    const alwaysIncludeFields = ['socialProfiles', 'currentStage', 'assignedTo'];
+    
     // Return fields that have data in at least one lead
-    return Object.keys(fieldCounts).filter(key => fieldCounts[key] > 0);
+    return [
+      ...alwaysIncludeFields,
+      ...Object.entries(fieldCounts)
+        .filter(([key, count]) => count > 0 && !alwaysIncludeFields.includes(key))
+        .map(([key]) => key)
+    ];
   };
 
   const populatedFields = getPopulatedFields();

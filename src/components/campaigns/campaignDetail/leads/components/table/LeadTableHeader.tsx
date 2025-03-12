@@ -43,12 +43,16 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         <th className="py-3 px-6 text-left font-medium">Platforms</th>
       )}
       
+      {displayColumn('firstContacted') && (
+        <th className="py-3 px-6 text-left font-medium">First Contacted</th>
+      )}
+      
       {displayColumn('lastContacted') && (
         <th className="py-3 px-6 text-left font-medium">Last Contacted</th>
       )}
       
       {displayColumn('followUpDate') && (
-        <th className="py-3 px-6 text-left font-medium">Follow Up</th>
+        <th className="py-3 px-6 text-left font-medium">Next Follow Up</th>
       )}
       
       {displayColumn('currentStage') && (

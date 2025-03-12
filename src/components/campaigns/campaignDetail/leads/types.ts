@@ -9,6 +9,7 @@ export interface Lead {
   twitter?: string | null;
   instagram?: string | null;
   facebook?: string | null;
+  firstContacted?: string;
   lastContacted: string;
   currentStage: string;
   assignedTo: string;
@@ -19,6 +20,16 @@ export interface Lead {
   title?: string;
   status?: string;
   lastContact?: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  socialProfiles?: {
+    linkedin?: string;
+    twitter?: string;
+    instagram?: string;
+    facebook?: string;
+    whatsapp?: string;
+  };
 }
 
 export interface CampaignStage {

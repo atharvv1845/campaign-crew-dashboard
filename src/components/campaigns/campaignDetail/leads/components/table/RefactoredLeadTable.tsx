@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LeadTableHeader from './LeadTableHeader';
 import LeadTableRow from './LeadTableRow';
@@ -48,15 +47,13 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     <div className="glass-card rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead>
-            <LeadTableHeader 
-              hasSelection={!!onSelectLead}
-              onSelectAll={handleSelectAll}
-              allSelected={leads.length > 0 && selectedLeads.length === leads.length}
-              leads={leads}
-              selectedLeads={selectedLeads}
-            />
-          </thead>
+          <LeadTableHeader 
+            hasSelection={!!onSelectLead}
+            onSelectAll={handleSelectAll}
+            allSelected={leads.length > 0 && selectedLeads.length === leads.length}
+            leads={leads}
+            selectedLeads={selectedLeads}
+          />
           <tbody className="divide-y divide-border bg-card">
             {leads.map(lead => (
               <LeadTableRow
@@ -67,6 +64,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
                 isSelected={selectedLeads.includes(lead.id)}
                 onLeadClick={onLeadClick}
                 onUpdateLead={handleUpdateLead}
+                onOpen={onLeadClick || (() => {})}
               />
             ))}
           </tbody>

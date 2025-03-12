@@ -1,6 +1,4 @@
 
-import { Lead, Campaign } from '../types';
-
 export enum InteractionType {
   Email = 'email',
   Call = 'call',
@@ -15,6 +13,9 @@ export interface Interaction {
   timestamp: string;
   leadId: number;
   user?: string;
+  // Added for compatibility with existing code
+  date?: string;
+  description?: string;
 }
 
 export interface InteractionProps {

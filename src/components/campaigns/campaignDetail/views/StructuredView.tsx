@@ -2,11 +2,12 @@
 import React from 'react';
 import StructuredMessageWorkflow from '../StructuredMessageWorkflow';
 import { MessageStep } from '../hooks/sequenceTypes';
+import { Campaign } from '../leads/types';
 
 interface StructuredViewProps {
   steps: MessageStep[];
   onUpdateSteps: (steps: MessageStep[]) => void;
-  campaign?: any;
+  campaign?: Campaign;
   updateCampaign?: (data: any) => void;
 }
 

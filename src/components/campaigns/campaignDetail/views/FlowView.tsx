@@ -3,6 +3,7 @@ import React from 'react';
 import SequenceList from '../components/SequenceList';
 import StepActionButtons from '../components/StepActionButtons';
 import { MessageStep } from '../hooks/sequenceTypes';
+import { Campaign } from '../leads/types';
 import { toast } from '@/hooks/use-toast';
 
 interface FlowViewProps {
@@ -11,7 +12,7 @@ interface FlowViewProps {
   onDelete: (id: number) => void;
   onMove: (id: number, direction: 'up' | 'down') => void;
   onAddStep: (type: string) => void;
-  campaign?: any;
+  campaign?: Campaign;
   updateCampaign?: (data: any) => void;
 }
 

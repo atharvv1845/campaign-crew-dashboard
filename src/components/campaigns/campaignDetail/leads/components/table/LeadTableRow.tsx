@@ -15,22 +15,22 @@ import {
 
 interface LeadTableRowProps {
   lead: Lead;
-  onOpen: (lead: Lead) => void;
   campaign?: Campaign;
   onSelectLead?: (leadId: number, selected: boolean) => void;
   isSelected?: boolean;
   onLeadClick?: (lead: Lead) => void;
   onUpdateLead?: (lead: Lead) => void;
+  onOpen: (lead: Lead) => void;
 }
 
 const LeadTableRow: React.FC<LeadTableRowProps> = ({ 
   lead, 
-  onOpen,
   campaign,
   onSelectLead,
   isSelected,
   onLeadClick,
-  onUpdateLead
+  onUpdateLead,
+  onOpen
 }) => {
   return (
     <tr>

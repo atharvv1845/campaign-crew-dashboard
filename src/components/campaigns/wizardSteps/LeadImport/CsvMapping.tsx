@@ -45,12 +45,15 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                     <option value="currentStage">Status</option>
                     <option value="assignedTo">Assigned To</option>
                     <option value="notes">Notes</option>
+                    <option value="platformLinks">Platform Links</option>
                     <option value="linkedin">LinkedIn</option>
                     <option value="twitter">Twitter</option>
                     <option value="facebook">Facebook</option>
                     <option value="instagram">Instagram</option>
                     <option value="whatsapp">WhatsApp</option>
                     <option value="lastContacted">Last Contact</option>
+                    <option value="firstContacted">First Contact</option>
+                    <option value="followUpDate">Next Follow Up</option>
                   </select>
                 </td>
               </tr>

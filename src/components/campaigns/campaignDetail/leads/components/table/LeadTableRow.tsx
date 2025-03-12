@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
@@ -77,8 +78,28 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
     }
   };
 
+  // Always display these core fields
+  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
+  
   const displayColumn = (fieldName: string): boolean => {
-    return populatedFields.includes(fieldName);
+    return coreFields.includes(fieldName) || populatedFields.includes(fieldName);
+  };
+
+  // Get the lead's display name based on available information
+  const getLeadName = () => {
+    if (lead.name) return lead.name;
+    
+    if (lead.firstName && lead.lastName) {
+      return `${lead.firstName} ${lead.lastName}`;
+    } else if (lead.firstName) {
+      return lead.firstName;
+    } else if (lead.lastName) {
+      return lead.lastName;
+    } else if (lead.fullName) {
+      return lead.fullName;
+    } else {
+      return `Lead #${lead.id}`;
+    }
   };
 
   return (
@@ -95,7 +116,7 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
           />
         </td>
       )}
-      <td className="py-3 px-6">{lead.name || ''}</td>
+      <td className="py-3 px-6">{getLeadName()}</td>
       
       {displayColumn('socialProfiles') && (
         <td className="py-3 px-6">

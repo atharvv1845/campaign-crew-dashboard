@@ -26,8 +26,9 @@ export const processLeadData = (
       status: initialStageId,
       currentStage: '',
       source: 'csv',
-      lastContact: '',
+      firstContacted: '',
       lastContacted: '',
+      followUpDate: '',
       notes: '',
       platformLinks: '',
       assignedTo: '',
@@ -35,7 +36,8 @@ export const processLeadData = (
       twitter: '',
       facebook: '',
       instagram: '',
-      whatsapp: ''
+      whatsapp: '',
+      socialProfiles: {}
     };
     
     headers.forEach((header, index) => {
@@ -83,24 +85,51 @@ export const processLeadData = (
         leadData.notes = value;
       } else if (mappingKey === 'linkedin') {
         leadData.linkedin = value;
-        leadData.platformLinks = leadData.platformLinks ? `${leadData.platformLinks}, LinkedIn: ${value}` : `LinkedIn: ${value}`;
+        leadData.socialProfiles.linkedin = value;
       } else if (mappingKey === 'twitter') {
         leadData.twitter = value;
-        leadData.platformLinks = leadData.platformLinks ? `${leadData.platformLinks}, Twitter: ${value}` : `Twitter: ${value}`;
+        leadData.socialProfiles.twitter = value;
       } else if (mappingKey === 'facebook') {
         leadData.facebook = value;
-        leadData.platformLinks = leadData.platformLinks ? `${leadData.platformLinks}, Facebook: ${value}` : `Facebook: ${value}`;
+        leadData.socialProfiles.facebook = value;
       } else if (mappingKey === 'instagram') {
         leadData.instagram = value;
-        leadData.platformLinks = leadData.platformLinks ? `${leadData.platformLinks}, Instagram: ${value}` : `Instagram: ${value}`;
+        leadData.socialProfiles.instagram = value;
       } else if (mappingKey === 'whatsapp') {
         leadData.whatsapp = value;
-        leadData.platformLinks = leadData.platformLinks ? `${leadData.platformLinks}, WhatsApp: ${value}` : `WhatsApp: ${value}`;
+        leadData.socialProfiles.whatsapp = value;
       } else if (mappingKey === 'platformLinks') {
         leadData.platformLinks = value;
-      } else if (mappingKey === 'lastContact' || mappingKey === 'lastContacted') {
-        leadData.lastContact = value;
+        
+        // Try to extract individual links if platformLinks contains URLs
+        if (value) {
+          const urls = value.split(/[\s,;]+/);
+          
+          urls.forEach(url => {
+            if (url.includes('linkedin.com')) {
+              leadData.linkedin = url;
+              leadData.socialProfiles.linkedin = url;
+            } else if (url.includes('twitter.com') || url.includes('x.com')) {
+              leadData.twitter = url;
+              leadData.socialProfiles.twitter = url;
+            } else if (url.includes('facebook.com')) {
+              leadData.facebook = url;
+              leadData.socialProfiles.facebook = url;
+            } else if (url.includes('instagram.com')) {
+              leadData.instagram = url;
+              leadData.socialProfiles.instagram = url;
+            } else if (url.includes('wa.me') || url.includes('whatsapp')) {
+              leadData.whatsapp = url;
+              leadData.socialProfiles.whatsapp = url;
+            }
+          });
+        }
+      } else if (mappingKey === 'lastContacted') {
         leadData.lastContacted = value;
+      } else if (mappingKey === 'firstContacted') {
+        leadData.firstContacted = value;
+      } else if (mappingKey === 'followUpDate') {
+        leadData.followUpDate = value;
       }
     });
 

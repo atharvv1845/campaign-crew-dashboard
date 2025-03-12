@@ -46,10 +46,12 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
 
   // Get all possible fields to display
   const allPossibleFields = [
-    'socialProfiles', 'firstContacted', 'lastContacted', 'followUpDate', 
-    'currentStage', 'assignedTo', 'notes', 'email', 'linkedin', 'twitter',
+    'socialProfiles', 'notes', 'email', 'linkedin', 'twitter',
     'facebook', 'instagram', 'whatsapp'
   ];
+  
+  // Core fields that should always be displayed
+  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
   
   // Determine which fields are populated
   const getPopulatedFields = () => {
@@ -78,14 +80,11 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
       }
     });
     
-    // Always include these fields even if empty
-    const alwaysIncludeFields = ['socialProfiles', 'currentStage', 'assignedTo'];
-    
-    // Return fields that have data in at least one lead
+    // Return fields that have data in at least one lead (excluding core fields which are handled separately)
     return [
-      ...alwaysIncludeFields,
+      'socialProfiles',  // Always include socialProfiles
       ...Object.entries(fieldCounts)
-        .filter(([key, count]) => count > 0 && !alwaysIncludeFields.includes(key))
+        .filter(([key, count]) => count > 0 && key !== 'socialProfiles')
         .map(([key]) => key)
     ];
   };

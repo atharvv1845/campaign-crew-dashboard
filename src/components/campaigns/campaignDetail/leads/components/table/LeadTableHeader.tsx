@@ -20,8 +20,11 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
   selectedLeads,
   populatedFields = []
 }) => {
+  // Always display these core fields
+  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
+  
   const displayColumn = (fieldName: string): boolean => {
-    return populatedFields.includes(fieldName);
+    return coreFields.includes(fieldName) || populatedFields.includes(fieldName);
   };
 
   return (
@@ -35,14 +38,15 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         </th>
       )}
       
-      {/* Always show name column, even if names are optional */}
+      {/* Always show name column */}
       <th className="py-3 px-6 text-left font-medium">Name</th>
       
-      {/* Only show columns with data */}
+      {/* Show social platforms column */}
       {displayColumn('socialProfiles') && (
         <th className="py-3 px-6 text-left font-medium">Platforms</th>
       )}
       
+      {/* Always show these core date fields */}
       {displayColumn('firstContacted') && (
         <th className="py-3 px-6 text-left font-medium">First Contacted</th>
       )}
@@ -55,6 +59,7 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         <th className="py-3 px-6 text-left font-medium">Next Follow Up</th>
       )}
       
+      {/* Always show these core management fields */}
       {displayColumn('currentStage') && (
         <th className="py-3 px-6 text-left font-medium">Stage</th>
       )}

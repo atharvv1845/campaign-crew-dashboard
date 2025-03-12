@@ -6,12 +6,14 @@ interface SettingsTabProps {
   campaign: any;
   onExportCampaign: () => void;
   onImportCampaign: () => void;
+  updateCampaign?: (data: any) => void;
 }
 
 const SettingsTab: React.FC<SettingsTabProps> = ({ 
   campaign, 
   onExportCampaign, 
-  onImportCampaign 
+  onImportCampaign,
+  updateCampaign
 }) => {
   return (
     <div className="space-y-6">

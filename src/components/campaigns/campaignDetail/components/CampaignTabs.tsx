@@ -38,37 +38,49 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const tabs = getTabs(campaign, campaignLeads);
 
   return (
-    <TabsLayout tabs={tabs} defaultValue="overview">
-      <TabsContent value="overview">
-        <OverviewTab campaign={campaign} updateCampaign={updateCampaign} />
-      </TabsContent>
+    <div>
+      {/* Use individual tab components directly instead of TabsLayout with children */}
+      <TabsLayout 
+        tabs={tabs} 
+        activeTab="overview" 
+        campaign={campaign} 
+        leadsData={campaignLeads}
+        view={view}
+        setView={setView}
+        updateCampaign={updateCampaign}
+      >
+        <TabsContent value="overview">
+          <OverviewTab campaign={campaign} leadsData={campaignLeads} updateCampaign={updateCampaign} />
+        </TabsContent>
 
-      <TabsContent value="leads">
-        <LeadsTab 
-          campaign={enhancedCampaign} 
-          leadsData={campaignLeads}
-          view={view}
-          setView={setView}
-          updateCampaign={updateCampaign}
-        />
-      </TabsContent>
+        <TabsContent value="leads">
+          <LeadsTab 
+            campaign={enhancedCampaign} 
+            leadsData={campaignLeads}
+            view={view}
+            setView={setView}
+            updateCampaign={updateCampaign}
+          />
+        </TabsContent>
 
-      <TabsContent value="messages">
-        <MessagesTab campaign={campaign} updateCampaign={updateCampaign} />
-      </TabsContent>
+        <TabsContent value="messages">
+          <MessagesTab campaign={campaign} updateCampaign={updateCampaign} />
+        </TabsContent>
 
-      <TabsContent value="reports">
-        <ReportsTab campaign={campaign} />
-      </TabsContent>
+        <TabsContent value="reports">
+          <ReportsTab campaign={campaign} leadsData={campaignLeads} />
+        </TabsContent>
 
-      <TabsContent value="settings">
-        <SettingsTab 
-          campaign={campaign}
-          onExportCampaign={handleExportCampaign}
-          onImportCampaign={handleImportCampaign}
-        />
-      </TabsContent>
-    </TabsLayout>
+        <TabsContent value="settings">
+          <SettingsTab 
+            campaign={campaign}
+            onExportCampaign={handleExportCampaign}
+            onImportCampaign={handleImportCampaign}
+            updateCampaign={updateCampaign}
+          />
+        </TabsContent>
+      </TabsLayout>
+    </div>
   );
 };
 

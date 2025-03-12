@@ -16,6 +16,8 @@ interface TabsLayoutProps {
   view: 'table' | 'kanban';
   setView: (view: 'table' | 'kanban') => void;
   updateCampaign?: (data: any) => void;
+  children?: React.ReactNode;
+  defaultValue?: string;
 }
 
 const TabsLayout: React.FC<TabsLayoutProps> = ({ 
@@ -25,34 +27,46 @@ const TabsLayout: React.FC<TabsLayoutProps> = ({
   leadsData, 
   view, 
   setView,
-  updateCampaign 
+  updateCampaign,
+  children
 }) => {
   return (
     <>
-      {activeTab === 'overview' && (
-        <OverviewTab campaign={campaign} leadsData={leadsData} />
-      )}
-      
-      {activeTab === 'leads' && (
-        <LeadsTab 
-          campaign={campaign} 
-          leadsData={leadsData}
-          view={view}
-          setView={setView}
-          updateCampaign={updateCampaign}
-        />
-      )}
-      
-      {activeTab === 'messages' && (
-        <MessagesTab campaign={campaign} />
-      )}
-      
-      {activeTab === 'reports' && (
-        <ReportsTab campaign={campaign} leadsData={leadsData} />
-      )}
-      
-      {activeTab === 'settings' && (
-        <SettingsTab campaign={campaign} updateCampaign={updateCampaign} />
+      {children ? (
+        children
+      ) : (
+        <>
+          {activeTab === 'overview' && (
+            <OverviewTab campaign={campaign} leadsData={leadsData} updateCampaign={updateCampaign} />
+          )}
+          
+          {activeTab === 'leads' && (
+            <LeadsTab 
+              campaign={campaign} 
+              leadsData={leadsData}
+              view={view}
+              setView={setView}
+              updateCampaign={updateCampaign}
+            />
+          )}
+          
+          {activeTab === 'messages' && (
+            <MessagesTab campaign={campaign} updateCampaign={updateCampaign} />
+          )}
+          
+          {activeTab === 'reports' && (
+            <ReportsTab campaign={campaign} leadsData={leadsData} />
+          )}
+          
+          {activeTab === 'settings' && (
+            <SettingsTab 
+              campaign={campaign} 
+              onExportCampaign={() => {}} 
+              onImportCampaign={() => {}}
+              updateCampaign={updateCampaign} 
+            />
+          )}
+        </>
       )}
     </>
   );

@@ -9,9 +9,10 @@ import { Lead } from '../leads/types';
 interface OverviewTabProps {
   campaign: any;
   leadsData: Lead[];
+  updateCampaign?: (data: any) => void;
 }
 
-const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData }) => {
+const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData, updateCampaign }) => {
   return (
     <div className="space-y-6">
       <CampaignDescription campaign={campaign} />

@@ -31,6 +31,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
       key={campaign.id}
       className="hover:bg-muted/20 transition-colors cursor-pointer"
       onClick={handleRowClick}
+      data-testid={`campaign-row-${campaign.id}`}
     >
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm font-medium">{campaign.name}</div>

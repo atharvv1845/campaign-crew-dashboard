@@ -41,6 +41,7 @@ const App = () => (
                 <Campaigns />
               </MainLayout>
             }
+            data-testid="campaigns-route"
           />
           
           <Route
@@ -50,6 +51,7 @@ const App = () => (
                 <CampaignDetail />
               </MainLayout>
             }
+            data-testid="campaign-detail-route"
           />
           
           <Route

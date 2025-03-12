@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Edit, Save, Loader } from 'lucide-react';
 import { campaignData, leadsData } from './mockData';
 import CampaignHeader from './CampaignHeader';
 import CampaignDescription from './CampaignDescription';
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OutreachSummary from './OutreachSummary';
 import MessageSequence from './MessageSequence';
 import CampaignReports from './CampaignReports';
+import { useToast } from "@/hooks/use-toast";
 
 interface EnhancedLead {
   id: number;
@@ -34,36 +35,65 @@ interface EnhancedLead {
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [view, setView] = useState<'table' | 'kanban'>('table');
   const [showEditModal, setShowEditModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [campaign, setCampaign] = useState<any>(null);
+  const [enhancedLeadsData, setEnhancedLeadsData] = useState<EnhancedLead[]>([]);
   
-  // In a real app, we'd fetch the campaign data based on the ID
-  // For now, we'll just use our mock data
-  const campaign = {
-    ...campaignData,
-    contacted: campaignData.leads - Math.floor(campaignData.leads * 0.15), // Add missing contacted property
-    positive: Math.floor(campaignData.responses * 0.7), // Add missing positive property
-    negative: Math.floor(campaignData.responses * 0.3), // Add missing negative property
-    teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'], // Add team members for dropdown assignments
-    stages: [
-      { id: 1, name: 'Not Contacted', count: 24 },
-      { id: 2, name: 'Contacted', count: 15 },
-      { id: 3, name: 'Replied', count: 8 },
-      { id: 4, name: 'Follow-Up Needed', count: 5 },
-      { id: 5, name: 'Positive', count: 3 },
-      { id: 6, name: 'Negative', count: 2 },
-    ]
-  };
-  
-  // Enhance mock leads data with follow-up dates and notes
-  const enhancedLeadsData: EnhancedLead[] = leadsData.map(lead => ({
-    ...lead,
-    lastContacted: lead.lastContact,
-    currentStage: lead.status,
-    assignedTo: Math.random() > 0.5 ? 'John Smith' : 'Sarah Lee',
-    followUpDate: Math.random() > 0.5 ? '2023-11-' + Math.floor(Math.random() * 30 + 1) : undefined,
-    notes: Math.random() > 0.3 ? 'Last discussion about pricing options. Interested in Enterprise plan.' : '',
-  }));
+  // Fetch campaign data
+  useEffect(() => {
+    setLoading(true);
+    // Simulate API call with timeout
+    const timer = setTimeout(() => {
+      const foundCampaign = campaignData.find(c => c.id === Number(id));
+      
+      if (foundCampaign) {
+        // Enhance the campaign with additional data
+        const enhancedCampaign = {
+          ...foundCampaign,
+          contacted: foundCampaign.leads - Math.floor(foundCampaign.leads * 0.15),
+          positive: Math.floor(foundCampaign.responses * 0.7),
+          negative: Math.floor(foundCampaign.responses * 0.3),
+          teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'],
+          stages: [
+            { id: 1, name: 'Not Contacted', count: 24 },
+            { id: 2, name: 'Contacted', count: 15 },
+            { id: 3, name: 'Replied', count: 8 },
+            { id: 4, name: 'Follow-Up Needed', count: 5 },
+            { id: 5, name: 'Positive', count: 3 },
+            { id: 6, name: 'Negative', count: 2 },
+          ]
+        };
+        
+        setCampaign(enhancedCampaign);
+        
+        // Enhance mock leads data
+        const enhanced: EnhancedLead[] = leadsData.map(lead => ({
+          ...lead,
+          lastContacted: lead.lastContact,
+          currentStage: lead.status,
+          assignedTo: Math.random() > 0.5 ? 'John Smith' : 'Sarah Lee',
+          followUpDate: Math.random() > 0.5 ? '2023-11-' + Math.floor(Math.random() * 30 + 1) : undefined,
+          notes: Math.random() > 0.3 ? 'Last discussion about pricing options. Interested in Enterprise plan.' : '',
+        }));
+        
+        setEnhancedLeadsData(enhanced);
+      } else {
+        toast({
+          title: "Campaign not found",
+          description: "The campaign you're looking for doesn't exist.",
+          variant: "destructive"
+        });
+        navigate('/campaigns');
+      }
+      
+      setLoading(false);
+    }, 800); // Simulate loading
+    
+    return () => clearTimeout(timer);
+  }, [id, navigate, toast]);
   
   const handleEditCampaign = () => {
     setShowEditModal(true);
@@ -72,6 +102,21 @@ const CampaignDetail: React.FC = () => {
   const handleCloseEditModal = () => {
     setShowEditModal(false);
   };
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-6rem)]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading campaign details...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!campaign) {
+    return null; // Should not happen due to navigation in useEffect
+  }
   
   return (
     <div className="space-y-6 h-[calc(100vh-6rem)] overflow-y-auto pr-2">
@@ -128,7 +173,10 @@ const CampaignDetail: React.FC = () => {
       
       {/* Edit Campaign Modal */}
       {showEditModal && (
-        <CreateCampaign onClose={handleCloseEditModal} />
+        <CreateCampaign 
+          onClose={handleCloseEditModal} 
+          existingCampaign={campaign}
+        />
       )}
     </div>
   );

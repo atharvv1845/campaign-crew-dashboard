@@ -1,3 +1,4 @@
+
 import React from 'react';
 import OverviewTab from './OverviewTab';
 import LeadsTab from './LeadsTab';
@@ -36,7 +37,7 @@ const TabsLayout: React.FC<TabsLayoutProps> = ({
       <Tabs defaultValue={defaultValue} className="w-full">
         <TabsList className="grid w-full grid-cols-5">
           {tabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+            <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
               {tab.icon && <tab.icon className="h-4 w-4" />}
               <span>{tab.label}</span>
             </TabsTrigger>

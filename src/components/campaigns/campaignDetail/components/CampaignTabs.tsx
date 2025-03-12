@@ -41,6 +41,8 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     <TabsLayout 
       tabs={tabs} 
       defaultValue="overview"
+      campaign={enhancedCampaign}
+      leadsData={campaignLeads}
     >
       <TabsContent value="overview">
         <OverviewTab campaign={enhancedCampaign} leadsData={campaignLeads} updateCampaign={updateCampaign} />

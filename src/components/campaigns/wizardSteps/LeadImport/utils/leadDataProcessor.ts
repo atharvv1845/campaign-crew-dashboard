@@ -25,27 +25,28 @@ export const processLeadData = (
       socialProfiles: {}
     };
     
-    let fullName = '';
-    
     headers.forEach((header, index) => {
       const mappingKey = mapping[header];
       const value = values[index] || '';
       
       if (mappingKey === 'fullName' && value) {
-        fullName = value;
         const nameParts = value.split(' ');
         if (nameParts.length >= 2) {
           leadData.firstName = nameParts[0];
           leadData.lastName = nameParts.slice(1).join(' ');
-          leadData.name = value; // Set the full name directly from CSV
+          leadData.name = value; // Full name from CSV
         } else {
           leadData.firstName = value;
-          leadData.name = value; // Use single name as full name
+          leadData.name = value; // Single name becomes both name and firstName
         }
-      } else if (mappingKey === 'firstName') {
+      } else if (mappingKey === 'firstName' && value) {
         leadData.firstName = value;
-      } else if (mappingKey === 'lastName') {
+        leadData.name = value; // If only firstName, use it as name too
+      } else if (mappingKey === 'lastName' && value) {
         leadData.lastName = value;
+        if (!leadData.name) { // Only set name if not already set by firstName
+          leadData.name = value;
+        }
       } else if (mappingKey === 'email') {
         leadData.email = value;
       } else if (mappingKey === 'company') {
@@ -63,11 +64,12 @@ export const processLeadData = (
       }
     });
 
-    // Only set name from firstName/lastName if fullName wasn't provided
-    if (!leadData.name) {
-      leadData.name = leadData.firstName && leadData.lastName 
-        ? `${leadData.firstName} ${leadData.lastName}`
-        : leadData.firstName || leadData.lastName || `Lead #${leadData.id}`;
+    // Final name determination - combine firstName and lastName if both exist
+    if (leadData.firstName && leadData.lastName) {
+      leadData.name = `${leadData.firstName} ${leadData.lastName}`;
+    } else if (!leadData.name) {
+      // Fallback if no name was set at all
+      leadData.name = leadData.firstName || leadData.lastName || `Lead #${leadData.id}`;
     }
     
     newLeads.push(leadData);

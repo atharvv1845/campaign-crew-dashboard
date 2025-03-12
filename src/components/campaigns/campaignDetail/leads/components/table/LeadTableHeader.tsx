@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Lead } from '../../types';
@@ -9,6 +8,7 @@ interface LeadTableHeaderProps {
   allSelected: boolean;
   leads: Lead[];
   selectedLeads: number[];
+  displayFields?: string[];
   populatedFields?: string[];
 }
 
@@ -18,13 +18,36 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
   allSelected,
   leads,
   selectedLeads,
+  displayFields = [],
   populatedFields = []
 }) => {
-  // Always display these core fields
-  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
-  
-  const displayColumn = (fieldName: string): boolean => {
-    return coreFields.includes(fieldName) || populatedFields.includes(fieldName);
+  // Use displayFields if provided, otherwise fall back to populatedFields
+  const fields = displayFields.length > 0 ? displayFields : populatedFields;
+
+  // Helper for field display names
+  const getFieldDisplayName = (field: string): string => {
+    const displayNames: Record<string, string> = {
+      name: 'Name',
+      company: 'Company',
+      email: 'Email',
+      phone: 'Phone',
+      currentStage: 'Stage',
+      assignedTo: 'Assigned To',
+      firstContacted: 'First Contacted',
+      lastContacted: 'Last Contacted',
+      followUpDate: 'Next Follow Up',
+      notes: 'Notes',
+      linkedin: 'LinkedIn',
+      twitter: 'Twitter',
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      whatsapp: 'WhatsApp',
+      socialProfiles: 'Platforms',
+      title: 'Title',
+      status: 'Status'
+    };
+    
+    return displayNames[field] || field.charAt(0).toUpperCase() + field.slice(1);
   };
 
   return (
@@ -38,49 +61,17 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         </th>
       )}
       
-      {/* Always show name column */}
-      <th className="py-3 px-6 text-left font-medium">Name</th>
-      
-      {/* Show social platforms column */}
-      {displayColumn('socialProfiles') && (
-        <th className="py-3 px-6 text-left font-medium">Platforms</th>
+      {/* Always show name column first if in fields */}
+      {fields.includes('name') && (
+        <th className="py-3 px-6 text-left font-medium">Name</th>
       )}
       
-      {/* Show company column if data exists */}
-      {displayColumn('company') && (
-        <th className="py-3 px-6 text-left font-medium">Company</th>
-      )}
-      
-      {/* Show title column if data exists */}
-      {displayColumn('title') && (
-        <th className="py-3 px-6 text-left font-medium">Title</th>
-      )}
-      
-      {/* Always show these core fields */}
-      {displayColumn('currentStage') && (
-        <th className="py-3 px-6 text-left font-medium">Stage</th>
-      )}
-      
-      {displayColumn('assignedTo') && (
-        <th className="py-3 px-6 text-left font-medium">Assigned To</th>
-      )}
-      
-      {/* Always show these core date fields */}
-      {displayColumn('firstContacted') && (
-        <th className="py-3 px-6 text-left font-medium">First Contacted</th>
-      )}
-      
-      {displayColumn('lastContacted') && (
-        <th className="py-3 px-6 text-left font-medium">Last Contacted</th>
-      )}
-      
-      {displayColumn('followUpDate') && (
-        <th className="py-3 px-6 text-left font-medium">Next Follow Up</th>
-      )}
-      
-      {displayColumn('notes') && (
-        <th className="py-3 px-6 text-left font-medium">Notes</th>
-      )}
+      {/* Other fields */}
+      {fields.filter(field => field !== 'name').map(field => (
+        <th key={field} className="py-3 px-6 text-left font-medium">
+          {getFieldDisplayName(field)}
+        </th>
+      ))}
       
       {/* Always show actions */}
       <th className="py-3 px-3 text-left font-medium">Actions</th>

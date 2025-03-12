@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { Node, Edge, MarkerType } from 'reactflow';
+import { Node, Edge } from 'reactflow';
 import { createEdgeBetweenNodes } from './nodeCreation';
 
 interface UseDeleteNodeProps {
@@ -12,6 +12,7 @@ interface UseDeleteNodeProps {
 }
 
 export function useDeleteNode({
+  nodes,
   edges,
   setNodes,
   setEdges,
@@ -20,28 +21,45 @@ export function useDeleteNode({
   const deleteNode = useCallback((nodeId: string) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId));
     
-    // Remove any edges connected to this node
-    setEdges((eds) =>
-      eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
-    );
+    // Get incoming and outgoing edges for the deleted node
+    const incomingEdges = edges.filter(edge => edge.target === nodeId);
+    const outgoingEdges = edges.filter(edge => edge.source === nodeId);
     
-    // Create new edges to connect the nodes before and after the deleted node
-    const sourceEdges = edges.filter(edge => edge.target === nodeId);
-    const targetEdges = edges.filter(edge => edge.source === nodeId);
-    
-    if (sourceEdges.length > 0 && targetEdges.length > 0) {
-      const sourceNode = sourceEdges[0].source;
-      const targetNode = targetEdges[0].target;
+    // For each incoming edge, try to connect its source to each target of outgoing edges
+    if (incomingEdges.length > 0 && outgoingEdges.length > 0) {
+      const newEdges: Edge[] = [];
       
-      // Add this new edge only if it doesn't already exist
-      setEdges(eds => {
-        const edgeExists = eds.some(e => e.source === sourceNode && e.target === targetNode);
-        if (!edgeExists) {
-          const newEdge = createEdgeBetweenNodes(sourceNode, targetNode);
-          return [...eds.filter(e => e.source !== nodeId && e.target !== nodeId), newEdge];
-        }
-        return eds.filter(e => e.source !== nodeId && e.target !== nodeId);
+      incomingEdges.forEach(inEdge => {
+        outgoingEdges.forEach(outEdge => {
+          // Preserve the sourceHandle from the incoming edge if it exists
+          const newEdge = createEdgeBetweenNodes(
+            inEdge.source, 
+            outEdge.target,
+            inEdge.sourceHandle,
+            outEdge.targetHandle
+          );
+          newEdges.push(newEdge);
+        });
       });
+      
+      // Remove any edges connected to this node and add the new connecting edges
+      setEdges(eds => {
+        const filteredEdges = eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
+        
+        // Check for duplicate edges before adding new ones
+        const uniqueNewEdges = newEdges.filter(newEdge => 
+          !filteredEdges.some(e => 
+            e.source === newEdge.source && 
+            e.target === newEdge.target && 
+            e.sourceHandle === newEdge.sourceHandle
+          )
+        );
+        
+        return [...filteredEdges, ...uniqueNewEdges];
+      });
+    } else {
+      // Just remove edges connected to this node
+      setEdges(eds => eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
     }
     
     setShowNodeModal(false);

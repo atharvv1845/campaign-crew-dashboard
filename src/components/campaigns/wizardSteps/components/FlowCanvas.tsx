@@ -7,7 +7,8 @@ import ReactFlow, {
   Panel, 
   ConnectionLineType, 
   ConnectionMode,
-  MarkerType 
+  MarkerType, 
+  Position
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import MessageNode from '../flowNodes/MessageNode';

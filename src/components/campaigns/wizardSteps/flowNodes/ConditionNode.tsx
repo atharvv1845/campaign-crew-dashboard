@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { Handle, Position } from 'reactflow';
 
 interface ConditionNodeProps {
   data: {
@@ -21,6 +22,36 @@ function ConditionNode({ data, id }: ConditionNodeProps) {
       </div>
       <div className="text-xs text-muted-foreground border-t border-border pt-2 mt-1">
         {data.condition}
+      </div>
+      
+      {/* Input handle */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="target"
+        style={{ background: '#3b82f6' }}
+      />
+      
+      {/* Output handles for Yes/No branches */}
+      <div className="flex justify-between mt-4 text-xs text-muted-foreground">
+        <div className="flex flex-col items-center">
+          <span>Yes</span>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="yes"
+            style={{ background: '#10b981', left: '30%' }}
+          />
+        </div>
+        <div className="flex flex-col items-center">
+          <span>No</span>
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="no"
+            style={{ background: '#ef4444', left: '70%' }}
+          />
+        </div>
       </div>
     </div>
   );

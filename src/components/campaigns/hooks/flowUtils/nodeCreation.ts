@@ -40,14 +40,20 @@ export const createNewNode = (
  */
 export const createEdgeBetweenNodes = (
   sourceNodeId: string,
-  targetNodeId: string
+  targetNodeId: string,
+  sourceHandle?: string,
+  targetHandle?: string,
+  label?: string
 ): Edge => {
   return {
-    id: `e${sourceNodeId}-${targetNodeId}`,
+    id: `e${sourceNodeId}-${targetNodeId}${sourceHandle ? `-${sourceHandle}` : ''}`,
     source: sourceNodeId,
     target: targetNodeId,
+    sourceHandle,
+    targetHandle,
     animated: true,
     type: 'smoothstep',
+    label,
     style: { stroke: '#3b82f6', strokeWidth: 2 },
     markerEnd: {
       type: MarkerType.ArrowClosed,
@@ -82,4 +88,21 @@ export const findAppropriateSourceNode = (
   }
   
   return sourceNodeId;
+};
+
+/**
+ * Check if a node can have multiple outgoing connections
+ */
+export const canHaveMultipleConnections = (nodeType: string): boolean => {
+  return nodeType === 'conditionNode';
+};
+
+/**
+ * Get available connection handles for a node type
+ */
+export const getAvailableHandles = (nodeType: string): string[] => {
+  if (nodeType === 'conditionNode') {
+    return ['yes', 'no'];
+  }
+  return ['default'];
 };

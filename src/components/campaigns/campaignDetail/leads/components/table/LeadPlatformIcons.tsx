@@ -23,20 +23,26 @@ const LeadPlatformIcons: React.FC<LeadPlatformIconsProps> = ({ lead }) => {
   }
   
   const handlePlatformClick = (url: string, platform: string) => {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      // Handle different platform URL formats
-      if (platform === 'Email') {
-        window.open(`mailto:${url}`, '_blank');
-        return;
-      }
-      if (platform === 'WhatsApp') {
-        window.open(`https://wa.me/${url.replace(/\D/g, '')}`, '_blank');
-        return;
-      }
-      window.open(`https://${url}`, '_blank');
+    if (platform === 'Email') {
+      window.open(`mailto:${url}`, '_blank');
       return;
     }
-    window.open(url, '_blank');
+    
+    if (platform === 'WhatsApp') {
+      // Convert phone number for WhatsApp
+      const phoneNumber = url.replace(/\D/g, '');
+      if (phoneNumber) {
+        window.open(`https://wa.me/${phoneNumber}`, '_blank');
+        return;
+      }
+    }
+    
+    // For social media URLs
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      window.open(`https://${url}`, '_blank');
+    } else {
+      window.open(url, '_blank');
+    }
   };
   
   return (
@@ -47,7 +53,10 @@ const LeadPlatformIcons: React.FC<LeadPlatformIconsProps> = ({ lead }) => {
             <TooltipTrigger asChild>
               <button 
                 className="p-1.5 bg-muted/30 rounded-md hover:bg-muted/50 transition-colors"
-                onClick={() => handlePlatformClick(value, name)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePlatformClick(value, name);
+                }}
                 aria-label={`Open ${name}: ${value}`}
               >
                 <Icon className="h-3.5 w-3.5 text-muted-foreground" />

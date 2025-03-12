@@ -37,14 +37,20 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                   >
                     <option value="">-- Select Field --</option>
                     <option value="name">Name</option>
+                    <option value="firstName">First Name</option>
+                    <option value="lastName">Last Name</option>
                     <option value="email">Email</option>
                     <option value="company">Company</option>
                     <option value="title">Title</option>
                     <option value="currentStage">Status</option>
                     <option value="assignedTo">Assigned To</option>
                     <option value="notes">Notes</option>
-                    <option value="platformLinks">Platform Links</option>
-                    <option value="lastContact">Last Contact</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="lastContacted">Last Contact</option>
                   </select>
                 </td>
               </tr>

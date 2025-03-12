@@ -27,10 +27,14 @@ const ImportedLeadsTable: React.FC<ImportedLeadsTableProps> = ({ leads }) => {
           <tbody className="divide-y divide-border">
             {leads.map((lead) => (
               <tr key={lead.id}>
-                <td className="px-4 py-2">{`${lead.firstName} ${lead.lastName}`}</td>
-                <td className="px-4 py-2">{lead.email}</td>
+                <td className="px-4 py-2">
+                  {lead.name || (lead.firstName && lead.lastName ? 
+                    `${lead.firstName} ${lead.lastName}` : 
+                    lead.firstName || lead.lastName || `Lead #${lead.id}`)}
+                </td>
+                <td className="px-4 py-2">{lead.email || '-'}</td>
                 <td className="px-4 py-2">{lead.company || '-'}</td>
-                <td className="px-4 py-2">{lead.statusName || '-'}</td>
+                <td className="px-4 py-2">{lead.statusName || lead.currentStage || '-'}</td>
               </tr>
             ))}
           </tbody>

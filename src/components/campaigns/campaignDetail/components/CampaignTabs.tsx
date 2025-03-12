@@ -56,7 +56,9 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
         // Generate a display name based on available fields
         let displayName = '';
         
-        if (lead.firstName && lead.lastName) {
+        if (lead.name) {
+          displayName = lead.name;
+        } else if (lead.firstName && lead.lastName) {
           displayName = `${lead.firstName} ${lead.lastName}`;
         } else if (lead.firstName) {
           displayName = lead.firstName;
@@ -64,8 +66,6 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
           displayName = lead.lastName;
         } else if (lead.fullName) {
           displayName = lead.fullName;
-        } else if (lead.name) {
-          displayName = lead.name;
         } else {
           displayName = `Lead #${index + 1}`;
         }
@@ -74,7 +74,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
           ...lead,
           id: lead.id || `lead-${index}`,
           name: displayName,
-          currentStage: lead.status || lead.currentStage || 'New',
+          currentStage: lead.currentStage || lead.status || lead.statusName || 'New',
           // Ensure platform links are accessible
           linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
           twitter: lead.twitter || lead.socialProfiles?.twitter || '',
@@ -83,7 +83,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
           whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
           // Date fields
           firstContacted: lead.firstContacted || lead.createdAt || '',
-          lastContacted: lead.lastContacted || '',
+          lastContacted: lead.lastContacted || lead.lastContact || '',
           followUpDate: lead.followUpDate || lead.nextFollowUp || '',
           // Team assignee
           assignedTo: lead.assignedTo || lead.teamMember || '',

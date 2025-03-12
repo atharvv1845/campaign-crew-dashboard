@@ -12,7 +12,7 @@ const DrawerHeader: React.FC<DrawerHeaderProps> = ({ lead, isEditing }) => {
   // Handle display when name or email is missing
   const displayName = lead.name || 
                      (lead.firstName && lead.lastName ? `${lead.firstName} ${lead.lastName}` : 
-                     lead.firstName || lead.lastName || `Lead #${lead.id}`);
+                     lead.firstName || lead.lastName || `Lead ${lead.id}`);
   
   return (
     <SheetHeader className="pb-4">

@@ -12,11 +12,11 @@ import CreateCampaign from '../CreateCampaign';
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { loading, campaign, refreshCampaign, updateCampaign } = useCampaignData(id);
-  const { handleExportCampaign, handleImportCampaign } = useCampaignActions();
+  const { handleEditCampaign, handleExportCampaign, handleImportCampaign } = useCampaignActions();
   const [showEditCampaign, setShowEditCampaign] = useState(false);
 
   // Handle edit campaign modal
-  const handleEditCampaign = () => {
+  const handleEditCampaignClick = () => {
     setShowEditCampaign(true);
   };
 
@@ -57,13 +57,13 @@ const CampaignDetail: React.FC = () => {
     <div className="space-y-6">
       <CampaignHeader 
         campaign={safeCampaign} 
-        onEditCampaign={handleEditCampaign}
-        onExportCampaign={handleExportCampaign}
+        onEditCampaign={handleEditCampaignClick}
+        onExportCampaign={() => handleExportCampaign(safeCampaign)}
       />
 
       <CampaignTabs 
         campaign={safeCampaign}
-        handleExportCampaign={handleExportCampaign}
+        handleExportCampaign={() => handleExportCampaign(safeCampaign)}
         handleImportCampaign={handleImportCampaign}
         updateCampaign={updateCampaign}
       />

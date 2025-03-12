@@ -2,6 +2,7 @@
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { saveAs } from 'file-saver';
 
 export const useCampaignActions = () => {
   const { toast } = useToast();
@@ -14,8 +15,14 @@ export const useCampaignActions = () => {
     });
   };
 
-  const handleExportCampaign = () => {
+  const handleExportCampaign = (campaign?: any) => {
     // Generate JSON file for campaign export
+    if (campaign) {
+      const campaignData = JSON.stringify(campaign, null, 2);
+      const blob = new Blob([campaignData], { type: 'application/json' });
+      saveAs(blob, `campaign-${campaign.id}-export.json`);
+    }
+    
     toast({
       title: "Export Campaign",
       description: "Campaign data exported successfully.",

@@ -2,15 +2,17 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Interaction } from '../../types/interactions';
+import { Interaction, InteractionProps } from '../../types/interactions';
 import { getInteractionIcon } from '../../utils/interactionUtils';
+import { Lead } from '../../types';
 
 interface InteractionsTabProps {
   interactions: Interaction[];
   onLogInteraction: (type: 'email' | 'call' | 'meeting' | 'message', description: string) => void;
+  lead: Lead;
 }
 
-const InteractionsTab: React.FC<InteractionsTabProps> = ({ interactions, onLogInteraction }) => {
+const InteractionsTab: React.FC<InteractionsTabProps> = ({ interactions, onLogInteraction, lead }) => {
   return (
     <div className="mt-4 space-y-4">
       <div className="flex justify-between">

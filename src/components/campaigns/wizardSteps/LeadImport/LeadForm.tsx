@@ -82,13 +82,13 @@ const LeadForm: React.FC<LeadFormProps> = ({
         
         {/* Social profiles */}
         <div>
-          <label className="block text-sm font-medium mb-1">Twitter</label>
+          <label className="block text-sm font-medium mb-1">Twitter/X</label>
           <input
             type="text"
             name="social-twitter"
             value={currentLead.socialProfiles?.twitter || ''}
             onChange={handleLeadInputChange}
-            placeholder="Twitter handle"
+            placeholder="Twitter handle or URL"
             className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
@@ -100,7 +100,43 @@ const LeadForm: React.FC<LeadFormProps> = ({
             name="social-linkedin"
             value={currentLead.socialProfiles?.linkedin || ''}
             onChange={handleLeadInputChange}
-            placeholder="LinkedIn profile"
+            placeholder="LinkedIn profile URL"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Instagram</label>
+          <input
+            type="text"
+            name="social-instagram"
+            value={currentLead.socialProfiles?.instagram || ''}
+            onChange={handleLeadInputChange}
+            placeholder="Instagram handle or URL"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium mb-1">Facebook</label>
+          <input
+            type="text"
+            name="social-facebook"
+            value={currentLead.socialProfiles?.facebook || ''}
+            onChange={handleLeadInputChange}
+            placeholder="Facebook profile URL"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium mb-1">WhatsApp</label>
+          <input
+            type="text"
+            name="social-whatsapp"
+            value={currentLead.socialProfiles?.whatsapp || ''}
+            onChange={handleLeadInputChange}
+            placeholder="WhatsApp number with country code"
             className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>

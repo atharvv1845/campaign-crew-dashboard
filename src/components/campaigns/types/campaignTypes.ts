@@ -1,3 +1,4 @@
+
 import { Node, Edge } from 'reactflow';
 
 // Campaign form data structure
@@ -29,7 +30,13 @@ export interface LeadData {
   status: string;
   assignedTo?: string;
   notes?: string;
-  socialProfiles?: Record<string, string>;
+  socialProfiles?: {
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+    facebook?: string;
+    whatsapp?: string;
+  };
   source?: string;
 }
 

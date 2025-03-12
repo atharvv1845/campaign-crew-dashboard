@@ -28,7 +28,10 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
     notes: '',
     socialProfiles: {
       twitter: '',
-      linkedin: ''
+      linkedin: '',
+      instagram: '',
+      facebook: '',
+      whatsapp: ''
     },
   });
   
@@ -97,7 +100,10 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
         notes: '',
         socialProfiles: {
           twitter: '',
-          linkedin: ''
+          linkedin: '',
+          instagram: '',
+          facebook: '',
+          whatsapp: ''
         },
       });
     } else {
@@ -113,7 +119,10 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
         notes: '',
         socialProfiles: {
           twitter: '',
-          linkedin: ''
+          linkedin: '',
+          instagram: '',
+          facebook: '',
+          whatsapp: ''
         },
       });
     }

@@ -13,6 +13,8 @@ interface Lead {
   linkedin?: string;
   whatsapp?: string | null;
   twitter?: string | null;
+  instagram?: string | null;
+  facebook?: string | null;
   lastContacted: string;
   currentStage: string;
   assignedTo: string;

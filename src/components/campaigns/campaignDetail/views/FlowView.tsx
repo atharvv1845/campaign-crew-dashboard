@@ -30,6 +30,7 @@ const FlowView: React.FC<FlowViewProps> = ({
       return;
     }
     
+    console.log("Deleting step with ID:", id);
     onDelete(id);
   };
 

@@ -14,13 +14,15 @@ const StructuredView: React.FC<StructuredViewProps> = ({
 }) => {
   const handleUpdateSteps = (newSteps: MessageStep[]) => {
     console.log("StructuredView updating steps:", newSteps.length);
-    // Ensure all steps have valid IDs
-    newSteps.forEach((step, index) => {
-      step.id = step.id || index + 1;
-    });
+    
+    // Create a deep copy of steps to avoid reference issues
+    const updatedSteps = newSteps.map(step => ({
+      ...step,
+      id: step.id || Math.floor(Math.random() * 1000) // Ensure all steps have valid IDs
+    }));
     
     // Update steps in parent component
-    onUpdateSteps(newSteps);
+    onUpdateSteps(updatedSteps);
   };
 
   return (

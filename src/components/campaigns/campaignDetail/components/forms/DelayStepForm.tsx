@@ -25,8 +25,14 @@ const DelayStepForm: React.FC<DelayStepFormProps> = ({
       return;
     }
 
-    // Update the data with new delay value
-    onChange({...data, delay: value});
+    // Create a new object to ensure the change is detected
+    const updatedData = {
+      ...data,
+      delay: value
+    };
+    
+    console.log("Updating delay step with data:", updatedData);
+    onChange(updatedData);
   };
 
   return (

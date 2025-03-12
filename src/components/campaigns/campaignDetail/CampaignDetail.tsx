@@ -1,183 +1,121 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit, Save, Loader } from 'lucide-react';
-import { campaignData, leadsData } from './mockData';
+import { useParams } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import CampaignHeader from './CampaignHeader';
 import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
-import ChannelsAndStages from './ChannelsAndStages';
 import LeadTracking from './LeadTracking';
-import CreateCampaign from '../CreateCampaign';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import OutreachSummary from './OutreachSummary';
 import MessageSequence from './MessageSequence';
+import OutreachSummary from './outreachSummary';
+import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
-import { useToast } from "@/hooks/use-toast";
-
-interface EnhancedLead {
-  id: number;
-  name: string;
-  company: string;
-  email: string;
-  linkedin?: string;
-  whatsapp?: string | null;
-  twitter?: string | null;
-  instagram?: string | null;
-  facebook?: string | null;
-  lastContacted: string;
-  currentStage: string;
-  assignedTo: string;
-  followUpDate?: string;
-  notes?: string;
-}
+import { campaignData } from '../campaignData';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const [view, setView] = useState<'table' | 'kanban'>('table');
-  const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [campaign, setCampaign] = useState<any>(null);
-  const [enhancedLeadsData, setEnhancedLeadsData] = useState<EnhancedLead[]>([]);
   
-  // Fetch campaign data
   useEffect(() => {
-    setLoading(true);
-    // Simulate API call with timeout
-    const timer = setTimeout(() => {
-      const foundCampaign = campaignData.find(c => c.id === Number(id));
-      
-      if (foundCampaign) {
-        // Enhance the campaign with additional data
-        const enhancedCampaign = {
-          ...foundCampaign,
-          contacted: foundCampaign.leads - Math.floor(foundCampaign.leads * 0.15),
-          positive: Math.floor(foundCampaign.responses * 0.7),
-          negative: Math.floor(foundCampaign.responses * 0.3),
-          teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'],
-          stages: [
-            { id: 1, name: 'Not Contacted', count: 24 },
-            { id: 2, name: 'Contacted', count: 15 },
-            { id: 3, name: 'Replied', count: 8 },
-            { id: 4, name: 'Follow-Up Needed', count: 5 },
-            { id: 5, name: 'Positive', count: 3 },
-            { id: 6, name: 'Negative', count: 2 },
-          ]
-        };
-        
-        setCampaign(enhancedCampaign);
-        
-        // Enhance mock leads data
-        const enhanced: EnhancedLead[] = leadsData.map(lead => ({
-          ...lead,
-          lastContacted: lead.lastContact,
-          currentStage: lead.status,
-          assignedTo: Math.random() > 0.5 ? 'John Smith' : 'Sarah Lee',
-          followUpDate: Math.random() > 0.5 ? '2023-11-' + Math.floor(Math.random() * 30 + 1) : undefined,
-          notes: Math.random() > 0.3 ? 'Last discussion about pricing options. Interested in Enterprise plan.' : '',
-        }));
-        
-        setEnhancedLeadsData(enhanced);
-      } else {
+    // Simulate API call to fetch campaign details
+    const fetchCampaign = async () => {
+      setLoading(true);
+      try {
+        // In a real app, this would be an API call
+        setTimeout(() => {
+          // Find the campaign by ID
+          const campaignById = campaignData.find(c => c.id === parseInt(id || '0'));
+          
+          if (campaignById) {
+            setCampaign(campaignById);
+          } else {
+            toast({
+              title: "Error",
+              description: "Campaign not found",
+              variant: "destructive",
+            });
+          }
+          setLoading(false);
+        }, 500);
+      } catch (error) {
         toast({
-          title: "Campaign not found",
-          description: "The campaign you're looking for doesn't exist.",
-          variant: "destructive"
+          title: "Error",
+          description: "Failed to load campaign details",
+          variant: "destructive",
         });
-        navigate('/campaigns');
+        setLoading(false);
       }
-      
-      setLoading(false);
-    }, 800); // Simulate loading
-    
-    return () => clearTimeout(timer);
-  }, [id, navigate, toast]);
-  
-  const handleEditCampaign = () => {
-    setShowEditModal(true);
-  };
-  
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-  };
-  
+    };
+
+    fetchCampaign();
+  }, [id, toast]);
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-6rem)]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading campaign details...</p>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!campaign) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <h3 className="text-lg font-medium">Campaign not found</h3>
+          <p className="text-muted-foreground">The campaign you're looking for doesn't exist or has been removed.</p>
         </div>
       </div>
     );
   }
-  
-  if (!campaign) {
-    return null; // Should not happen due to navigation in useEffect
-  }
-  
+
   return (
-    <div className="space-y-6 h-[calc(100vh-6rem)] overflow-y-auto pr-2">
-      {/* Campaign header with edit functionality */}
-      <CampaignHeader 
-        campaign={campaign} 
-        onEdit={handleEditCampaign}
-      />
+    <div className="space-y-6">
+      <CampaignHeader campaign={campaign} />
       
-      {/* Campaign description */}
-      {campaign.description && (
-        <CampaignDescription description={campaign.description} />
-      )}
-      
-      {/* Stats cards */}
-      <StatCards campaign={campaign} />
-      
-      {/* Campaign details tabs */}
-      <Tabs defaultValue="leads">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="leads">Lead Tracking</TabsTrigger>
-          <TabsTrigger value="message">Message Sequence</TabsTrigger>
-          <TabsTrigger value="outreach">Outreach Summary</TabsTrigger>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="w-full justify-start mb-6">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="leads">Leads</TabsTrigger>
+          <TabsTrigger value="sequence">Message Sequence</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="leads" className="mt-6">
-          {/* Channels and stages */}
-          <ChannelsAndStages campaign={campaign} />
-          
-          {/* Leads tracking */}
-          <div className="mt-6">
-            <LeadTracking 
-              campaign={campaign} 
-              leadsData={enhancedLeadsData} 
-              view={view} 
-              setView={setView} 
-            />
+        <TabsContent value="overview" className="space-y-6">
+          <StatCards stats={campaign} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CampaignDescription campaign={campaign} />
+            <ChannelsAndStages campaign={campaign} />
           </div>
+          <Separator />
+          <OutreachSummary campaignId={campaign.id} />
         </TabsContent>
         
-        <TabsContent value="message" className="mt-6">
+        <TabsContent value="leads" className="space-y-6">
+          <LeadTracking campaign={campaign} />
+        </TabsContent>
+        
+        <TabsContent value="sequence" className="space-y-6">
           <MessageSequence />
         </TabsContent>
         
-        <TabsContent value="outreach" className="mt-6">
-          <OutreachSummary campaign={campaign} teamMembers={campaign.teamMembers} />
-        </TabsContent>
-        
-        <TabsContent value="reports" className="mt-6">
+        <TabsContent value="reports" className="space-y-6">
           <CampaignReports campaign={campaign} />
         </TabsContent>
+        
+        <TabsContent value="settings" className="space-y-6">
+          <h2 className="text-xl font-semibold">Campaign Settings</h2>
+          <p className="text-muted-foreground">
+            Configure your campaign settings, notifications, and automation rules.
+          </p>
+          {/* Settings content would go here */}
+        </TabsContent>
       </Tabs>
-      
-      {/* Edit Campaign Modal */}
-      {showEditModal && (
-        <CreateCampaign 
-          onClose={handleCloseEditModal} 
-          existingCampaign={campaign}
-        />
-      )}
     </div>
   );
 };

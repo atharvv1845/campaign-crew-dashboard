@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import ReactFlow, { Background, Controls, NodeTypes } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { MessageSquare, Clock, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CampaignFormData } from '../types/campaignTypes';
 import MessageNode from './flowNodes/MessageNode';
@@ -11,6 +10,7 @@ import ConditionNode from './flowNodes/ConditionNode';
 import FlowNodeEditor from './FlowNodeEditor';
 import { useFlowState } from '../hooks/useFlowState';
 import { useNodeOperations } from '../hooks/useNodeOperations';
+import FlowControlsToolbar from './FlowControlsToolbar';
 
 interface MessageFlowProps {
   formData: CampaignFormData;
@@ -48,6 +48,9 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     showNodeModal,
     nodeType,
     nodeData,
+    setNodes,
+    setEdges,
+    setSelectedNode,
     setShowNodeModal,
     setNodeType,
     setNodeData,
@@ -97,8 +100,8 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     if (selectedNode) {
       updateNode(selectedNode, nodeType, nodeData);
     } else {
-      const { setNodeData } = addNode(nodeType);
-      setNodeData(nodeData);
+      const { setNodeData: setNewNodeData } = addNode(nodeType);
+      setNewNodeData(nodeData);
     }
     setShowNodeModal(false);
   };
@@ -123,20 +126,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
 
   return (
     <div className="h-full flex flex-col">
-      <div className="mb-4 flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Message Sequence Flow</h3>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleAddNode('message')}>
-            <MessageSquare className="h-4 w-4 mr-1" /> Add Message
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => handleAddNode('delay')}>
-            <Clock className="h-4 w-4 mr-1" /> Add Delay
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => handleAddNode('condition')}>
-            <AlertTriangle className="h-4 w-4 mr-1" /> Add Condition
-          </Button>
-        </div>
-      </div>
+      <FlowControlsToolbar onAddNode={handleAddNode} />
 
       <div className="border rounded-md flex-1 min-h-[400px]">
         <ReactFlow

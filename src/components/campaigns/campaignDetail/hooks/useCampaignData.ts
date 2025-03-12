@@ -12,12 +12,15 @@ export const useCampaignData = (id: string | undefined) => {
     const fetchCampaign = async () => {
       setLoading(true);
       try {
+        // Simulate API call with setTimeout
         setTimeout(() => {
-          const campaignById = campaignData.find(c => c.id === parseInt(id || '0'));
+          const foundCampaign = campaignData.find(c => c.id === Number(id));
           
-          if (campaignById) {
-            setCampaign(campaignById);
+          if (foundCampaign) {
+            console.log('Found campaign:', foundCampaign);
+            setCampaign(foundCampaign);
           } else {
+            console.log('Campaign not found for id:', id);
             toast({
               title: "Error",
               description: "Campaign not found",
@@ -27,6 +30,7 @@ export const useCampaignData = (id: string | undefined) => {
           setLoading(false);
         }, 500);
       } catch (error) {
+        console.error('Error fetching campaign:', error);
         toast({
           title: "Error",
           description: "Failed to load campaign details",
@@ -36,7 +40,9 @@ export const useCampaignData = (id: string | undefined) => {
       }
     };
 
-    fetchCampaign();
+    if (id) {
+      fetchCampaign();
+    }
   }, [id, toast]);
 
   return { loading, campaign };

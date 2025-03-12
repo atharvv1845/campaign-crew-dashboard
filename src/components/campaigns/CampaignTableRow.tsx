@@ -14,17 +14,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
   const navigate = useNavigate();
 
   const handleRowClick = () => {
-    // Navigate to campaign detail page with the specific campaign ID
-    if (campaign && campaign.id) {
-      navigate(`/campaigns/${campaign.id}`);
-    }
-  };
-
-  const handleNameClick = (e: React.MouseEvent) => {
-    // Prevent the row click event from firing
-    e.stopPropagation();
-    // Navigate to campaign detail page
-    if (campaign && campaign.id) {
+    if (campaign?.id) {
       navigate(`/campaigns/${campaign.id}`);
     }
   };
@@ -32,9 +22,9 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
   // Make sure all campaign data has default values to prevent errors
   const safeCampaign = {
     ...campaign,
-    channels: campaign.channels || [],
-    teamMembers: campaign.teamMembers || [],
-    createdAt: campaign.createdAt || ''
+    channels: campaign?.channels || [],
+    teamMembers: campaign?.teamMembers || [],
+    createdAt: campaign?.createdAt || new Date().toISOString().slice(0, 10)
   };
 
   return (
@@ -43,12 +33,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
       onClick={handleRowClick}
     >
       <td className="p-4">
-        <button 
-          onClick={handleNameClick}
-          className="font-medium text-primary hover:underline text-left"
-        >
-          {safeCampaign.name}
-        </button>
+        <span className="font-medium text-primary">{safeCampaign.name}</span>
       </td>
       <td className="p-4">
         <CampaignStatusBadge status={safeCampaign.status} />
@@ -60,11 +45,11 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
           ))}
         </div>
       </td>
-      <td className="p-4">{safeCampaign.leads}</td>
-      <td className="p-4">{safeCampaign.responses}</td>
+      <td className="p-4">{safeCampaign.leads || 0}</td>
+      <td className="p-4">{safeCampaign.responses || 0}</td>
       <td className="p-4">
         <div className="flex items-center gap-1">
-          {safeCampaign.teamMembers && safeCampaign.teamMembers.map((member: string, index: number) => (
+          {safeCampaign.teamMembers.map((member: string, index: number) => (
             <span key={index} className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs">
               {member.substring(0, 2)}
             </span>

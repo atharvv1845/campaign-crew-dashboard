@@ -33,9 +33,32 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
 
   const handleSubmit = () => {
     console.log("Submitting campaign with data:", formData);
-    console.log("Message flow nodes:", formData.messageFlow?.nodes?.length);
     
-    // Validate the message flow once more
+    // Check if leads exist and have required fields, including Google sheet imported leads
+    if (!formData.leads || formData.leads.length === 0) {
+      toast({
+        title: "Warning",
+        description: "No leads found. Please import or add leads before launching.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Validate that each lead has required fields
+    const invalidLeads = formData.leads.filter(lead => 
+      !lead.firstName || !lead.email
+    );
+    
+    if (invalidLeads.length > 0) {
+      toast({
+        title: "Warning",
+        description: `${invalidLeads.length} leads are missing required fields (name or email).`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Validate the message flow
     if (!formData.messageFlow || !formData.messageFlow.nodes || formData.messageFlow.nodes.length === 0) {
       toast({
         title: "Warning",

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CampaignFormData } from '../../types/campaignTypes';
 import { useToast } from "@/hooks/use-toast";
@@ -67,7 +68,26 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
       const initialStageId = formData.stages[0]?.id || '';
       const newLeads = await processLeadsFromCsv(csvFile, csvMapping, initialStageId, generateId);
       
-      const leadsWithStages = newLeads.map(lead => {
+      // Validate each lead has at least firstName and email
+      const validLeads = newLeads.filter(lead => lead.firstName && lead.email);
+      
+      if (validLeads.length === 0) {
+        toast({
+          title: "Import Error",
+          description: "No valid leads found. Each lead must have at least a name and email.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (validLeads.length < newLeads.length) {
+        toast({
+          title: "Warning",
+          description: `${newLeads.length - validLeads.length} leads were skipped due to missing required fields.`,
+        });
+      }
+      
+      const leadsWithStages = validLeads.map(lead => {
         if (lead.statusName) {
           const stage = formData.stages.find(s => 
             s.name.toLowerCase() === lead.statusName.toLowerCase()

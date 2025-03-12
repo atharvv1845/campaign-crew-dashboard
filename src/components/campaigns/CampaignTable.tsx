@@ -6,13 +6,15 @@ import { CampaignData } from './campaignData';
 
 interface CampaignTableProps {
   campaigns: CampaignData[];
+  refreshList?: () => void;
 }
 
-const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns }) => {
+const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList }) => {
   const [, setRefreshTable] = useState(0); // Used to force re-render when status changes
 
   const handleStatusChange = () => {
     setRefreshTable(prev => prev + 1); // Force re-render
+    if (refreshList) refreshList();
   };
 
   return (
@@ -37,13 +39,21 @@ const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-card">
-            {campaigns.map((campaign) => (
-              <CampaignTableRow 
-                key={campaign.id}
-                campaign={campaign} 
-                onStatusChange={handleStatusChange}
-              />
-            ))}
+            {campaigns.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-6 py-4 text-center text-muted-foreground">
+                  No campaigns found
+                </td>
+              </tr>
+            ) : (
+              campaigns.map((campaign) => (
+                <CampaignTableRow 
+                  key={campaign.id}
+                  campaign={campaign} 
+                  onStatusChange={handleStatusChange}
+                />
+              ))
+            )}
           </tbody>
         </table>
       </div>

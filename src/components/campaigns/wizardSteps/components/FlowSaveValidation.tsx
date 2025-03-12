@@ -28,19 +28,27 @@ const FlowSaveValidation = ({
       return;
     }
     
-    validateFlow(nodes, edges);
+    if (!validateFlow(nodes, edges)) {
+      return;
+    }
+    
+    // Create deep copies to avoid circular reference issues
+    const nodesCopy = nodes.map(node => ({
+      ...node,
+      data: { ...node.data }
+    }));
     
     // Explicitly update the formData with the latest nodes and edges
     setFormData(prev => ({
       ...prev,
       messageFlow: {
-        nodes: [...nodes],
+        nodes: nodesCopy,
         edges: [...edges]
       },
-      flows: nodes.map(node => ({
+      flows: nodesCopy.map(node => ({
         id: node.id,
         type: node.type,
-        data: node.data
+        data: { ...node.data }
       }))
     }));
     

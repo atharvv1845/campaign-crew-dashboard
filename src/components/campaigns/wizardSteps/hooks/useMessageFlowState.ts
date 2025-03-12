@@ -56,19 +56,27 @@ export const useMessageFlowState = (
     setShowNodeModal
   });
 
+  // Update formData whenever nodes or edges change
   useEffect(() => {
     if (nodes.length > 0) {
       console.log("Updating messageFlow in formData with nodes:", nodes);
+      
+      // Create a deep copy to avoid circular reference issues
+      const nodesForFormData = nodes.map(node => ({
+        ...node,
+        data: { ...node.data } // Create a new object for the data property
+      }));
+      
       setFormData(prev => ({
         ...prev,
         messageFlow: {
-          nodes,
-          edges
+          nodes: nodesForFormData,
+          edges: [...edges]
         },
-        flows: nodes.map(node => ({
+        flows: nodesForFormData.map(node => ({
           id: node.id,
           type: node.type,
-          data: node.data
+          data: { ...node.data }
         }))
       }));
     }

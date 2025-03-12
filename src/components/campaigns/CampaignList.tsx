@@ -12,13 +12,14 @@ const CampaignList: React.FC = () => {
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [campaigns, setCampaigns] = useState(campaignData);
+  const [campaigns, setCampaigns] = useState([...campaignData]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Update campaigns when campaignData changes or when modal closes
   useEffect(() => {
     console.log("Refreshing campaign list data, found:", campaignData.length);
     setCampaigns([...campaignData]);
-  }, [showCreateCampaign]);
+  }, [showCreateCampaign, refreshTrigger]);
   
   // Filter campaigns based on search term and status
   const filteredCampaigns = campaigns.filter(campaign => {
@@ -36,6 +37,7 @@ const CampaignList: React.FC = () => {
   const handleCampaignCreated = () => {
     // Force refresh of campaign data
     setCampaigns([...campaignData]);
+    setRefreshTrigger(prev => prev + 1);
     setShowCreateCampaign(false);
     
     toast({
@@ -66,7 +68,10 @@ const CampaignList: React.FC = () => {
       
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto pb-4">
-          <CampaignTable campaigns={filteredCampaigns} />
+          <CampaignTable 
+            campaigns={filteredCampaigns}
+            refreshList={() => setRefreshTrigger(prev => prev + 1)} 
+          />
         </div>
       </div>
       

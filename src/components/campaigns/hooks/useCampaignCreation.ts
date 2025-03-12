@@ -87,6 +87,16 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
 
     // Create new campaign or update existing
     const campaignId = existingCampaign ? existingCampaign.id : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
+    
+    // Create a sanitized version of messageFlow to avoid circular references
+    const messageFlow = formData.messageFlow ? {
+      nodes: formData.messageFlow.nodes.map(node => ({
+        ...node,
+        data: { ...node.data } // Create a deep copy of the data
+      })),
+      edges: formData.messageFlow.edges ? [...formData.messageFlow.edges] : []
+    } : { nodes: [], edges: [] };
+    
     const newCampaign = {
       id: campaignId,
       name: formData.name,
@@ -105,7 +115,7 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
       teamMembers: formData.team || [],
       createdAt: new Date().toISOString().slice(0, 10),
       contacted: 0,
-      messageFlow: formData.messageFlow,
+      messageFlow: messageFlow,
     };
 
     if (existingCampaign) {

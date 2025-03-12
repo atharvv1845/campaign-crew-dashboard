@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
 import { ChevronDown, UserPlus, Check, Users } from 'lucide-react';
@@ -27,10 +27,28 @@ const teamMembers = [
 ];
 
 const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, onNext, onBack }) => {
+  // Initialize teamAssignments if it doesn't exist
+  useEffect(() => {
+    if (!formData.teamAssignments) {
+      setFormData(prev => ({
+        ...prev,
+        teamAssignments: {}
+      }));
+    }
+    
+    // Add team members to team array if not there already
+    if (!formData.team || formData.team.length === 0) {
+      setFormData(prev => ({
+        ...prev,
+        team: teamMembers.map(member => member.id)
+      }));
+    }
+  }, [formData, setFormData]);
+
   // Assign a team member to a channel
   const assignTeamMember = (channelId: string, memberId: string) => {
     setFormData(prev => {
-      const currentAssignments = prev.teamAssignments[channelId] || [];
+      const currentAssignments = prev.teamAssignments ? prev.teamAssignments[channelId] || [] : [];
       
       // Toggle the team member
       const newAssignments = currentAssignments.includes(memberId)
@@ -40,7 +58,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
       return {
         ...prev,
         teamAssignments: {
-          ...prev.teamAssignments,
+          ...(prev.teamAssignments || {}),
           [channelId]: newAssignments
         }
       };
@@ -49,7 +67,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
 
   // Get assigned team members for a channel
   const getAssignedMembers = (channelId: string) => {
-    return formData.teamAssignments[channelId] || [];
+    return formData.teamAssignments ? formData.teamAssignments[channelId] || [] : [];
   };
 
   // Get assigned member names for display

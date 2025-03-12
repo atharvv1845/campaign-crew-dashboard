@@ -65,12 +65,23 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
 
   // Update parent formData whenever nodes or edges change
   useEffect(() => {
+    // Update messageFlow in formData
     setFormData(prev => ({
       ...prev,
       messageFlow: {
         nodes,
         edges
       }
+    }));
+
+    // Also update flows for compatibility with older code
+    setFormData(prev => ({
+      ...prev,
+      flows: nodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        data: node.data
+      }))
     }));
   }, [nodes, edges, setFormData]);
 
@@ -132,7 +143,12 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
       messageFlow: {
         nodes,
         edges
-      }
+      },
+      flows: nodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        data: node.data
+      }))
     });
     onNext();
   };

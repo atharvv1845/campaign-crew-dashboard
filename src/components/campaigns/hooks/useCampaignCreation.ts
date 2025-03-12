@@ -16,7 +16,8 @@ const defaultFormData: CampaignFormData = {
   messageFlow: {
     nodes: [],
     edges: []
-  }
+  },
+  teamAssignments: {}
 };
 
 const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
@@ -37,10 +38,11 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
         flows: [], // We would need to fetch message flow data
         stages: [], // We would need to fetch stages data
         team: existingCampaign.teamMembers || [],
-        messageFlow: {
+        messageFlow: existingCampaign.messageFlow || {
           nodes: [],
           edges: []
-        }
+        },
+        teamAssignments: {}
       };
       
       setFormData(transformedData);
@@ -100,9 +102,10 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
       positive: 0,
       negative: 0,
       conversion: '0%',
-      teamMembers: formData.team,
+      teamMembers: formData.team || [],
       createdAt: new Date().toISOString().slice(0, 10),
-      contacted: 0
+      contacted: 0,
+      messageFlow: formData.messageFlow,
     };
 
     if (existingCampaign) {

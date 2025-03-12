@@ -3,6 +3,7 @@ import React from 'react';
 import { Check, AlertTriangle } from 'lucide-react';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
+import { Button } from '@/components/ui/button';
 
 interface ReviewLaunchProps {
   formData: CampaignFormData;
@@ -14,7 +15,7 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
   // Check if all required sections are complete
   const isSetupComplete = formData.name.trim() !== '' && formData.channels.length > 0;
   const isLeadsComplete = formData.leads && formData.leads.length > 0;
-  const isMessagesComplete = formData.flows && formData.flows.length > 0;
+  const isMessagesComplete = formData.messageFlow && formData.messageFlow.nodes.length > 0;
   const isStagesComplete = formData.stages && formData.stages.length > 0;
   const isTeamComplete = formData.team && formData.team.length > 0;
   
@@ -87,7 +88,7 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
               ) : (
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
               )}
-              <span className="text-sm">Message Flow</span>
+              <span className="text-sm">Message Flow ({formData.messageFlow?.nodes.length || 0} steps)</span>
             </div>
             
             <div className="flex items-center gap-2">
@@ -126,21 +127,13 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
 
       {/* Navigation buttons */}
       <div className="flex justify-between pt-4 border-t border-border">
-        <button
-          onClick={onBack}
-          className="px-4 py-2 border border-border rounded-lg hover:bg-muted/20 transition-colors"
-        >
+        <Button variant="outline" onClick={onBack}>
           Back
-        </button>
+        </Button>
         
-        <div className="flex gap-3">
-          <button
-            onClick={onSubmit}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isReadyToLaunch ? 'Launch Campaign' : 'Save as Draft'}
-          </button>
-        </div>
+        <Button onClick={onSubmit}>
+          {isReadyToLaunch ? 'Launch Campaign' : 'Save as Draft'}
+        </Button>
       </div>
     </div>
   );

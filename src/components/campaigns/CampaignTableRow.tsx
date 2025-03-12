@@ -7,7 +7,7 @@ import ChannelBadge from './ChannelBadge';
 
 interface CampaignTableRowProps {
   campaign: any;
-  onStatusChange?: () => void; // Make onStatusChange optional
+  onStatusChange: () => void;
 }
 
 const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusChange }) => {
@@ -24,7 +24,9 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
       onClick={handleRowClick}
     >
       <td className="p-4 font-medium">{campaign.name}</td>
-      <td className="p-4">{campaign.type}</td>
+      <td className="p-4">
+        <CampaignStatusBadge status={campaign.status} />
+      </td>
       <td className="p-4">
         <div className="flex items-center gap-1">
           {campaign.channels.map((channel: string) => (
@@ -35,7 +37,13 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
       <td className="p-4">{campaign.leads}</td>
       <td className="p-4">{campaign.responses}</td>
       <td className="p-4">
-        <CampaignStatusBadge status={campaign.status} />
+        <div className="flex items-center gap-1">
+          {campaign.teamMembers && campaign.teamMembers.map((member: string, index: number) => (
+            <span key={index} className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs">
+              {member.substring(0, 2)}
+            </span>
+          ))}
+        </div>
       </td>
       <td className="p-4">{campaign.createdAt}</td>
       <td className="p-4">

@@ -7,6 +7,7 @@ interface Campaign {
   name: string;
   channels?: any[];
   responses?: number;
+  leads?: any[];
   [key: string]: any;
 }
 
@@ -87,6 +88,34 @@ export const getMockLeads = (): Lead[] => {
       campaignId: 8
     }))
   ];
+};
+
+// New function to convert imported leads to the Lead format
+export const convertImportedLeads = (campaignData: any): Lead[] => {
+  if (!campaignData || !campaignData.importedLeads || !Array.isArray(campaignData.importedLeads)) {
+    return [];
+  }
+  
+  return campaignData.importedLeads.map((lead: any, index: number) => {
+    // Create a standardized lead object from the imported data
+    return {
+      id: lead.id || index + 1000, // Use provided ID or generate one
+      name: `${lead.firstName || ''} ${lead.lastName || ''}`.trim() || lead.name || `Lead ${index + 1}`,
+      company: lead.company || 'Not specified',
+      email: lead.email || '',
+      linkedin: lead.socialProfiles?.linkedin || '',
+      whatsapp: lead.socialProfiles?.whatsapp || '',
+      twitter: lead.socialProfiles?.twitter || '',
+      facebook: lead.socialProfiles?.facebook || '',
+      instagram: lead.socialProfiles?.instagram || '',
+      lastContacted: lead.lastContacted || new Date().toISOString().slice(0, 10),
+      currentStage: lead.status || lead.currentStage || 'New',
+      assignedTo: lead.assignedTo || 'Unassigned',
+      followUpDate: lead.followUpDate || '',
+      notes: lead.notes || '',
+      campaignId: campaignData.id || 8
+    };
+  });
 };
 
 export const enhanceCampaign = (campaign: any) => {

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
 import TabsLayout from '../tabs/TabsLayout';
@@ -7,7 +7,8 @@ import OverviewTab from '../tabs/OverviewTab';
 import LeadsTab from '../tabs/LeadsTab';
 import MessagesTab from '../tabs/MessagesTab';
 import ReportsTab from '../tabs/ReportsTab';
-import { getTabs, getMockLeads, enhanceCampaign } from '../tabs/helpers/tabHelpers';
+import { getTabs, getMockLeads, enhanceCampaign, convertImportedLeads } from '../tabs/helpers/tabHelpers';
+import { useToast } from '@/hooks/use-toast';
 
 interface CampaignTabsProps {
   campaign: any;
@@ -23,17 +24,33 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   updateCampaign
 }) => {
   const [view, setView] = useState<'table' | 'kanban'>('table');
+  const { toast } = useToast();
   
-  // Mock leads data - in a real app, this would be fetched from an API
-  const mockLeads: Lead[] = getMockLeads();
-
-  // Filter leads to only show leads for this campaign
-  const campaignLeads = mockLeads.filter(lead => lead.campaignId === campaign.id);
+  // Get leads from campaign data if available, or use mock data as fallback
+  const getLeadsForCampaign = (): Lead[] => {
+    // Check if campaign has imported leads (from form creation)
+    if (campaign.leads && Array.isArray(campaign.leads)) {
+      return convertImportedLeads({
+        ...campaign,
+        importedLeads: campaign.leads
+      });
+    }
+    
+    // Fallback to mock leads if no imported leads
+    const mockLeads = getMockLeads();
+    return mockLeads.filter(lead => lead.campaignId === campaign.id);
+  };
+  
+  const campaignLeads = getLeadsForCampaign();
+  
+  useEffect(() => {
+    console.log('Campaign Leads:', campaignLeads);
+  }, [campaign]);
   
   // Enhance campaign with stages data if needed
   const enhancedCampaign = enhanceCampaign(campaign);
 
-  // Generate tabs based on campaign information - removed settings tab
+  // Generate tabs based on campaign information
   const tabs = getTabs(campaign, campaignLeads);
 
   return (

@@ -67,12 +67,13 @@ const CampaignDetail: React.FC = () => {
     responses: campaign.responses || 0,
     positive: campaign.positive || 0,
     negative: campaign.negative || 0,
-    leads: campaign.leads || 0,
+    leads: campaign.leads || [],  // Ensure leads is an array
     contacted: campaign.contacted || 0,
     stages: campaign.stages || []
   };
 
   console.log('Rendering campaign detail for:', safeCampaign.id, safeCampaign.name);
+  console.log('Campaign leads:', safeCampaign.leads);
 
   return (
     <div className="space-y-6">

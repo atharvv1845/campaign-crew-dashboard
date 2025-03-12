@@ -90,24 +90,34 @@ export const getMockLeads = (): Lead[] => {
   ];
 };
 
-// New function to convert imported leads to the Lead format
+// Enhanced function to convert imported leads to the Lead format
 export const convertImportedLeads = (campaignData: any): Lead[] => {
+  console.log('Converting leads for campaign ID:', campaignData.id);
+  
   if (!campaignData || !campaignData.importedLeads || !Array.isArray(campaignData.importedLeads)) {
+    console.log('No imported leads found or invalid data structure');
     return [];
   }
   
+  console.log(`Found ${campaignData.importedLeads.length} leads to convert`);
+  
   return campaignData.importedLeads.map((lead: any, index: number) => {
+    // Handle both formats - the imported lead format and any other possible format
+    const firstName = lead.firstName || '';
+    const lastName = lead.lastName || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    
     // Create a standardized lead object from the imported data
-    return {
+    const convertedLead = {
       id: lead.id || index + 1000, // Use provided ID or generate one
-      name: `${lead.firstName || ''} ${lead.lastName || ''}`.trim() || lead.name || `Lead ${index + 1}`,
+      name: fullName || lead.name || `Lead ${index + 1}`,
       company: lead.company || 'Not specified',
       email: lead.email || '',
-      linkedin: lead.socialProfiles?.linkedin || '',
-      whatsapp: lead.socialProfiles?.whatsapp || '',
-      twitter: lead.socialProfiles?.twitter || '',
-      facebook: lead.socialProfiles?.facebook || '',
-      instagram: lead.socialProfiles?.instagram || '',
+      linkedin: lead.socialProfiles?.linkedin || lead.linkedin || '',
+      whatsapp: lead.socialProfiles?.whatsapp || lead.whatsapp || '',
+      twitter: lead.socialProfiles?.twitter || lead.twitter || '',
+      facebook: lead.socialProfiles?.facebook || lead.facebook || '',
+      instagram: lead.socialProfiles?.instagram || lead.instagram || '',
       lastContacted: lead.lastContacted || new Date().toISOString().slice(0, 10),
       currentStage: lead.status || lead.currentStage || 'New',
       assignedTo: lead.assignedTo || 'Unassigned',
@@ -115,6 +125,9 @@ export const convertImportedLeads = (campaignData: any): Lead[] => {
       notes: lead.notes || '',
       campaignId: campaignData.id || 8
     };
+    
+    console.log(`Converted lead: ${convertedLead.name} (ID: ${convertedLead.id})`);
+    return convertedLead;
   });
 };
 

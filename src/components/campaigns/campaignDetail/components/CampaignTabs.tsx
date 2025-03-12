@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -28,8 +27,20 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   
   // Get leads from campaign data if available, or use mock data as fallback
   const getLeadsForCampaign = (): Lead[] => {
-    // Check if campaign has imported leads (from form creation)
+    console.log('Campaign object:', campaign);
+    
+    // First check if campaign has direct leads property that is an array
     if (campaign.leads && Array.isArray(campaign.leads)) {
+      console.log('Found leads array in campaign:', campaign.leads.length);
+      
+      // If these are already in the Lead format, use them directly
+      if (campaign.leads.length > 0 && campaign.leads[0].hasOwnProperty('name') && campaign.leads[0].hasOwnProperty('company')) {
+        console.log('Leads are already in correct format');
+        return campaign.leads as Lead[];
+      }
+      
+      // Otherwise convert them from the imported format
+      console.log('Converting imported leads to Lead format');
       return convertImportedLeads({
         ...campaign,
         importedLeads: campaign.leads
@@ -37,6 +48,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     }
     
     // Fallback to mock leads if no imported leads
+    console.log('No leads found in campaign, using mock data');
     const mockLeads = getMockLeads();
     return mockLeads.filter(lead => lead.campaignId === campaign.id);
   };

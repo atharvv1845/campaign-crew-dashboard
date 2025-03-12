@@ -22,7 +22,7 @@ const CampaignList: React.FC = () => {
   
   // Update campaigns when campaignData changes or when modal closes
   useEffect(() => {
-    console.log("Refreshing campaign list data, found:", campaignData.length);
+    console.log("Refreshing campaign list data, found:", campaignData.length, "campaigns");
     // Create a deep copy to avoid reference issues
     const campaignsCopy = JSON.parse(JSON.stringify(campaignData));
     
@@ -61,7 +61,7 @@ const CampaignList: React.FC = () => {
   const handleCampaignCreated = (campaign: CampaignFormData) => {
     // Find the new campaign in the campaignData array
     const newCampaignId = campaignData[campaignData.length - 1].id;
-    console.log("New campaign created with ID:", newCampaignId);
+    console.log("New campaign created with ID:", newCampaignId, "Total campaigns:", campaignData.length);
     
     // Force refresh of campaign data
     setRefreshTrigger(prev => prev + 1);
@@ -80,11 +80,13 @@ const CampaignList: React.FC = () => {
     // Navigate to the new campaign after a short delay
     setTimeout(() => {
       console.log("Navigating to newly created campaign:", newCampaignId);
+      refreshList(); // Refresh list before navigation
       navigate(`/campaigns/${newCampaignId}`);
-    }, 2000); // Increased delay to ensure campaign is fully processed
+    }, 2500); // Increased delay to ensure campaign is fully processed
   };
   
   const refreshList = () => {
+    console.log("Manually refreshing campaign list");
     setRefreshTrigger(prev => prev + 1);
   };
   
@@ -149,7 +151,10 @@ const CampaignList: React.FC = () => {
       {createdCampaign && (
         <CampaignCreatedSummary
           campaign={createdCampaign}
-          onClose={() => setCreatedCampaign(null)}
+          onClose={() => {
+            setCreatedCampaign(null);
+            refreshList(); // Refresh campaign list after closing summary
+          }}
           onLeadUpdate={handleLeadUpdate}
         />
       )}

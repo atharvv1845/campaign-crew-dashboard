@@ -91,8 +91,12 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
       return;
     }
 
-    // Create new campaign or update existing
-    const campaignId = existingCampaign ? existingCampaign.id : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
+    // Generate new campaign ID or use existing
+    const campaignId = existingCampaign 
+      ? existingCampaign.id 
+      : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
+    
+    console.log("Creating campaign with ID:", campaignId);
     
     // Create a sanitized version of messageFlow to avoid circular references
     const messageFlow = formData.messageFlow ? {
@@ -150,6 +154,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         // Add new campaign to the list
         campaignData.push(newCampaign);
         console.log("Added new campaign:", newCampaign, "Total campaigns now:", campaignData.length);
+        console.log("Campaign data array now contains:", campaignData.map(c => c.id));
         toast({
           title: "Campaign Created",
           description: `${formData.name} has been created successfully.`

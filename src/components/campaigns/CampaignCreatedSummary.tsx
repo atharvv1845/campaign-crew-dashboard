@@ -27,13 +27,18 @@ const CampaignCreatedSummary: React.FC<CampaignCreatedSummaryProps> = ({
     });
   };
 
+  const handleClose = () => {
+    console.log("Closing campaign summary and refreshing campaign list");
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="relative bg-card w-full max-w-4xl max-h-[90vh] rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Campaign Created Successfully</h2>
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="p-2 rounded-full hover:bg-muted/50 transition-colors"
             aria-label="Close"
           >
@@ -142,7 +147,7 @@ const CampaignCreatedSummary: React.FC<CampaignCreatedSummaryProps> = ({
 
         <div className="flex justify-end mt-6 pt-4 border-t border-border">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
           >
             Go to Campaign List

@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -25,6 +24,28 @@ const defaultFormData: CampaignFormData = {
     edges: []
   },
   teamAssignments: {}
+};
+
+const transformLeadData = (leadData: any, campaignId: number | string): Lead => {
+  return {
+    id: leadData.id,
+    name: `${leadData.firstName} ${leadData.lastName}`.trim() || leadData.email || `Lead #${leadData.id}`,
+    firstName: leadData.firstName,
+    lastName: leadData.lastName,
+    email: leadData.email,
+    phone: leadData.phone,
+    status: leadData.status,
+    company: leadData.company,
+    assignedTo: leadData.assignedTo,
+    assignedTeamMember: leadData.assignedTo,
+    campaignId: campaignId,
+    notes: leadData.notes,
+    socialProfiles: leadData.socialProfiles,
+    lastContact: leadData.lastContact || leadData.lastContacted,
+    firstContactDate: leadData.firstContactDate || leadData.firstContacted,
+    nextFollowUpDate: leadData.nextFollowUpDate || leadData.followUpDate,
+    currentStage: leadData.currentStage || leadData.status,
+  };
 };
 
 const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, existingCampaign?: any) => {
@@ -107,11 +128,10 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         count: 0 // Initialize count to zero
       }));
       
-      // Prepare leads data - ensure each lead has the proper campaignId
-      const leadsWithCampaignId: Lead[] = formData.leads.map(lead => ({
-        ...lead,
-        campaignId: campaignId
-      }));
+      // Transform leads to match Lead interface
+      const transformedLeads: Lead[] = formData.leads.map(lead => 
+        transformLeadData(lead, campaignId)
+      );
       
       // Create a new, properly formatted campaign object
       const newCampaign = {
@@ -121,7 +141,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         status: 'Active',
         type: 'Email',
         channels: formData.channels,
-        leads: leadsWithCampaignId, // Store the actual lead objects
+        leads: transformedLeads, // Store the actual lead objects
         responses: 0,
         positive: 0,
         negative: 0,
@@ -131,7 +151,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         contacted: 0,
         messageFlow: formData.messageFlow || { nodes: [], edges: [] },
         stages: normalizedStages,
-        leadsData: leadsWithCampaignId // Duplicate leads in leadsData for backward compatibility
+        leadsData: transformedLeads // Duplicate leads in leadsData for backward compatibility
       };
 
       if (existingCampaign) {

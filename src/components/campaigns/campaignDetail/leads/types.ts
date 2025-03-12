@@ -1,13 +1,19 @@
-
 export interface Lead {
   id: number | string;
-  name: string;
+  name: string;                 // Required full name
+  firstName?: string;           // Optional components
+  lastName?: string;
   email?: string;
   phone?: string;
   company?: string;
   channel?: string;
-  status: string;
-  lastContact?: string;
+  status: string;              // Current status
+  currentStage?: string;       // For stage tracking
+  assignedTeamMember?: string; // For team assignment
+  assignedTo?: string;         // Alias for team assignment
+  lastContact?: string;        // For tracking contacts
+  firstContactDate?: string;   // First contact tracking
+  nextFollowUpDate?: string;   // Next follow-up
   notes?: string;
   campaignId: number | string;
   // Social profiles
@@ -16,8 +22,7 @@ export interface Lead {
   facebook?: string;
   instagram?: string;
   whatsapp?: string;
-  // Additional fields
-  title?: string;
+  // Additional tracking
   socialProfiles?: {
     linkedin?: string;
     twitter?: string;
@@ -25,10 +30,10 @@ export interface Lead {
     instagram?: string;
     whatsapp?: string;
   };
-  // New tracking fields
-  firstContactDate?: string;
-  nextFollowUpDate?: string;
-  assignedTeamMember?: string;
+  // Metadata
+  source?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CampaignStage {

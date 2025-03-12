@@ -1,20 +1,29 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignStatusBadge from './CampaignStatusBadge';
 import CampaignRowActions from './CampaignRowActions';
 import ChannelBadge from './ChannelBadge';
+import { CampaignData } from './campaignData';
 
 interface CampaignTableRowProps {
-  campaign: any;
+  campaign: CampaignData;
   onStatusChange: () => void;
+  onRowClick?: () => void;  // Make it optional
 }
 
-const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusChange }) => {
+const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ 
+  campaign, 
+  onStatusChange,
+  onRowClick 
+}) => {
   const navigate = useNavigate();
 
   const handleRowClick = () => {
-    navigate(`/campaigns/${campaign.id}`);
+    if (onRowClick) {
+      onRowClick();
+    } else {
+      navigate(`/campaigns/${campaign.id}`);
+    }
   };
 
   // Calculate the number of leads

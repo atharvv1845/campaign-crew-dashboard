@@ -31,15 +31,16 @@ export const processLeadData = (
       const mappingKey = mapping[header];
       const value = values[index] || '';
       
-      // Handle full name mapping first
       if (mappingKey === 'fullName' && value) {
         fullName = value;
         const nameParts = value.split(' ');
         if (nameParts.length >= 2) {
           leadData.firstName = nameParts[0];
           leadData.lastName = nameParts.slice(1).join(' ');
+          leadData.name = value; // Set the full name directly from CSV
         } else {
           leadData.firstName = value;
+          leadData.name = value; // Use single name as full name
         }
       } else if (mappingKey === 'firstName') {
         leadData.firstName = value;
@@ -62,11 +63,12 @@ export const processLeadData = (
       }
     });
 
-    // Set name property for display
-    leadData.name = fullName || 
-                   (leadData.firstName && leadData.lastName 
-                    ? `${leadData.firstName} ${leadData.lastName}` 
-                    : leadData.firstName || leadData.lastName || `Lead #${leadData.id}`);
+    // Only set name from firstName/lastName if fullName wasn't provided
+    if (!leadData.name) {
+      leadData.name = leadData.firstName && leadData.lastName 
+        ? `${leadData.firstName} ${leadData.lastName}`
+        : leadData.firstName || leadData.lastName || `Lead #${leadData.id}`;
+    }
     
     newLeads.push(leadData);
   }

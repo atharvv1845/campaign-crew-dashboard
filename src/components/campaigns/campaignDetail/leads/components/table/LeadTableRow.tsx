@@ -97,6 +97,8 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
       return lead.lastName;
     } else if (lead.fullName) {
       return lead.fullName;
+    } else if (lead.email) {
+      return lead.email;
     } else {
       return `Lead #${lead.id}`;
     }
@@ -122,6 +124,14 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
         <td className="py-3 px-6">
           <LeadPlatformIcons lead={lead} />
         </td>
+      )}
+      
+      {displayColumn('company') && (
+        <td className="py-3 px-6">{lead.company || 'N/A'}</td>
+      )}
+      
+      {displayColumn('title') && (
+        <td className="py-3 px-6">{lead.title || 'N/A'}</td>
       )}
       
       {displayColumn('firstContacted') && (

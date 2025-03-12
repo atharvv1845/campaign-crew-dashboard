@@ -46,6 +46,16 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
         <th className="py-3 px-6 text-left font-medium">Platforms</th>
       )}
       
+      {/* Show company column if data exists */}
+      {displayColumn('company') && (
+        <th className="py-3 px-6 text-left font-medium">Company</th>
+      )}
+      
+      {/* Show title column if data exists */}
+      {displayColumn('title') && (
+        <th className="py-3 px-6 text-left font-medium">Title</th>
+      )}
+      
       {/* Always show these core date fields */}
       {displayColumn('firstContacted') && (
         <th className="py-3 px-6 text-left font-medium">First Contacted</th>

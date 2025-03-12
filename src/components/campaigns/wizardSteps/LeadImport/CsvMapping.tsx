@@ -16,6 +16,10 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
     <div className="border border-border rounded-lg overflow-hidden">
       <div className="bg-muted/20 px-4 py-3 border-b border-border">
         <h4 className="font-medium">Map CSV Columns to Lead Fields</h4>
+        <p className="text-sm text-muted-foreground mt-1">
+          For platform links, you can either map to specific platforms or use the "Platform Links" option 
+          to automatically detect multiple URLs in a single column.
+        </p>
       </div>
       <div className="p-4 max-h-[300px] overflow-y-auto">
         <table className="w-full text-sm">
@@ -45,7 +49,7 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                     <option value="currentStage">Status</option>
                     <option value="assignedTo">Assigned To</option>
                     <option value="notes">Notes</option>
-                    <option value="platformLinks">Platform Links</option>
+                    <option value="platformLinks">Platform Links (Auto-detect)</option>
                     <option value="linkedin">LinkedIn</option>
                     <option value="twitter">Twitter</option>
                     <option value="facebook">Facebook</option>

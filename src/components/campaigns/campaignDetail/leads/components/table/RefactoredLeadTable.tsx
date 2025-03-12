@@ -47,7 +47,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
   // Get all possible fields to display
   const allPossibleFields = [
     'socialProfiles', 'notes', 'email', 'linkedin', 'twitter',
-    'facebook', 'instagram', 'whatsapp'
+    'facebook', 'instagram', 'whatsapp', 'company', 'title'
   ];
   
   // Core fields that should always be displayed
@@ -90,6 +90,9 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
   };
 
   const populatedFields = getPopulatedFields();
+
+  // Add console log to debug the leads data
+  console.log('Displaying leads in table:', leads);
 
   return (
     <div className="glass-card rounded-xl overflow-hidden">

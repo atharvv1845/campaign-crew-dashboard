@@ -7,17 +7,33 @@ import { campaignData } from '../../campaignData';
 import { exportCampaignToJson, importCampaignFromJson } from '../../utils/campaignExport';
 
 interface CampaignExportImportProps {
-  campaignId: number;
+  campaignId?: number;
+  campaign?: any;
+  onExportCampaign?: () => void;
+  onImportCampaign?: () => void;
 }
 
-const CampaignExportImport: React.FC<CampaignExportImportProps> = ({ campaignId }) => {
+const CampaignExportImport: React.FC<CampaignExportImportProps> = ({ 
+  campaign, 
+  campaignId: propsCampaignId, 
+  onExportCampaign,
+  onImportCampaign
+}) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Use campaign.id if campaign is passed, otherwise use campaignId
+  const campaignId = campaign?.id || propsCampaignId;
 
   const handleExport = () => {
-    const campaign = campaignData.find(c => c.id === campaignId);
+    if (onExportCampaign) {
+      onExportCampaign();
+      return;
+    }
     
-    if (!campaign) {
+    const campaignToExport = campaign || campaignData.find(c => c.id === campaignId);
+    
+    if (!campaignToExport) {
       toast({
         title: "Error",
         description: "Campaign not found",
@@ -27,7 +43,7 @@ const CampaignExportImport: React.FC<CampaignExportImportProps> = ({ campaignId 
     }
     
     try {
-      exportCampaignToJson(campaign);
+      exportCampaignToJson(campaignToExport);
       toast({
         title: "Campaign Exported",
         description: "Your campaign has been successfully exported",
@@ -42,6 +58,11 @@ const CampaignExportImport: React.FC<CampaignExportImportProps> = ({ campaignId 
   };
 
   const handleImportClick = () => {
+    if (onImportCampaign) {
+      onImportCampaign();
+      return;
+    }
+    
     fileInputRef.current?.click();
   };
 

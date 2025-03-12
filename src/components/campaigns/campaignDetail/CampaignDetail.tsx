@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -8,11 +9,47 @@ import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
 import LeadTracking from './LeadTracking';
 import MessageSequence from './MessageSequence';
-import { OutreachSummary } from './outreachSummary';
+import { OutreachSummary } from './outreachSummary/index';
 import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
 import CampaignExportImport from './components/CampaignExportImport';
 import { campaignData } from '../campaignData';
+import { Lead } from './LeadTracking';
+
+// Mock leads data for the campaign
+const mockLeads: Lead[] = [
+  {
+    id: 1,
+    name: 'John Smith',
+    company: 'Tech Corp',
+    email: 'john@techcorp.com',
+    linkedin: 'linkedin.com/in/johnsmith',
+    lastContacted: '2023-10-01',
+    currentStage: 'Contacted',
+    assignedTo: 'Sarah Lee'
+  },
+  {
+    id: 2,
+    name: 'Emily Johnson',
+    company: 'Creative Solutions',
+    email: 'emily@creativesolutions.com',
+    linkedin: 'linkedin.com/in/emilyjohnson',
+    whatsapp: '+1234567890',
+    lastContacted: '2023-10-03',
+    currentStage: 'New',
+    assignedTo: 'John Smith'
+  },
+  {
+    id: 3,
+    name: 'Michael Brown',
+    company: 'Innovative Inc',
+    email: 'michael@innovative.com',
+    lastContacted: '2023-09-28',
+    currentStage: 'Interested',
+    assignedTo: 'Sarah Lee',
+    followUpDate: '2023-10-15'
+  }
+];
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -92,6 +129,23 @@ const CampaignDetail: React.FC = () => {
     );
   }
 
+  // Mock stages data based on campaign stages or default values
+  const stagesData = [
+    { id: 1, name: 'New', count: 5 },
+    { id: 2, name: 'Contacted', count: 12 },
+    { id: 3, name: 'Interested', count: 8 },
+    { id: 4, name: 'Qualified', count: 4 },
+    { id: 5, name: 'Meeting', count: 2 },
+    { id: 6, name: 'Closed', count: 1 },
+    { id: 7, name: 'Lost', count: 3 },
+  ];
+
+  // Enhanced campaign with stages
+  const enhancedCampaign = {
+    ...campaign,
+    stages: stagesData
+  };
+
   return (
     <div className="space-y-6">
       <CampaignHeader 
@@ -112,7 +166,7 @@ const CampaignDetail: React.FC = () => {
         <TabsContent value="overview" className="space-y-6">
           <StatCards campaign={campaign} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CampaignDescription data={campaign} />
+            <CampaignDescription campaign={campaign} />
             <ChannelsAndStages campaign={campaign} />
           </div>
           <Separator />
@@ -120,7 +174,12 @@ const CampaignDetail: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="leads" className="space-y-6">
-          <LeadTracking campaign={campaign} />
+          <LeadTracking 
+            campaign={enhancedCampaign} 
+            leadsData={mockLeads}
+            view={view}
+            setView={setView}
+          />
         </TabsContent>
 
         <TabsContent value="messages" className="space-y-6">

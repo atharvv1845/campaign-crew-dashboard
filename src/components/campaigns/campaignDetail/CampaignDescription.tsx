@@ -2,12 +2,14 @@
 import React from 'react';
 
 interface CampaignDescriptionProps {
-  description: string;
+  campaign: {
+    description: string;
+  };
 }
 
-const CampaignDescription: React.FC<CampaignDescriptionProps> = ({ description }) => {
+const CampaignDescription: React.FC<CampaignDescriptionProps> = ({ campaign }) => {
   return (
-    <p className="text-sm text-muted-foreground">{description}</p>
+    <p className="text-sm text-muted-foreground">{campaign.description}</p>
   );
 };
 

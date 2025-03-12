@@ -15,10 +15,17 @@ import { campaignData } from '../campaignData';
 
 interface CampaignHeaderProps {
   campaign: any;
-  onEdit: () => void;
+  onEdit?: () => void;
+  onEditCampaign?: () => void; // Added for compatibility
+  onExportCampaign?: () => void;
 }
 
-const CampaignHeader: React.FC<CampaignHeaderProps> = ({ campaign, onEdit }) => {
+const CampaignHeader: React.FC<CampaignHeaderProps> = ({ 
+  campaign, 
+  onEdit, 
+  onEditCampaign, 
+  onExportCampaign 
+}) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -62,6 +69,9 @@ const CampaignHeader: React.FC<CampaignHeaderProps> = ({ campaign, onEdit }) => 
       description: `${campaign.name} has been stopped.`,
     });
   };
+
+  // Use either onEdit or onEditCampaign, preferring onEditCampaign if both are provided
+  const handleEdit = onEditCampaign || onEdit;
   
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -89,7 +99,7 @@ const CampaignHeader: React.FC<CampaignHeaderProps> = ({ campaign, onEdit }) => 
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={onEdit}>
+          <DropdownMenuItem onClick={handleEdit}>
             <Edit className="h-4 w-4 mr-2" />
             Edit Campaign
           </DropdownMenuItem>

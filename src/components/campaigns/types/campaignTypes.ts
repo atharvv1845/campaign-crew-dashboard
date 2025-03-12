@@ -37,6 +37,7 @@ export interface CampaignData {
     nodes: Node[];
     edges: Edge[];
   };
+  contacted?: number;
 }
 
 // Lead data structure
@@ -84,6 +85,7 @@ export interface MessageStepData {
   assignedTo: string;
   templateId?: string;
   subject?: string;
+  channel?: string;
 }
 
 // Delay step data

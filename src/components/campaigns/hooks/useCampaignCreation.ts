@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { CampaignFormData, defaultStages } from '../types/campaignTypes';
+import { CampaignFormData, defaultStages, CampaignData } from '../types/campaignTypes';
 import { campaignData } from '../campaignData';
 
 export const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
@@ -71,8 +71,8 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
     if (existingCampaign) {
       const campaignIndex = campaignData.findIndex(c => c.id === existingCampaign.id);
       if (campaignIndex !== -1) {
-        // Update the existing campaign
-        campaignData[campaignIndex] = {
+        // Update the existing campaign with type assertion
+        const updatedCampaign = {
           ...campaignData[campaignIndex],
           name: formData.name,
           channels: formData.channels,
@@ -80,7 +80,9 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
           teamMembers: Object.values(formData.teamAssignments).flat(),
           description: formData.description,
           messageFlow: formData.messageFlow
-        };
+        } as CampaignData;
+        
+        campaignData[campaignIndex] = updatedCampaign;
         
         toast({
           title: 'Campaign Updated',
@@ -91,6 +93,7 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
       // Create a new campaign with a numeric ID
       const newId = Math.max(0, ...campaignData.map(c => Number(c.id))) + 1;
       
+      // Create new campaign with type assertion
       const newCampaign = {
         id: newId,
         name: formData.name,
@@ -106,7 +109,7 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         createdAt: new Date().toISOString().split('T')[0],
         description: formData.description,
         messageFlow: formData.messageFlow
-      };
+      } as CampaignData;
 
       campaignData.unshift(newCampaign);
       

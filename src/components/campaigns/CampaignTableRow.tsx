@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignStatusBadge from './CampaignStatusBadge';
@@ -6,9 +7,10 @@ import ChannelBadge from './ChannelBadge';
 
 interface CampaignTableRowProps {
   campaign: any;
+  onStatusChange?: () => void; // Make onStatusChange optional
 }
 
-const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign }) => {
+const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusChange }) => {
   const navigate = useNavigate();
 
   const handleRowClick = () => {
@@ -37,7 +39,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign }) => {
       </td>
       <td className="p-4">{campaign.createdAt}</td>
       <td className="p-4">
-        <CampaignRowActions campaign={campaign} />
+        <CampaignRowActions campaign={campaign} onStatusChange={onStatusChange} />
       </td>
     </tr>
   );

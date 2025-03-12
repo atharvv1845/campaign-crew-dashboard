@@ -19,7 +19,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
         <div className="space-y-2">
           <Label>Channel</Label>
           <Select 
-            defaultValue={data.channel || "email"}
+            value={data.channel || "email"}
             onValueChange={(value) => onChange({ ...data, channel: value })}
           >
             <SelectTrigger>

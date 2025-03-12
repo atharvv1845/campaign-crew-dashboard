@@ -23,7 +23,18 @@ const CampaignList: React.FC = () => {
     console.log("Refreshing campaign list data, found:", campaignData.length);
     // Create a deep copy to avoid reference issues
     const campaignsCopy = JSON.parse(JSON.stringify(campaignData));
-    setCampaigns(campaignsCopy);
+    
+    // Ensure each campaign has all required fields with default values
+    const sanitizedCampaigns = campaignsCopy.map((campaign: any) => ({
+      ...campaign,
+      channels: campaign.channels || [],
+      teamMembers: campaign.teamMembers || [],
+      createdAt: campaign.createdAt || new Date().toISOString().slice(0, 10),
+      leads: campaign.leads || 0,
+      responses: campaign.responses || 0
+    }));
+    
+    setCampaigns(sanitizedCampaigns);
   }, [showCreateCampaign, refreshTrigger]);
   
   // Filter campaigns based on search term and status
@@ -105,7 +116,13 @@ const CampaignList: React.FC = () => {
       
       {showCreateCampaign && (
         <CreateCampaign 
-          onClose={(campaign) => handleCampaignCreated(campaign)} 
+          onClose={(campaign) => {
+            if (campaign) {
+              handleCampaignCreated(campaign);
+            } else {
+              setShowCreateCampaign(false);
+            }
+          }} 
         />
       )}
       

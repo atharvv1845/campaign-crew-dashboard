@@ -13,6 +13,7 @@ const CampaignDetail: React.FC = () => {
   const { loading, campaign } = useCampaignData(id);
   const { handleEditCampaign, handleExportCampaign, handleImportCampaign } = useCampaignActions();
 
+  // Add error handling for when campaign is loaded but has invalid data
   if (loading) {
     return <CampaignLoading />;
   }
@@ -21,16 +22,28 @@ const CampaignDetail: React.FC = () => {
     return <CampaignNotFound />;
   }
 
+  // Ensure all required fields exist for the campaign
+  const safeCampaign = {
+    ...campaign,
+    createdAt: campaign.createdAt || new Date().toISOString().slice(0, 10),
+    channels: campaign.channels || [],
+    teamMembers: campaign.teamMembers || [],
+    messageFlow: campaign.messageFlow || { nodes: [], edges: [] },
+    responses: campaign.responses || 0,
+    positive: campaign.positive || 0,
+    negative: campaign.negative || 0
+  };
+
   return (
     <div className="space-y-6">
       <CampaignHeader 
-        campaign={campaign} 
+        campaign={safeCampaign} 
         onEditCampaign={handleEditCampaign}
         onExportCampaign={handleExportCampaign}
       />
 
       <CampaignTabs 
-        campaign={campaign}
+        campaign={safeCampaign}
         handleExportCampaign={handleExportCampaign}
         handleImportCampaign={handleImportCampaign}
       />

@@ -15,14 +15,26 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
 
   const handleRowClick = () => {
     // Navigate to campaign detail page with the specific campaign ID
-    navigate(`/campaigns/${campaign.id}`);
+    if (campaign && campaign.id) {
+      navigate(`/campaigns/${campaign.id}`);
+    }
   };
 
   const handleNameClick = (e: React.MouseEvent) => {
     // Prevent the row click event from firing
     e.stopPropagation();
     // Navigate to campaign detail page
-    navigate(`/campaigns/${campaign.id}`);
+    if (campaign && campaign.id) {
+      navigate(`/campaigns/${campaign.id}`);
+    }
+  };
+
+  // Make sure all campaign data has default values to prevent errors
+  const safeCampaign = {
+    ...campaign,
+    channels: campaign.channels || [],
+    teamMembers: campaign.teamMembers || [],
+    createdAt: campaign.createdAt || ''
   };
 
   return (
@@ -35,33 +47,33 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
           onClick={handleNameClick}
           className="font-medium text-primary hover:underline text-left"
         >
-          {campaign.name}
+          {safeCampaign.name}
         </button>
       </td>
       <td className="p-4">
-        <CampaignStatusBadge status={campaign.status} />
+        <CampaignStatusBadge status={safeCampaign.status} />
       </td>
       <td className="p-4">
         <div className="flex items-center gap-1">
-          {campaign.channels.map((channel: string) => (
-            <ChannelBadge key={channel} channel={channel} />
+          {safeCampaign.channels.map((channel: string, index: number) => (
+            <ChannelBadge key={`${channel}-${index}`} channel={channel} />
           ))}
         </div>
       </td>
-      <td className="p-4">{campaign.leads}</td>
-      <td className="p-4">{campaign.responses}</td>
+      <td className="p-4">{safeCampaign.leads}</td>
+      <td className="p-4">{safeCampaign.responses}</td>
       <td className="p-4">
         <div className="flex items-center gap-1">
-          {campaign.teamMembers && campaign.teamMembers.map((member: string, index: number) => (
+          {safeCampaign.teamMembers && safeCampaign.teamMembers.map((member: string, index: number) => (
             <span key={index} className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs">
               {member.substring(0, 2)}
             </span>
           ))}
         </div>
       </td>
-      <td className="p-4">{campaign.createdAt}</td>
+      <td className="p-4">{safeCampaign.createdAt}</td>
       <td className="p-4">
-        <CampaignRowActions campaign={campaign} onStatusChange={onStatusChange} />
+        <CampaignRowActions campaign={safeCampaign} onStatusChange={onStatusChange} />
       </td>
     </tr>
   );

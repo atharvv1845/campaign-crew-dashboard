@@ -50,7 +50,7 @@ export const getMockLeads = (): Lead[] => {
       lastContacted: '2023-10-01',
       currentStage: 'Contacted',
       assignedTo: 'Sarah Lee',
-      campaignId: 1
+      campaignId: 8
     },
     {
       id: 2,
@@ -62,7 +62,7 @@ export const getMockLeads = (): Lead[] => {
       lastContacted: '2023-10-03',
       currentStage: 'New',
       assignedTo: 'John Smith',
-      campaignId: 1
+      campaignId: 8
     },
     {
       id: 3,
@@ -73,18 +73,19 @@ export const getMockLeads = (): Lead[] => {
       currentStage: 'Interested',
       assignedTo: 'Sarah Lee',
       followUpDate: '2023-10-15',
-      campaignId: 2
+      campaignId: 8
     },
-    {
-      id: 4,
-      name: 'Campaign 7 Lead',
-      company: 'Test Company',
-      email: 'test@example.com',
+    // Add more leads to match the total of 18
+    ...Array.from({ length: 15 }, (_, i) => ({
+      id: i + 4,
+      name: `Lead ${i + 4}`,
+      company: `Company ${i + 4}`,
+      email: `lead${i + 4}@example.com`,
       lastContacted: '2023-10-05',
       currentStage: 'New Lead',
       assignedTo: 'user1',
-      campaignId: 7
-    }
+      campaignId: 8
+    }))
   ];
 };
 

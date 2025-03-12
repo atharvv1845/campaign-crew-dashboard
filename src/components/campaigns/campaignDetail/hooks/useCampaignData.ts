@@ -52,29 +52,6 @@ export const useCampaignData = (id: string | undefined) => {
           if (foundCampaign) {
             console.log('Displaying campaign:', foundCampaign);
             
-            // Process leads data to ensure consistent format
-            let processedLeads;
-            if (Array.isArray(foundCampaign.leads)) {
-              // Leads is already an array of lead objects
-              processedLeads = foundCampaign.leads;
-            } else if (Array.isArray(foundCampaign.leadsData)) {
-              // Use leadsData if available
-              processedLeads = foundCampaign.leadsData;
-            } else if (typeof foundCampaign.leads === 'number') {
-              // Leads is a count, generate placeholder leads
-              processedLeads = Array.from({ length: foundCampaign.leads }, (_, index) => ({
-                id: index + 1,
-                name: `Lead #${index + 1}`,
-                company: 'Example Company',
-                email: `lead${index + 1}@example.com`,
-                currentStage: foundCampaign.stages?.[0]?.name || 'New',
-                lastContacted: new Date().toISOString().slice(0, 10)
-              }));
-            } else {
-              // Default to empty array
-              processedLeads = [];
-            }
-            
             // Ensure all required fields are present to prevent errors
             const sanitizedCampaign = {
               ...foundCampaign,
@@ -84,7 +61,7 @@ export const useCampaignData = (id: string | undefined) => {
               channels: foundCampaign.channels || [],
               teamMembers: foundCampaign.teamMembers || [],
               createdAt: foundCampaign.createdAt || new Date().toISOString().slice(0, 10),
-              leads: processedLeads,
+              leads: foundCampaign.leads || 0,
               responses: foundCampaign.responses || 0,
               positive: foundCampaign.positive || 0,
               negative: foundCampaign.negative || 0,

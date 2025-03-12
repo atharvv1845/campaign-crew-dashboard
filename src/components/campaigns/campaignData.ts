@@ -5,7 +5,7 @@ export interface CampaignData {
   status: string;
   type: string;
   channels: string[];
-  leads: any[]; // Changed to store actual lead data objects, not just a count
+  leads: number | any[];
   responses: number;
   positive: number;
   negative: number;

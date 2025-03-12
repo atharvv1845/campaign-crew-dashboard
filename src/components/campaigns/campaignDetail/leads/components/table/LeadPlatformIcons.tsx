@@ -25,33 +25,12 @@ const LeadPlatformIcons: React.FC<LeadPlatformIconsProps> = ({ lead }) => {
       
       // For platform-specific checks
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        // Check for specific domains or handles
-        if (url.includes('linkedin.com') || url.includes('/in/')) {
-          return `https://linkedin.com/in/${url.replace(/.*\/in\//, '')}`;
-        } else if (url.includes('twitter.com') || url.includes('@')) {
-          return `https://twitter.com/${url.replace(/.*@/, '')}`;
-        } else if (url.includes('facebook.com')) {
-          return `https://facebook.com/${url.replace(/.*facebook.com\//, '')}`;
-        } else if (url.includes('instagram.com')) {
-          return `https://instagram.com/${url.replace(/.*instagram.com\//, '')}`;
-        } else {
-          return `https://${url}`;
-        }
+        return `https://${url}`;
       }
       
       return url;
     }
   };
-
-  // Log the lead's social profiles for debugging
-  console.log('Lead platform data:', {
-    email: lead.email,
-    linkedin: lead.linkedin,
-    twitter: lead.twitter,
-    facebook: lead.facebook,
-    instagram: lead.instagram,
-    whatsapp: lead.whatsapp
-  });
 
   const platforms = [
     {

@@ -40,7 +40,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         name: existingCampaign.name || '',
         description: existingCampaign.description || '',
         channels: existingCampaign.channels?.map((c: string) => c.toLowerCase()) || [],
-        leads: existingCampaign.leads || [], // Keep the actual lead objects, not just the count
+        leads: [], // We would need to fetch leads data
         flows: [], // We would need to fetch message flow data
         stages: existingCampaign.stages || defaultFormData.stages, 
         team: existingCampaign.teamMembers || [],
@@ -96,7 +96,6 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
       
       console.log("Creating campaign with ID:", campaignId);
-      console.log("Lead data:", formData.leads);
       
       // Create normalized stages data with counts for the campaign data structure
       const normalizedStages = formData.stages.map(stage => ({
@@ -115,7 +114,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         status: 'Active',
         type: 'Email',
         channels: formData.channels,
-        leads: formData.leads, // Store the full lead objects, not just the count
+        leads: formData.leads.length,
         responses: 0,
         positive: 0,
         negative: 0,

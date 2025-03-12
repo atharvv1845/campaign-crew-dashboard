@@ -106,27 +106,21 @@ export const processLeadData = (
           const urls = value.split(/[\s,;]+/);
           
           urls.forEach(url => {
-            const trimmedUrl = url.trim();
-            if (!trimmedUrl) return;
-            
-            if (trimmedUrl.includes('linkedin.com') || /linkedin|\/in\//.test(trimmedUrl)) {
-              leadData.linkedin = trimmedUrl;
-              leadData.socialProfiles.linkedin = trimmedUrl;
-            } else if (trimmedUrl.includes('twitter.com') || trimmedUrl.includes('x.com') || /twitter|@/.test(trimmedUrl)) {
-              leadData.twitter = trimmedUrl;
-              leadData.socialProfiles.twitter = trimmedUrl;
-            } else if (trimmedUrl.includes('facebook.com') || /facebook|fb\.com/.test(trimmedUrl)) {
-              leadData.facebook = trimmedUrl;
-              leadData.socialProfiles.facebook = trimmedUrl;
-            } else if (trimmedUrl.includes('instagram.com') || /instagram|insta/.test(trimmedUrl)) {
-              leadData.instagram = trimmedUrl;
-              leadData.socialProfiles.instagram = trimmedUrl;
-            } else if (trimmedUrl.includes('wa.me') || /whatsapp|whats\sapp/.test(trimmedUrl)) {
-              leadData.whatsapp = trimmedUrl;
-              leadData.socialProfiles.whatsapp = trimmedUrl;
-            } else if (trimmedUrl.includes('@') && !leadData.email) {
-              // Assume it's an email if it contains @ and we don't already have one
-              leadData.email = trimmedUrl;
+            if (url.includes('linkedin.com')) {
+              leadData.linkedin = url;
+              leadData.socialProfiles.linkedin = url;
+            } else if (url.includes('twitter.com') || url.includes('x.com')) {
+              leadData.twitter = url;
+              leadData.socialProfiles.twitter = url;
+            } else if (url.includes('facebook.com')) {
+              leadData.facebook = url;
+              leadData.socialProfiles.facebook = url;
+            } else if (url.includes('instagram.com')) {
+              leadData.instagram = url;
+              leadData.socialProfiles.instagram = url;
+            } else if (url.includes('wa.me') || url.includes('whatsapp')) {
+              leadData.whatsapp = url;
+              leadData.socialProfiles.whatsapp = url;
             }
           });
         }
@@ -151,9 +145,6 @@ export const processLeadData = (
         leadData.name = leadData.email || `Lead #${leadData.id}`;
       }
     }
-    
-    // Debugging the processed lead data
-    console.log('Processed lead data:', leadData);
     
     newLeads.push(leadData);
   }

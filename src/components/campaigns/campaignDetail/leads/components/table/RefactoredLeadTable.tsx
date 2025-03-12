@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import LeadTableHeader from './LeadTableHeader';
 import LeadTableRow from './LeadTableRow';
 import { Lead, Campaign } from '../../types';
@@ -31,10 +31,6 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     notifyContactLogged
   } = useToastNotifications();
 
-  useEffect(() => {
-    console.log('Rendering lead table with leads:', leads);
-  }, [leads]);
-
   const handleUpdateLead = (updatedLead: Lead) => {
     if (onUpdateLead) {
       onUpdateLead(updatedLead);
@@ -48,56 +44,52 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
     }
   };
 
-  // Dynamically determine which fields to display based on lead data
-  const determineDisplayFields = () => {
-    if (!leads || leads.length === 0) return ['name', 'email', 'company', 'currentStage'];
-
-    // Count how many leads have each field populated
+  // Get all possible fields to display
+  const allPossibleFields = [
+    'socialProfiles', 'notes', 'email', 'linkedin', 'twitter',
+    'facebook', 'instagram', 'whatsapp'
+  ];
+  
+  // Core fields that should always be displayed
+  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
+  
+  // Determine which fields are populated
+  const getPopulatedFields = () => {
     const fieldCounts: Record<string, number> = {};
-    const allFields = new Set<string>();
     
-    // Essential fields that should always be considered if present
-    const essentialFields = [
-      'name', 'email', 'company', 'currentStage', 'assignedTo', 
-      'lastContacted', 'followUpDate', 'linkedin', 'phone'
-    ];
+    // Initialize counts for all fields we want to show
+    allPossibleFields.forEach(field => {
+      fieldCounts[field] = 0;
+    });
     
-    // Go through all leads and count populated fields
+    // Count how many leads have each field populated
     leads.forEach(lead => {
+      // Check standard fields
       Object.entries(lead).forEach(([key, value]) => {
-        // Skip internal fields like id
-        if (key === 'id') return;
-        
-        // Add to all possible fields
-        allFields.add(key);
-        
-        // Count if the field has a value
-        if (value && value !== '' && value !== 'N/A') {
+        if (value && value !== '' && value !== 'N/A' && fieldCounts[key] !== undefined) {
           fieldCounts[key] = (fieldCounts[key] || 0) + 1;
         }
       });
+      
+      // Special handling for socialProfiles
+      const hasSocialProfiles = lead.linkedin || lead.twitter || lead.facebook || 
+                               lead.instagram || lead.whatsapp || lead.email;
+      
+      if (hasSocialProfiles) {
+        fieldCounts['socialProfiles'] = (fieldCounts['socialProfiles'] || 0) + 1;
+      }
     });
     
-    // Prioritize essential fields, then fields that have data for at least half the leads
-    const halfLeadCount = Math.max(1, Math.floor(leads.length / 2));
-    
-    // Start with essential fields that have data
-    const displayFields = essentialFields
-      .filter(field => allFields.has(field) && (fieldCounts[field] || 0) > 0);
-    
-    // Add other common fields
-    Array.from(allFields)
-      .filter(field => !essentialFields.includes(field) && (fieldCounts[field] || 0) >= halfLeadCount)
-      .forEach(field => displayFields.push(field));
-    
-    // Ensure we have a reasonable number of fields (between 4 and 8)
-    return displayFields.slice(0, Math.max(4, Math.min(8, displayFields.length)));
+    // Return fields that have data in at least one lead (excluding core fields which are handled separately)
+    return [
+      'socialProfiles',  // Always include socialProfiles
+      ...Object.entries(fieldCounts)
+        .filter(([key, count]) => count > 0 && key !== 'socialProfiles')
+        .map(([key]) => key)
+    ];
   };
 
-  const displayFields = determineDisplayFields();
-  
-  // For debugging
-  console.log('Display fields for lead table:', displayFields);
+  const populatedFields = getPopulatedFields();
 
   return (
     <div className="glass-card rounded-xl overflow-hidden">
@@ -110,7 +102,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
               allSelected={leads.length > 0 && selectedLeads.length === leads.length}
               leads={leads}
               selectedLeads={selectedLeads}
-              displayFields={displayFields}
+              populatedFields={populatedFields}
             />
           </thead>
           <tbody className="divide-y divide-border bg-card">
@@ -125,12 +117,12 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
                   onLeadClick={onLeadClick}
                   onUpdateLead={handleUpdateLead}
                   onOpen={onLeadClick || (() => {})}
-                  displayFields={displayFields}
+                  populatedFields={populatedFields}
                 />
               ))
             ) : (
               <tr>
-                <td colSpan={displayFields.length + (onSelectLead ? 2 : 1)} className="py-6 text-center text-muted-foreground">
+                <td colSpan={9} className="py-6 text-center text-muted-foreground">
                   No leads found for this campaign
                 </td>
               </tr>

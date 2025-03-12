@@ -1,14 +1,12 @@
 
-import React from 'react';
-import { MoreHorizontal, Calendar, Mail, MessageCircle, Phone } from 'lucide-react';
-import { Lead, Campaign } from '../../types';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { format } from 'date-fns';
+import { Lead, Campaign } from '../../types';
+import LeadDatePicker from './LeadDatePicker';
 import LeadPlatformIcons from './LeadPlatformIcons';
 import LeadStageSelector from './LeadStageSelector';
-import LeadDatePicker from './LeadDatePicker';
-import { StageBadge } from '@/components/campaigns/campaignDetail/badges/StageBadge';
+import LeadActions from './LeadActions';
 
 interface LeadTableRowProps {
   lead: Lead;
@@ -18,226 +16,166 @@ interface LeadTableRowProps {
   onLeadClick?: (lead: Lead) => void;
   onUpdateLead?: (lead: Lead) => void;
   onOpen: (lead: Lead) => void;
-  displayFields?: string[];
-  populatedFields?: string[]; // Keep for backward compatibility
+  populatedFields?: string[];
 }
 
-const LeadTableRow: React.FC<LeadTableRowProps> = ({
-  lead,
+const LeadTableRow: React.FC<LeadTableRowProps> = ({ 
+  lead, 
   campaign,
   onSelectLead,
-  isSelected = false,
+  isSelected,
   onLeadClick,
   onUpdateLead,
   onOpen,
-  displayFields = [],
   populatedFields = []
 }) => {
-  // Use displayFields if provided, otherwise fall back to populatedFields
-  const fields = displayFields.length > 0 ? displayFields : populatedFields;
+  const [firstContacted, setFirstContacted] = useState<Date | undefined>(
+    lead.firstContacted ? new Date(lead.firstContacted) : undefined
+  );
+  const [lastContacted, setLastContacted] = useState<Date | undefined>(
+    lead.lastContacted ? new Date(lead.lastContacted) : undefined
+  );
+  const [followUpDate, setFollowUpDate] = useState<Date | undefined>(
+    lead.followUpDate ? new Date(lead.followUpDate) : undefined
+  );
 
-  // Handle selection change
-  const handleSelectionChange = (checked: boolean) => {
-    if (onSelectLead) {
-      onSelectLead(lead.id, checked);
-    }
-  };
-
-  // Handle stage change
-  const handleStageChange = (newStage: string) => {
-    if (onUpdateLead) {
+  const handleFirstContactSelect = (newDate: Date | undefined) => {
+    setFirstContacted(newDate);
+    if (onUpdateLead && newDate) {
       onUpdateLead({
         ...lead,
-        currentStage: newStage
+        firstContacted: format(newDate, 'yyyy-MM-dd')
       });
     }
   };
 
-  // Handle date change
-  const handleDateChange = (field: string, date: string) => {
-    if (onUpdateLead) {
+  const handleDateSelect = (newDate: Date | undefined) => {
+    setLastContacted(newDate);
+    if (onUpdateLead && newDate) {
       onUpdateLead({
         ...lead,
-        [field]: date
+        lastContacted: format(newDate, 'yyyy-MM-dd')
       });
     }
   };
 
-  // Render cell based on field type
-  const renderCell = (field: string) => {
-    switch (field) {
-      case 'name':
-        return (
-          <td className="px-6 py-4" onClick={() => onOpen(lead)}>
-            <div className="cursor-pointer">
-              <div className="font-medium">{lead.name || `${lead.firstName || ''} ${lead.lastName || ''}`}</div>
-              {lead.title && <div className="text-sm text-muted-foreground">{lead.title}</div>}
-            </div>
-          </td>
-        );
-      
-      case 'socialProfiles':
-        return (
-          <td className="px-6 py-4">
-            <LeadPlatformIcons lead={lead} />
-          </td>
-        );
-      
-      case 'company':
-        return (
-          <td className="px-6 py-4">
-            <div className="font-medium">{lead.company || '-'}</div>
-          </td>
-        );
-      
-      case 'currentStage':
-      case 'status':
-        return (
-          <td className="px-6 py-4">
-            {campaign?.stages ? (
-              <LeadStageSelector
-                currentStage={lead.currentStage || lead.status || ''}
-                stages={campaign.stages}
-                onChange={handleStageChange}
-              />
-            ) : (
-              <StageBadge stage={lead.currentStage || lead.status || ''} />
-            )}
-          </td>
-        );
-      
-      case 'assignedTo':
-        return (
-          <td className="px-6 py-4">
-            <div className="text-sm">
-              {lead.assignedTo || '-'}
-            </div>
-          </td>
-        );
-      
-      case 'lastContacted':
-        return (
-          <td className="px-6 py-4">
-            <LeadDatePicker
-              date={lead.lastContacted}
-              onChange={(date) => handleDateChange('lastContacted', date)}
-              icon={<Calendar className="h-4 w-4" />}
-              readOnly
-            />
-          </td>
-        );
-      
-      case 'followUpDate':
-        return (
-          <td className="px-6 py-4">
-            <LeadDatePicker
-              date={lead.followUpDate}
-              onChange={(date) => handleDateChange('followUpDate', date)}
-              icon={<Calendar className="h-4 w-4" />}
-            />
-          </td>
-        );
-      
-      case 'firstContacted':
-        return (
-          <td className="px-6 py-4">
-            <LeadDatePicker
-              date={lead.firstContacted}
-              onChange={(date) => handleDateChange('firstContacted', date)}
-              icon={<Calendar className="h-4 w-4" />}
-              readOnly
-            />
-          </td>
-        );
-      
-      case 'email':
-        return (
-          <td className="px-6 py-4">
-            <div className="flex items-center">
-              <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm">{lead.email || '-'}</span>
-            </div>
-          </td>
-        );
-      
-      case 'phone':
-        return (
-          <td className="px-6 py-4">
-            <div className="flex items-center">
-              <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm">{lead.phone || '-'}</span>
-            </div>
-          </td>
-        );
-      
-      case 'notes':
-        return (
-          <td className="px-6 py-4">
-            <div className="text-sm max-w-[200px] truncate">
-              {lead.notes || '-'}
-            </div>
-          </td>
-        );
-      
-      // Social profiles
-      case 'linkedin':
-      case 'twitter':
-      case 'facebook':
-      case 'instagram':
-      case 'whatsapp':
-        return (
-          <td className="px-6 py-4">
-            <div className="flex items-center">
-              <MessageCircle className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm">{lead[field] || '-'}</span>
-            </div>
-          </td>
-        );
-      
-      default:
-        // Generic field display
-        return (
-          <td className="px-6 py-4">
-            <div className="text-sm">
-              {(lead as any)[field] || '-'}
-            </div>
-          </td>
-        );
+  const handleFollowUpSelect = (newDate: Date | undefined) => {
+    setFollowUpDate(newDate);
+    if (onUpdateLead && newDate) {
+      onUpdateLead({
+        ...lead,
+        followUpDate: format(newDate, 'yyyy-MM-dd')
+      });
+    }
+  };
+
+  const handleStageChange = (stage: string) => {
+    if (onUpdateLead) {
+      onUpdateLead({
+        ...lead,
+        currentStage: stage
+      });
+    }
+  };
+
+  // Always display these core fields
+  const coreFields = ['currentStage', 'assignedTo', 'firstContacted', 'lastContacted', 'followUpDate'];
+  
+  const displayColumn = (fieldName: string): boolean => {
+    return coreFields.includes(fieldName) || populatedFields.includes(fieldName);
+  };
+
+  // Get the lead's display name based on available information
+  const getLeadName = () => {
+    if (lead.name) return lead.name;
+    
+    if (lead.firstName && lead.lastName) {
+      return `${lead.firstName} ${lead.lastName}`;
+    } else if (lead.firstName) {
+      return lead.firstName;
+    } else if (lead.lastName) {
+      return lead.lastName;
+    } else if (lead.fullName) {
+      return lead.fullName;
+    } else {
+      return `Lead #${lead.id}`;
     }
   };
 
   return (
     <tr className="hover:bg-muted/10">
       {onSelectLead && (
-        <td className="px-3 py-4">
-          <Checkbox 
-            checked={isSelected} 
-            onCheckedChange={handleSelectionChange}
+        <td className="py-3 px-3">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) => {
+              if (onSelectLead) {
+                onSelectLead(lead.id, !!checked);
+              }
+            }}
+          />
+        </td>
+      )}
+      <td className="py-3 px-6">{getLeadName()}</td>
+      
+      {displayColumn('socialProfiles') && (
+        <td className="py-3 px-6">
+          <LeadPlatformIcons lead={lead} />
+        </td>
+      )}
+      
+      {displayColumn('firstContacted') && (
+        <td className="py-3 px-6">
+          <LeadDatePicker
+            date={firstContacted}
+            onDateSelect={handleFirstContactSelect}
+            label="Set first contact"
           />
         </td>
       )}
       
-      {/* Render fields based on determined display fields */}
-      {fields.map(field => renderCell(field))}
+      {displayColumn('lastContacted') && (
+        <td className="py-3 px-6">
+          <LeadDatePicker
+            date={lastContacted}
+            onDateSelect={handleDateSelect}
+            label="Set date"
+          />
+        </td>
+      )}
       
-      {/* Actions */}
-      <td className="px-3 py-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onOpen(lead)}>
-              View details
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => window.open(`mailto:${lead.email}`)}>
-              Send email
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {displayColumn('followUpDate') && (
+        <td className="py-3 px-6">
+          <LeadDatePicker
+            date={followUpDate}
+            onDateSelect={handleFollowUpSelect}
+            label="Set follow-up"
+          />
+        </td>
+      )}
+      
+      {displayColumn('currentStage') && (
+        <td className="py-3 px-6">
+          <LeadStageSelector
+            currentStage={lead.currentStage}
+            onStageChange={handleStageChange}
+            campaign={campaign}
+          />
+        </td>
+      )}
+      
+      {displayColumn('assignedTo') && (
+        <td className="py-3 px-6">{lead.assignedTo || 'N/A'}</td>
+      )}
+      
+      {displayColumn('notes') && (
+        <td className="py-3 px-6">
+          <span className="line-clamp-1 max-w-[150px]">{lead.notes || 'No notes'}</span>
+        </td>
+      )}
+      
+      <td className="py-3 px-3">
+        <LeadActions lead={lead} onOpen={onOpen} />
       </td>
     </tr>
   );

@@ -6,7 +6,7 @@ import OverviewTab from '../tabs/OverviewTab';
 import LeadsTab from '../tabs/LeadsTab';
 import MessagesTab from '../tabs/MessagesTab';
 import ReportsTab from '../tabs/ReportsTab';
-import { getTabs, convertImportedLeads } from '../tabs/helpers/tabHelpers';
+import { getTabs } from '../tabs/helpers/tabHelpers';
 import { useToast } from '@/hooks/use-toast';
 
 interface CampaignTabsProps {
@@ -28,30 +28,36 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   const getLeadsForCampaign = (): Lead[] => {
     console.log('Processing campaign leads:', campaign);
     
-    if (!campaign.leads || typeof campaign.leads === 'number') {
-      console.log('No actual lead data found');
+    if (!campaign.leads) {
+      console.log('No leads data found');
       return [];
     }
     
     if (Array.isArray(campaign.leads)) {
       console.log('Found leads array:', campaign.leads.length);
       
-      return campaign.leads.map((lead: any, index: number) => ({
-        id: lead.id || index + 1,
-        name: lead.firstName ? `${lead.firstName} ${lead.lastName || ''}` : lead.name || '',
-        email: lead.email || '',
-        company: lead.company || '',
-        currentStage: lead.status || lead.currentStage || 'New',
-        lastContacted: lead.lastContacted || '',
-        followUpDate: lead.followUpDate || '',
-        notes: lead.notes || '',
-        assignedTo: lead.assignedTo || '',
-        linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
-        twitter: lead.twitter || lead.socialProfiles?.twitter || '',
-        whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
-        facebook: lead.facebook || lead.socialProfiles?.facebook || '',
-        instagram: lead.instagram || lead.socialProfiles?.instagram || ''
-      }));
+      return campaign.leads.map((lead: any, index: number) => {
+        if (lead.id && lead.name !== undefined) {
+          return lead;
+        }
+        
+        return {
+          id: lead.id || index + 1,
+          name: lead.firstName ? `${lead.firstName} ${lead.lastName || ''}` : lead.name || '',
+          email: lead.email || '',
+          company: lead.company || '',
+          currentStage: lead.status || lead.currentStage || 'New',
+          lastContacted: lead.lastContacted || '',
+          followUpDate: lead.followUpDate || '',
+          notes: lead.notes || '',
+          assignedTo: lead.assignedTo || '',
+          linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
+          twitter: lead.twitter || lead.socialProfiles?.twitter || '',
+          whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
+          facebook: lead.facebook || lead.socialProfiles?.facebook || '',
+          instagram: lead.instagram || lead.socialProfiles?.instagram || ''
+        };
+      });
     }
     
     return [];
@@ -62,7 +68,7 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
   useEffect(() => {
     console.log('Processed Campaign Leads:', campaignLeads);
   }, [campaign]);
-  
+
   const enhancedCampaign = {
     ...campaign,
     stages: campaign.stages || [
@@ -76,11 +82,9 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
     ]
   };
 
-  const tabs = getTabs(campaign, campaignLeads);
-
   return (
     <TabsLayout 
-      tabs={tabs} 
+      tabs={getTabs(campaign, campaignLeads)} 
       defaultValue="overview"
       campaign={enhancedCampaign}
       leadsData={campaignLeads}

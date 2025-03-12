@@ -3,14 +3,15 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ConditionStepData } from '../../types/campaignTypes';
+import { ConditionStepData, StageData } from '../../types/campaignTypes';
 
 interface ConditionFormProps {
   data: ConditionStepData;
   onChange: (data: ConditionStepData) => void;
+  stages?: StageData[]; // Add stages prop
 }
 
-const ConditionForm: React.FC<ConditionFormProps> = ({ data, onChange }) => {
+const ConditionForm: React.FC<ConditionFormProps> = ({ data, onChange, stages = [] }) => {
   return (
     <>
       <div className="space-y-2">
@@ -59,11 +60,15 @@ const ConditionForm: React.FC<ConditionFormProps> = ({ data, onChange }) => {
               <SelectValue placeholder="Select stage" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="contacted">Contacted</SelectItem>
-              <SelectItem value="interested">Interested</SelectItem>
-              <SelectItem value="not-interested">Not Interested</SelectItem>
-              <SelectItem value="meeting">Meeting Scheduled</SelectItem>
-              <SelectItem value="qualified">Qualified</SelectItem>
+              {stages.length > 0 ? (
+                stages.map(stage => (
+                  <SelectItem key={stage.id} value={stage.id}>
+                    {stage.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="" disabled>No stages available</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>

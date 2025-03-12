@@ -1,153 +1,139 @@
-
+import { Lead } from '@/components/leads/LeadTableComponent';
 import { CampaignData } from '../campaignData';
 
-export const campaignData: CampaignData = {
+// Enhanced mock data for detailed campaign view
+export const campaignData: CampaignData & { 
+  description?: string;
+  stages?: Array<{
+    id: number;
+    name: string;
+    count: number;
+  }>;
+} = {
   id: 1,
-  name: 'Q4 Product Launch',
-  status: 'Active',
-  type: 'Email',
-  channels: ['Email', 'LinkedIn'],
-  leads: 1243,
-  responses: 341,
-  positive: 210,
-  negative: 131,
-  conversion: '27.4%',
-  teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'],
-  createdAt: '2023-09-15',
-  description: 'This campaign targets decision makers in the technology sector to introduce our new product features launching in Q4. The goal is to generate leads for the sales team and schedule product demos.',
-  stages: [
-    { id: 1, name: 'Not Contacted', count: 24 },
-    { id: 2, name: 'Contacted', count: 15 },
-    { id: 3, name: 'Replied', count: 8 },
-    { id: 4, name: 'Follow-Up Needed', count: 5 },
-    { id: 5, name: 'Positive', count: 3 },
-    { id: 6, name: 'Negative', count: 2 },
-  ]
+  name: "Q1 Tech Companies Outreach",
+  status: "Active",
+  type: "Sales",
+  channels: ["email", "linkedin", "call", "whatsapp"],
+  leads: 1250,
+  responses: 375,
+  positive: 125,
+  negative: 75,
+  conversion: "10%",
+  createdAt: "Jan 15, 2023",
+  description: "This campaign targets SaaS companies with 50-200 employees in the North American market. The primary goal is to schedule demos with decision-makers in the marketing and sales departments."
 };
 
-export const leadsData = [
+// Mock leads data for the campaign
+export const leadsData: Lead[] = [
   {
     id: 1,
-    name: 'John Anderson',
-    company: 'Tech Solutions Inc.',
-    email: 'john.anderson@techsolutions.com',
-    linkedin: 'https://linkedin.com/in/johnanderson',
-    whatsapp: null,
-    twitter: '@johnanderson',
-    instagram: null,
-    facebook: null,
-    lastContacted: '2023-10-05',
-    currentStage: 'Contacted',
-    assignedTo: 'Sarah Lee',
-    followUpDate: '2023-10-12',
-    notes: 'Initial call went well. Interested in Enterprise plan.'
+    name: "John Smith",
+    email: "john.smith@techcorp.com",
+    company: "TechCorp",
+    title: "Marketing Director",
+    status: "Contacted",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 5, 2023",
+    contactMethods: ["email", "linkedin"]
   },
   {
     id: 2,
-    name: 'Sarah Miller',
-    company: 'Growth Ventures',
-    email: 'sarah.miller@growthventures.com',
-    linkedin: 'https://linkedin.com/in/sarahmiller',
-    whatsapp: '+1234567890',
-    twitter: null,
-    instagram: '@sarahmiller',
-    facebook: null,
-    lastContacted: '2023-10-07',
-    currentStage: 'Replied',
-    assignedTo: 'John Smith',
-    followUpDate: '2023-10-14',
-    notes: 'Responded positively to our proposal. Scheduling a demo next week.'
+    name: "Alice Johnson",
+    email: "alice.johnson@innovate.ai",
+    company: "Innovate AI",
+    title: "CEO",
+    status: "Replied",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 8, 2023",
+    contactMethods: ["email", "call"]
   },
   {
     id: 3,
-    name: 'David Wilson',
-    company: 'Innovative Labs',
-    email: 'david.wilson@innovativelabs.com',
-    linkedin: 'https://linkedin.com/in/davidwilson',
-    whatsapp: null,
-    twitter: '@davidwilson',
-    instagram: null,
-    facebook: 'https://facebook.com/davidwilson',
-    lastContacted: '2023-10-03',
-    currentStage: 'Not Contacted',
-    assignedTo: 'Alex Chen'
+    name: "Bob Williams",
+    email: "bob.williams@cloudsolutions.net",
+    company: "Cloud Solutions",
+    title: "CTO",
+    status: "Not Contacted",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Never",
+    contactMethods: ["linkedin"]
   },
   {
     id: 4,
-    name: 'Emily Thompson',
-    company: 'Digital Dynamics',
-    email: 'emily.thompson@digitaldynamics.com',
-    linkedin: 'https://linkedin.com/in/emilythompson',
-    whatsapp: '+0987654321',
-    twitter: null,
-    instagram: null,
-    facebook: null,
-    lastContacted: '2023-10-08',
-    currentStage: 'Follow-Up Needed',
-    assignedTo: 'Mia Johnson',
-    followUpDate: '2023-10-15',
-    notes: 'Asked for pricing details. Sent follow-up email with quote.'
+    name: "Emily Davis",
+    email: "emily.davis@datawise.io",
+    company: "DataWise",
+    title: "Data Scientist",
+    status: "Contacted",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 10, 2023",
+    contactMethods: ["email"]
   },
   {
     id: 5,
-    name: 'Michael Chen',
-    company: 'Global Systems',
-    email: 'michael.chen@globalsystems.com',
-    linkedin: 'https://linkedin.com/in/michaelchen',
-    whatsapp: null,
-    twitter: '@michaelchen',
-    instagram: '@michaelchen',
-    facebook: null,
-    lastContacted: '2023-10-02',
-    currentStage: 'Negative',
-    assignedTo: 'John Smith',
-    notes: 'Not interested at this time. Using a competitor product.'
+    name: "David Brown",
+    email: "david.brown@softwaresolutions.com",
+    company: "Software Solutions",
+    title: "VP of Engineering",
+    status: "Replied",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 12, 2023",
+    contactMethods: ["email", "call"]
   },
   {
     id: 6,
-    name: 'Jessica Brown',
-    company: 'Future Innovations',
-    email: 'jessica.brown@futureinnovations.com',
-    linkedin: 'https://linkedin.com/in/jessicabrown',
-    whatsapp: '+1122334455',
-    twitter: null,
-    instagram: null,
-    facebook: 'https://facebook.com/jessicabrown',
-    lastContacted: '2023-10-09',
-    currentStage: 'Positive',
-    assignedTo: 'Sarah Lee',
-    followUpDate: '2023-10-16',
-    notes: 'Very interested. Meeting scheduled with their team next week.'
+    name: "Olivia Green",
+    email: "olivia.green@globaltech.org",
+    company: "Global Tech",
+    title: "Project Manager",
+    status: "Positive",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 15, 2023",
+    contactMethods: ["email", "linkedin", "whatsapp"]
   },
   {
     id: 7,
-    name: 'Robert Davis',
-    company: 'Apex Solutions',
-    email: 'robert.davis@apexsolutions.com',
-    linkedin: 'https://linkedin.com/in/robertdavis',
-    whatsapp: null,
-    twitter: '@robertdavis',
-    instagram: null,
-    facebook: null,
-    lastContacted: '2023-10-01',
-    currentStage: 'Not Contacted',
-    assignedTo: 'Alex Chen'
+    name: "James Miller",
+    email: "james.miller@cybersecurity.com",
+    company: "Cybersecurity Inc.",
+    title: "Security Analyst",
+    status: "Negative",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 18, 2023",
+    contactMethods: ["email"]
   },
   {
     id: 8,
-    name: 'Jennifer Garcia',
-    company: 'Creative Technologies',
-    email: 'jennifer.garcia@creativetech.com',
-    linkedin: 'https://linkedin.com/in/jennifergarcia',
-    whatsapp: '+5544332211',
-    twitter: null,
-    instagram: '@jennifergarcia',
-    facebook: null,
-    lastContacted: '2023-10-06',
-    currentStage: 'Contacted',
-    assignedTo: 'Mia Johnson',
-    followUpDate: '2023-10-13',
-    notes: 'Sent initial email. No response yet.'
+    name: "Linda Wilson",
+    email: "linda.wilson@mobileapps.dev",
+    company: "Mobile Apps Dev",
+    title: "Mobile Developer",
+    status: "Not Contacted",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Never",
+    contactMethods: ["linkedin"]
+  },
+  {
+    id: 9,
+    name: "Thomas Taylor",
+    email: "thomas.taylor@aiinnovations.net",
+    company: "AI Innovations",
+    title: "AI Researcher",
+    status: "Contacted",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 20, 2023",
+    contactMethods: ["email", "call"]
+  },
+  {
+    id: 10,
+    name: "Sophia Anderson",
+    email: "sophia.anderson@biotech.org",
+    company: "BioTech Solutions",
+    title: "Biologist",
+    status: "Replied",
+    campaign: "Q1 Tech Companies",
+    lastContact: "Mar 22, 2023",
+    contactMethods: ["email"]
   }
 ];
-

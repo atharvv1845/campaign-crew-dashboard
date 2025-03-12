@@ -12,6 +12,7 @@ import CreateCampaign from '../CreateCampaign';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OutreachSummary from './OutreachSummary';
 import MessageSequence from './MessageSequence';
+import CampaignReports from './CampaignReports';
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,7 @@ const CampaignDetail: React.FC = () => {
   // For now, we'll just use our mock data
   const campaign = {
     ...campaignData,
+    contacted: campaignData.leads - Math.floor(campaignData.leads * 0.15), // Add missing contacted property
     teamMembers: ['John Smith', 'Sarah Lee', 'Alex Chen', 'Mia Johnson'], // Add team members for dropdown assignments
     stages: [
       { id: 1, name: 'Not Contacted', count: 24 },
@@ -67,10 +69,11 @@ const CampaignDetail: React.FC = () => {
       
       {/* Campaign details tabs */}
       <Tabs defaultValue="leads">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="leads">Lead Tracking</TabsTrigger>
           <TabsTrigger value="message">Message Sequence</TabsTrigger>
           <TabsTrigger value="outreach">Outreach Summary</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
         
         <TabsContent value="leads" className="mt-6">
@@ -94,6 +97,10 @@ const CampaignDetail: React.FC = () => {
         
         <TabsContent value="outreach" className="mt-6">
           <OutreachSummary campaign={campaign} teamMembers={campaign.teamMembers} />
+        </TabsContent>
+        
+        <TabsContent value="reports" className="mt-6">
+          <CampaignReports campaign={campaign} />
         </TabsContent>
       </Tabs>
       

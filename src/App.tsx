@@ -1,93 +1,33 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import Campaigns from "./pages/Campaigns";
-import CampaignDetail from "./pages/CampaignDetail";
-import CampaignManagement from "./pages/CampaignManagement";
-import Leads from "./pages/Leads";
-import Messaging from "./pages/Messaging";
-import NotFound from "./pages/NotFound";
-import MainLayout from "./components/layout/MainLayout";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from '@/components/ui/toaster';
+import Dashboard from './pages/Dashboard';
+import Campaigns from './pages/Campaigns';
+import CampaignDetail from './pages/CampaignDetail';
+import Leads from './pages/Leads';
+import Messaging from './pages/Messaging';
+import NotFound from './pages/NotFound';
+import MainLayout from './components/layout/MainLayout';
+import Reports from './pages/Reports';
+import './App.css';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Pages with main layout */}
-          <Route
-            path="/dashboard"
-            element={
-              <MainLayout>
-                <Dashboard />
-              </MainLayout>
-            }
-          />
-          
-          <Route
-            path="/campaigns"
-            element={
-              <MainLayout>
-                <CampaignManagement />
-              </MainLayout>
-            }
-            data-testid="campaigns-route"
-          />
-          
-          <Route
-            path="/campaigns/list"
-            element={
-              <MainLayout>
-                <Campaigns />
-              </MainLayout>
-            }
-          />
-          
-          <Route
-            path="/campaigns/:id"
-            element={
-              <MainLayout>
-                <CampaignDetail />
-              </MainLayout>
-            }
-            data-testid="campaign-detail-route"
-          />
-          
-          <Route
-            path="/leads"
-            element={
-              <MainLayout>
-                <Leads />
-              </MainLayout>
-            }
-          />
-          
-          <Route
-            path="/messaging"
-            element={
-              <MainLayout>
-                <Messaging />
-              </MainLayout>
-            }
-          />
-          
-          {/* Catch-all route */}
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="campaigns" element={<Campaigns />} />
+          <Route path="campaigns/:id" element={<CampaignDetail />} />
+          <Route path="leads" element={<Leads />} />
+          <Route path="messaging" element={<Messaging />} />
+          <Route path="reports" element={<Reports />} />
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+        </Route>
+      </Routes>
+      <Toaster />
+    </Router>
+  );
+}
 
 export default App;

@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { Node, Edge } from 'reactflow';
 import { MessageStepData, DelayStepData, ConditionStepData } from '../types/campaignTypes';
@@ -22,74 +21,38 @@ export function useNodeOperations({
     return {
       type,
       setNodeData: (data: MessageStepData | DelayStepData | ConditionStepData) => {
-        const id = (nodes.length + 1).toString();
-        let newNode: Node;
+        const newNodeId = (nodes.length + 1).toString();
+        let position = { 
+          x: 250, 
+          y: nodes.length > 0 ? nodes[nodes.length - 1].position.y + 150 : 100 
+        };
 
-        if (type === 'message') {
-          const messageData = data as MessageStepData;
-          const nodeLabel = messageData.label || `Message ${id}`;
-          newNode = {
-            id,
-            type: 'messageNode',
-            position: { x: 250, y: nodes.length * 150 + 100 },
-            data: {
-              label: nodeLabel,
-              channel: messageData.channel || 'email',
-              message: messageData.message,
-              assignedTo: messageData.assignedTo,
-              templateId: messageData.templateId,
-              subject: messageData.subject,
-            },
-          };
-        } else if (type === 'delay') {
-          const delayData = data as DelayStepData;
-          const nodeLabel = delayData.label || `Delay ${id}`;
-          newNode = {
-            id,
-            type: 'delayNode',
-            position: { x: 250, y: nodes.length * 150 + 100 },
-            data: {
-              label: nodeLabel,
-              days: delayData.days,
-              hours: delayData.hours,
-            },
-          };
-        } else {
-          const conditionData = data as ConditionStepData;
-          const nodeLabel = conditionData.label || `Condition ${id}`;
-          newNode = {
-            id,
-            type: 'conditionNode',
-            position: { x: 250, y: nodes.length * 150 + 100 },
-            data: {
-              label: nodeLabel,
-              condition: conditionData.condition,
-              action: conditionData.action,
-              targetStage: conditionData.targetStage,
-              waitDays: conditionData.waitDays,
-            },
-          };
-        }
+        let newNode: Node = {
+          id: newNodeId,
+          type: `${type}Node`,
+          position,
+          data: {
+            ...data,
+            label: data.label || `${type.charAt(0).toUpperCase() + type.slice(1)} ${newNodeId}`
+          },
+        };
 
-        setNodes((prevNodes) => [...prevNodes, newNode]);
+        setNodes(prevNodes => [...prevNodes, newNode]);
 
-        // If there are existing nodes, create an edge from the last node to the new node
+        // Create edge from last node to new node if there are existing nodes
         if (nodes.length > 0) {
           const lastNodeId = nodes[nodes.length - 1].id;
           const newEdge: Edge = {
-            id: `e${lastNodeId}-${id}`,
+            id: `e${lastNodeId}-${newNodeId}`,
             source: lastNodeId,
-            target: id,
+            target: newNodeId,
             animated: true,
           };
-          setEdges((prevEdges) => [...prevEdges, newEdge]);
+          setEdges(prevEdges => [...prevEdges, newEdge]);
         }
-        
-        console.log("Added new node:", newNode);
-        console.log("Current nodes:", [...nodes, newNode]);
       }
     };
-  }, [nodes, edges, setNodes, setEdges]);
+  }, [nodes, setNodes, setEdges]);
 
   const updateNode = useCallback((nodeId: string, nodeType: 'message' | 'delay' | 'condition', data: MessageStepData | DelayStepData | ConditionStepData) => {
     setNodes((nds) =>

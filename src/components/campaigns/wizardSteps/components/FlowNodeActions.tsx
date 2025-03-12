@@ -33,6 +33,7 @@ const FlowNodeActions = ({
     setNodeType(type);
     setSelectedNode(null);
     
+    // Initialize appropriate data structure based on node type
     if (type === 'message') {
       setNodeData({
         message: '',
@@ -63,22 +64,50 @@ const FlowNodeActions = ({
 
   const handleSaveNode = () => {
     if (!validateMessageData(nodeType, nodeData)) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
       return;
     }
     
-    if (selectedNode) {
-      updateNode(selectedNode, nodeType, nodeData);
-    } else {
-      const { setNodeData: setNewNodeData } = addNode(nodeType);
-      setNewNodeData(nodeData);
+    try {
+      if (selectedNode) {
+        // Update existing node
+        updateNode(selectedNode, nodeType, {...nodeData});
+        toast({
+          title: "Success",
+          description: "Node updated successfully"
+        });
+      } else {
+        // Add new node
+        const nodeHandler = addNode(nodeType);
+        nodeHandler.setNodeData({...nodeData});
+        toast({
+          title: "Success",
+          description: "New node added to flow"
+        });
+      }
+      setShowNodeModal(false);
+    } catch (error) {
+      console.error('Error saving node:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save node changes",
+        variant: "destructive"
+      });
     }
-    setShowNodeModal(false);
   };
 
   const handleDeleteNode = () => {
     if (selectedNode) {
       deleteNode(selectedNode);
       setShowNodeModal(false);
+      toast({
+        title: "Success",
+        description: "Node deleted successfully"
+      });
     }
   };
 

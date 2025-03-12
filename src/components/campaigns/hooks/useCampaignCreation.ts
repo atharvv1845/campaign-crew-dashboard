@@ -78,7 +78,7 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
           channels: formData.channels,
           leads: formData.leads.length,
           teamMembers: Object.values(formData.teamAssignments).flat(),
-          description: formData.description // Make sure description is updated
+          description: formData.description
         };
         
         toast({
@@ -87,9 +87,11 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         });
       }
     } else {
-      // Create a new campaign
+      // Create a new campaign with a numeric ID
+      const newId = Math.max(0, ...campaignData.map(c => Number(c.id))) + 1;
+      
       const newCampaign = {
-        id: campaignData.length + 1,
+        id: newId,
         name: formData.name,
         status: 'Active',
         type: 'Email',
@@ -101,7 +103,7 @@ export const useCampaignCreation = (onClose: () => void, existingCampaign?: any)
         conversion: '0%',
         teamMembers: Object.values(formData.teamAssignments).flat(),
         createdAt: new Date().toISOString().split('T')[0],
-        description: formData.description // Add description property
+        description: formData.description
       };
 
       campaignData.unshift(newCampaign);

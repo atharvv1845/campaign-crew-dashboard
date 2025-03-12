@@ -18,11 +18,19 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
     navigate(`/campaigns/${campaign.id}`);
   };
 
+  const handleRowClick = (e: React.MouseEvent) => {
+    // Prevent navigation when clicking on action buttons
+    if ((e.target as HTMLElement).closest('.campaign-action')) {
+      return;
+    }
+    handleCampaignClick();
+  };
+
   return (
     <tr 
       key={campaign.id}
       className="hover:bg-muted/20 transition-colors cursor-pointer"
-      onClick={handleCampaignClick}
+      onClick={handleRowClick}
     >
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm font-medium">{campaign.name}</div>
@@ -47,7 +55,7 @@ const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusC
           : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.createdAt}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm campaign-action">
         <CampaignRowActions 
           campaign={campaign} 
           onStatusChange={onStatusChange}

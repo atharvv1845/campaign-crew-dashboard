@@ -37,10 +37,12 @@ export const useStepOperations = (
   };
   
   const handleUpdateStep = () => {
-    if (!setEditingStepData) return;
+    // Fix: Don't try to use setEditingStepData directly as a condition
+    if (!editingStepData) return;
     
+    // Fix: Use the proper way to update sequence based on editingStep and editingStepData
     setSequence(sequence.map(step => 
-      step.id === setEditingStep ? setEditingStepData : step
+      step.id === editingStep ? editingStepData : step
     ));
     
     setEditingStep(null);

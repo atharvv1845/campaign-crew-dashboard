@@ -8,7 +8,7 @@ import useCampaignCreation from './hooks/useCampaignCreation';
 import CampaignSetup from './wizardSteps/CampaignSetup';
 import LeadStages from './wizardSteps/LeadStages';
 import TeamAssignment from './wizardSteps/TeamAssignment';
-import ReviewLaunch from './wizardSteps/ReviewLaunch';
+import { ReviewLaunch } from './wizardSteps/ReviewLaunch';
 import WizardProgress from './wizardSteps/WizardProgress';
 import LeadImport from './wizardSteps/LeadImport';
 import MessageFlow from './wizardSteps/MessageFlow';

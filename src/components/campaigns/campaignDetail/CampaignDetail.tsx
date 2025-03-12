@@ -67,7 +67,7 @@ const CampaignDetail: React.FC = () => {
     responses: campaign.responses || 0,
     positive: campaign.positive || 0,
     negative: campaign.negative || 0,
-    leads: campaign.leads || [],  // Ensure leads is an array
+    leads: campaign.leads || [],  // This can be either an array or a count number
     contacted: campaign.contacted || 0,
     stages: campaign.stages || []
   };

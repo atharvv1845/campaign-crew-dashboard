@@ -15,14 +15,23 @@ const CampaignDetail: React.FC = () => {
   const { loading, campaign, refreshCampaign, updateCampaign } = useCampaignData(id);
   const { handleEditCampaign, handleExportCampaign, handleImportCampaign } = useCampaignActions();
   const [showEditCampaign, setShowEditCampaign] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  // Force a refresh when loading a new campaign
+  // Only force a refresh on initial load or when ID changes, but not on every render
   useEffect(() => {
-    if (id) {
-      console.log('Campaign ID changed, refreshing data for ID:', id);
+    if (id && !initialLoadDone) {
+      console.log('Initial campaign load for ID:', id);
       refreshCampaign();
+      setInitialLoadDone(true);
     }
-  }, [id, refreshCampaign]);
+  }, [id, refreshCampaign, initialLoadDone]);
+
+  // Reset initialLoadDone when ID changes
+  useEffect(() => {
+    return () => {
+      setInitialLoadDone(false);
+    };
+  }, [id]);
 
   // Handle edit campaign modal
   const handleEditCampaignClick = () => {
@@ -32,11 +41,12 @@ const CampaignDetail: React.FC = () => {
   const handleCloseEditCampaign = (updatedCampaign?: any) => {
     setShowEditCampaign(false);
     if (updatedCampaign) {
+      // Only refresh after edit is complete
       refreshCampaign();
     }
   };
 
-  if (loading) {
+  if (loading && !initialLoadDone) {
     return <CampaignLoading />;
   }
 

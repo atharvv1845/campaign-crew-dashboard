@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { campaignData } from '../../campaignData';
 import { useNavigate } from 'react-router-dom';
@@ -10,14 +10,27 @@ export const useCampaignData = (id: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const [campaign, setCampaign] = useState<any>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isFetching, setIsFetching] = useState(false);
 
-  const refreshCampaign = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
+  const refreshCampaign = useCallback(() => {
+    if (!isFetching) {
+      setRefreshTrigger(prev => prev + 1);
+    }
+  }, [isFetching]);
 
   useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      setCampaign(null);
+      return;
+    }
+
     const fetchCampaign = async () => {
+      if (isFetching) return;
+      
+      setIsFetching(true);
       setLoading(true);
+      
       try {
         // Simulate API call with setTimeout
         setTimeout(() => {
@@ -42,6 +55,9 @@ export const useCampaignData = (id: string | undefined) => {
             // Ensure all required fields are present to prevent errors
             const sanitizedCampaign = {
               ...foundCampaign,
+              id: foundCampaign.id,
+              name: foundCampaign.name || 'Untitled Campaign',
+              description: foundCampaign.description || '',
               channels: foundCampaign.channels || [],
               teamMembers: foundCampaign.teamMembers || [],
               createdAt: foundCampaign.createdAt || new Date().toISOString().slice(0, 10),
@@ -64,6 +80,7 @@ export const useCampaignData = (id: string | undefined) => {
             });
           }
           setLoading(false);
+          setIsFetching(false);
         }, 500);
       } catch (error) {
         console.error('Error fetching campaign:', error);
@@ -73,18 +90,14 @@ export const useCampaignData = (id: string | undefined) => {
           variant: "destructive",
         });
         setLoading(false);
+        setIsFetching(false);
       }
     };
 
-    if (id) {
-      fetchCampaign();
-    } else {
-      setLoading(false);
-      setCampaign(null);
-    }
+    fetchCampaign();
   }, [id, toast, refreshTrigger, navigate]);
 
-  const updateCampaign = (updatedData: Partial<any>) => {
+  const updateCampaign = useCallback((updatedData: Partial<any>) => {
     if (!campaign) return;
     
     const campaignIndex = campaignData.findIndex(c => c.id === Number(id));
@@ -103,7 +116,7 @@ export const useCampaignData = (id: string | undefined) => {
       title: "Campaign Updated",
       description: "The campaign has been updated successfully."
     });
-  };
+  }, [campaign, id, toast]);
 
   return { loading, campaign, refreshCampaign, updateCampaign };
 };

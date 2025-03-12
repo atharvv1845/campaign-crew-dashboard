@@ -32,11 +32,10 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
           />
         </th>
       )}
-      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Lead</th>
-      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Company</th>
+      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Platforms</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Contacted</th>
-      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Follow-up Date</th>
+      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Next Follow-up</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Stage</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Assigned To</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Notes</th>

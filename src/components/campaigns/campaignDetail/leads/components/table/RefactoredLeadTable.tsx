@@ -73,7 +73,7 @@ const RefactoredLeadTable: React.FC<RefactoredLeadTableProps> = ({
               ))
             ) : (
               <tr>
-                <td colSpan={10} className="py-6 text-center text-muted-foreground">
+                <td colSpan={9} className="py-6 text-center text-muted-foreground">
                   No leads found for this campaign
                 </td>
               </tr>

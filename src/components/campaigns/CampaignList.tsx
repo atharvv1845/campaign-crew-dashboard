@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -20,56 +19,43 @@ const CampaignList: React.FC = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [createdCampaign, setCreatedCampaign] = useState<CampaignFormData | null>(null);
   
-  // Update campaigns when campaignData changes or when modal closes
+  const refreshList = () => {
+    console.log("Manually refreshing campaign list");
+    setCampaigns([...campaignData]); // Directly update campaigns state
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   useEffect(() => {
     console.log("Refreshing campaign list data, found:", campaignData.length, "campaigns");
-    // Create a deep copy to avoid reference issues
-    const campaignsCopy = JSON.parse(JSON.stringify(campaignData));
     
-    // Ensure each campaign has all required fields with default values
-    const sanitizedCampaigns = campaignsCopy.map((campaign: any) => ({
-      ...campaign,
+    const sanitizedCampaigns = campaignData.map(campaign => ({
+      id: campaign.id,
+      name: campaign.name || 'Untitled Campaign',
+      description: campaign.description || '',
+      status: campaign.status || 'Draft',
+      type: campaign.type || 'Email',
       channels: campaign.channels || [],
-      teamMembers: campaign.teamMembers || [],
-      createdAt: campaign.createdAt || new Date().toISOString().slice(0, 10),
       leads: campaign.leads || 0,
       responses: campaign.responses || 0,
       positive: campaign.positive || 0,
       negative: campaign.negative || 0,
       conversion: campaign.conversion || '0%',
+      teamMembers: campaign.teamMembers || [],
+      createdAt: campaign.createdAt || new Date().toISOString().slice(0, 10),
       contacted: campaign.contacted || 0,
       stages: campaign.stages || [],
       messageFlow: campaign.messageFlow || { nodes: [], edges: [] }
     }));
     
     setCampaigns(sanitizedCampaigns);
-  }, [showCreateCampaign, refreshTrigger]);
-  
-  // Filter campaigns based on search term and status
-  const filteredCampaigns = campaigns.filter(campaign => {
-    // Apply search filter
-    const matchesSearch = 
-      campaign.name.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Apply status filter if not "All"
-    const matchesStatus = statusFilter === 'All' || campaign.status === statusFilter;
-    
-    // Return true if both conditions are met
-    return matchesSearch && matchesStatus;
-  });
+  }, [refreshTrigger, showCreateCampaign]);
   
   const handleCampaignCreated = (campaign: CampaignFormData) => {
-    // Find the new campaign in the campaignData array
     const newCampaignId = campaignData[campaignData.length - 1].id;
     console.log("New campaign created with ID:", newCampaignId, "Total campaigns:", campaignData.length);
     
-    // Force refresh of campaign data
-    setRefreshTrigger(prev => prev + 1);
-    
-    // Close the campaign creation modal
+    refreshList(); // Refresh the list immediately
     setShowCreateCampaign(false);
-    
-    // Set the created campaign to show the summary
     setCreatedCampaign(campaign);
     
     toast({
@@ -77,23 +63,21 @@ const CampaignList: React.FC = () => {
       description: "Campaign has been successfully created."
     });
     
-    // Navigate to the new campaign after a short delay
     setTimeout(() => {
       console.log("Navigating to newly created campaign:", newCampaignId);
-      refreshList(); // Refresh list before navigation
       navigate(`/campaigns/${newCampaignId}`);
-    }, 2500); // Increased delay to ensure campaign is fully processed
+    }, 1000);
   };
   
-  const refreshList = () => {
-    console.log("Manually refreshing campaign list");
-    setRefreshTrigger(prev => prev + 1);
-  };
+  const filteredCampaigns = campaigns.filter(campaign => {
+    const matchesSearch = campaign.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || campaign.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
   
   const handleLeadUpdate = (leadId: string, updates: Partial<LeadData>) => {
     if (!createdCampaign) return;
     
-    // Update the lead in the created campaign
     const updatedLeads = createdCampaign.leads.map(lead => 
       lead.id === leadId ? { ...lead, ...updates } : lead
     );
@@ -103,7 +87,6 @@ const CampaignList: React.FC = () => {
       leads: updatedLeads
     });
     
-    // In a real app, this would also update the lead in the database
     console.log(`Updated lead ${leadId} with`, updates);
   };
   
@@ -153,7 +136,7 @@ const CampaignList: React.FC = () => {
           campaign={createdCampaign}
           onClose={() => {
             setCreatedCampaign(null);
-            refreshList(); // Refresh campaign list after closing summary
+            refreshList();
           }}
           onLeadUpdate={handleLeadUpdate}
         />

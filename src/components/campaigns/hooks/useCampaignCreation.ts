@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -78,94 +77,63 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
     }, 300);
   }, [onClose]);
 
-  // Handle form submission
   const handleSubmit = useCallback(() => {
-    // Validate form
+    // Basic validation
     if (!formData.name.trim()) {
       toast({
         title: "Validation Error",
         description: "Campaign name is required",
         variant: "destructive"
       });
-      setCurrentStep(1); // Go back to the first step
       return;
     }
 
-    // Generate new campaign ID or use existing
+    // Generate new campaign ID
     const campaignId = existingCampaign 
       ? existingCampaign.id 
       : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
     
     console.log("Creating campaign with ID:", campaignId);
     
-    // Create a sanitized version of messageFlow to avoid circular references
-    const messageFlow = formData.messageFlow ? {
-      nodes: formData.messageFlow.nodes.map(node => ({
-        id: node.id,
-        type: node.type,
-        position: { ...node.position },
-        data: { ...node.data }
-      })),
-      edges: formData.messageFlow.edges ? formData.messageFlow.edges.map(edge => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        animated: edge.animated,
-        sourceHandle: edge.sourceHandle,
-        targetHandle: edge.targetHandle
-      })) : []
-    } : { nodes: [], edges: [] };
-    
     const newCampaign = {
       id: campaignId,
       name: formData.name,
       description: formData.description,
-      status: 'Active', // Always set to Active for better visibility
-      type: 'Email', // Default type
-      channels: formData.channels.map(channel => {
-        // Convert channel id to display name (first letter uppercase)
-        return channel.charAt(0).toUpperCase() + channel.slice(1);
-      }),
+      status: 'Active',
+      type: 'Email',
+      channels: formData.channels,
       leads: formData.leads.length,
       responses: 0,
       positive: 0,
       negative: 0,
       conversion: '0%',
-      teamMembers: formData.team || [],
+      teamMembers: formData.team,
       createdAt: new Date().toISOString().slice(0, 10),
       contacted: 0,
-      messageFlow: messageFlow,
-      stages: formData.stages || [],
+      messageFlow: formData.messageFlow || { nodes: [], edges: [] },
+      stages: formData.stages
     };
 
     try {
       if (existingCampaign) {
-        // Find and update existing campaign
+        // Update existing campaign
         const index = campaignData.findIndex(c => c.id === existingCampaign.id);
         if (index !== -1) {
           campaignData[index] = { ...campaignData[index], ...newCampaign };
           console.log("Updated existing campaign:", campaignData[index]);
-          toast({
-            title: "Campaign Updated",
-            description: `${formData.name} has been updated.`
-          });
         }
       } else {
-        // Add new campaign to the list
+        // Add new campaign
         campaignData.push(newCampaign);
         console.log("Added new campaign:", newCampaign, "Total campaigns now:", campaignData.length);
-        console.log("Campaign data array now contains:", campaignData.map(c => c.id));
-        toast({
-          title: "Campaign Created",
-          description: `${formData.name} has been created successfully.`
-        });
       }
 
-      // Close the form with animation and pass the campaign data
+      // Close form with animation
       setExitAnimation(true);
       setTimeout(() => {
         onClose(formData);
       }, 300);
+      
     } catch (error) {
       console.error("Error saving campaign:", error);
       toast({
@@ -180,10 +148,13 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
     currentStep,
     formData,
     setFormData,
-    nextStep,
-    prevStep,
+    nextStep: () => setCurrentStep(prev => prev < 6 ? prev + 1 : prev),
+    prevStep: () => setCurrentStep(prev => prev > 1 ? prev - 1 : prev),
     handleSubmit,
-    handleClose,
+    handleClose: () => {
+      setExitAnimation(true);
+      setTimeout(() => onClose(), 300);
+    },
     exitAnimation
   };
 };

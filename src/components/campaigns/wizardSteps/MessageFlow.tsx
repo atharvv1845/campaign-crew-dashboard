@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import ReactFlow, { Background, Controls, NodeTypes } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -62,6 +63,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
     initialEdges: formData.messageFlow?.edges?.length ? formData.messageFlow.edges : initialEdges 
   });
 
+  // Update parent formData whenever nodes or edges change
   useEffect(() => {
     setFormData(prev => ({
       ...prev,

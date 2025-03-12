@@ -1,66 +1,43 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignStatusBadge from './CampaignStatusBadge';
-import ChannelBadge from './ChannelBadge';
 import CampaignRowActions from './CampaignRowActions';
-import { CampaignData } from './campaignData';
+import ChannelBadge from './ChannelBadge';
 
 interface CampaignTableRowProps {
-  campaign: CampaignData;
-  onStatusChange: () => void;
+  campaign: any;
 }
 
-const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign, onStatusChange }) => {
+const CampaignTableRow: React.FC<CampaignTableRowProps> = ({ campaign }) => {
   const navigate = useNavigate();
-  
-  const handleCampaignClick = () => {
-    navigate(`/campaigns/${campaign.id}`);
-  };
 
-  const handleRowClick = (e: React.MouseEvent) => {
-    // Prevent navigation when clicking on action buttons
-    if ((e.target as HTMLElement).closest('.campaign-action')) {
-      return;
-    }
-    handleCampaignClick();
+  const handleRowClick = () => {
+    // Navigate to campaign detail page with the specific campaign ID
+    navigate(`/campaigns/${campaign.id}`);
   };
 
   return (
     <tr 
-      key={campaign.id}
-      className="hover:bg-muted/20 transition-colors cursor-pointer"
+      className="border-b border-border hover:bg-muted/40 cursor-pointer transition-colors"
       onClick={handleRowClick}
-      data-testid={`campaign-row-${campaign.id}`}
     >
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium">{campaign.name}</div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <CampaignStatusBadge status={campaign.status} />
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex flex-wrap gap-1">
-          {campaign.channels.map((channel, idx) => (
-            <ChannelBadge key={idx} channel={channel} />
+      <td className="p-4 font-medium">{campaign.name}</td>
+      <td className="p-4">{campaign.type}</td>
+      <td className="p-4">
+        <div className="flex items-center gap-1">
+          {campaign.channels.map((channel: string) => (
+            <ChannelBadge key={channel} channel={channel} />
           ))}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.leads.toLocaleString()}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.responses.toLocaleString()}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-        {campaign.teamMembers.length > 0 
-          ? campaign.teamMembers.length > 1 
-            ? `${campaign.teamMembers[0]} +${campaign.teamMembers.length - 1}`
-            : campaign.teamMembers[0]
-          : '-'}
+      <td className="p-4">{campaign.leads}</td>
+      <td className="p-4">{campaign.responses}</td>
+      <td className="p-4">
+        <CampaignStatusBadge status={campaign.status} />
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">{campaign.createdAt}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm campaign-action">
-        <CampaignRowActions 
-          campaign={campaign} 
-          onStatusChange={onStatusChange}
-        />
+      <td className="p-4">{campaign.createdAt}</td>
+      <td className="p-4">
+        <CampaignRowActions campaign={campaign} />
       </td>
     </tr>
   );

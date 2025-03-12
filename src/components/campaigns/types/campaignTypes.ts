@@ -1,4 +1,3 @@
-
 import { Node, Edge } from 'reactflow';
 
 // Campaign form data structure
@@ -17,6 +16,27 @@ export interface CampaignFormData {
     edges: Edge[];
   };
   stepFlows: Record<string, MessageStep[]>;
+}
+
+// Campaign data structure
+export interface CampaignData {
+  id: number | string;
+  name: string;
+  status: string;
+  type: string;
+  channels: string[];
+  leads: number;
+  responses: number;
+  positive: number;
+  negative: number;
+  conversion: string;
+  teamMembers: string[];
+  createdAt: string;
+  description: string;
+  messageFlow?: {
+    nodes: Node[];
+    edges: Edge[];
+  };
 }
 
 // Lead data structure
@@ -46,7 +66,7 @@ export interface StageData {
   name: string;
   description: string;
   color: string;
-  order?: number; // Add order property
+  order?: number;
 }
 
 // Message step data

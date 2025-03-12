@@ -42,11 +42,25 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                     <option value="email">Email</option>
                     <option value="company">Company</option>
                     <option value="phone">Phone</option>
-                    <option value="linkedin">LinkedIn</option>
-                    <option value="twitter">Twitter</option>
-                    <option value="status">Status</option>
-                    <option value="assignedTo">Assigned To</option>
                     <option value="notes">Notes</option>
+                    <option value="currentStage">Stage</option>
+                    <option value="assignedTo">Assigned To</option>
+                    
+                    {/* Social profiles grouped under "Platforms" column */}
+                    <optgroup label="Platform Links">
+                      <option value="linkedin">LinkedIn</option>
+                      <option value="twitter">Twitter</option>
+                      <option value="facebook">Facebook</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="whatsapp">WhatsApp</option>
+                    </optgroup>
+                    
+                    {/* Contact dates */}
+                    <optgroup label="Contact Dates">
+                      <option value="firstContacted">First Contacted</option>
+                      <option value="lastContacted">Last Contacted</option>
+                      <option value="followUpDate">Next Follow Up</option>
+                    </optgroup>
                   </select>
                 </td>
               </tr>

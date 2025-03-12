@@ -61,6 +61,7 @@ export interface LeadData {
     whatsapp?: string;
   };
   source?: string;
+  statusName?: string; // Added this optional property for temporary use during import
 }
 
 // Stage data structure

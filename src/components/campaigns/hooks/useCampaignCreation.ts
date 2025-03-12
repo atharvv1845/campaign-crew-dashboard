@@ -12,11 +12,11 @@ const defaultFormData: CampaignFormData = {
   leads: [],
   flows: [],
   stages: [
-    { id: "1", name: "New Lead", description: "Initial outreach not yet started" },
-    { id: "2", name: "Contacted", description: "First contact made" },
-    { id: "3", name: "Interested", description: "Showed interest" },
-    { id: "4", name: "Meeting", description: "Meeting scheduled" },
-    { id: "5", name: "Qualified", description: "Ready for opportunity" }
+    { id: "1", name: "New Lead", description: "Initial outreach not yet started", color: "bg-blue-500" },
+    { id: "2", name: "Contacted", description: "First contact made", color: "bg-purple-500" },
+    { id: "3", name: "Interested", description: "Showed interest", color: "bg-green-500" },
+    { id: "4", name: "Meeting", description: "Meeting scheduled", color: "bg-yellow-500" },
+    { id: "5", name: "Qualified", description: "Ready for opportunity", color: "bg-orange-500" }
   ],
   team: [],
   messageFlow: {

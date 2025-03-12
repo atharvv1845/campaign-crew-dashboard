@@ -21,6 +21,7 @@ const ImportedLeadsTable: React.FC<ImportedLeadsTableProps> = ({ leads }) => {
               <th className="px-4 py-2 text-left">Name</th>
               <th className="px-4 py-2 text-left">Email</th>
               <th className="px-4 py-2 text-left">Company</th>
+              <th className="px-4 py-2 text-left">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -29,6 +30,7 @@ const ImportedLeadsTable: React.FC<ImportedLeadsTableProps> = ({ leads }) => {
                 <td className="px-4 py-2">{`${lead.firstName} ${lead.lastName}`}</td>
                 <td className="px-4 py-2">{lead.email}</td>
                 <td className="px-4 py-2">{lead.company || '-'}</td>
+                <td className="px-4 py-2">{lead.statusName || '-'}</td>
               </tr>
             ))}
           </tbody>

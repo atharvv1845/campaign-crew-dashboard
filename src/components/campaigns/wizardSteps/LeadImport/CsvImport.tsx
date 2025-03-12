@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CampaignFormData } from '../../types/campaignTypes';
 import { useToast } from "@/hooks/use-toast";
@@ -68,8 +67,7 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
       const initialStageId = formData.stages[0]?.id || '';
       const newLeads = await processLeadsFromCsv(csvFile, csvMapping, initialStageId, generateId);
       
-      // Handle stage mapping if there's a status column
-      newLeads.forEach(lead => {
+      const leadsWithStages = newLeads.map(lead => {
         if (lead.statusName) {
           const stage = formData.stages.find(s => 
             s.name.toLowerCase() === lead.statusName.toLowerCase()
@@ -77,20 +75,21 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
           if (stage) {
             lead.status = stage.id;
           }
-          delete lead.statusName; // Clean up temporary property
+          // We'll keep statusName property for display purposes
         }
+        return lead;
       });
       
       setFormData(prev => ({
         ...prev,
-        leads: [...prev.leads, ...newLeads]
+        leads: [...prev.leads, ...leadsWithStages]
       }));
       
-      setImportedLeads(newLeads);
+      setImportedLeads(leadsWithStages);
       
       toast({
         title: "Leads Imported",
-        description: `Successfully imported ${newLeads.length} leads from CSV.`,
+        description: `Successfully imported ${leadsWithStages.length} leads from CSV.`,
       });
       
       setCsvPreview([]);
@@ -147,7 +146,7 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         </div>
       )}
       
-      <ImportedLeadsTable leads={formData.leads} />
+      <ImportedLeadsTable leads={importedLeads.length > 0 ? importedLeads : formData.leads} />
     </div>
   );
 };

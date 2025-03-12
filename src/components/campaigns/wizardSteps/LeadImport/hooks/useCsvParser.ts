@@ -133,8 +133,8 @@ export const useCsvParser = () => {
               } else if (mappingKey === 'phone') {
                 leadData.phone = value;
               } else if (mappingKey === 'status') {
-                // Status is handled by the caller with the stages
-                leadData.statusName = value;
+                // Store the status name as a property we can use later
+                leadData.statusName = value; 
               } else if (mappingKey === 'assignedTo') {
                 leadData.assignedTo = value;
               } else if (mappingKey === 'notes') {

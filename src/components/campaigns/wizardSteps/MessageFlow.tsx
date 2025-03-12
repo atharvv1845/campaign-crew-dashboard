@@ -419,7 +419,7 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
                     rows={6}
                   />
                   <div className="text-xs text-muted-foreground">
-                    Use {{firstName}}, {{company}}, etc. for personalization.
+                    Use {"{{firstName}}"}, {"{{company}}"}, etc. for personalization.
                   </div>
                 </div>
               </>

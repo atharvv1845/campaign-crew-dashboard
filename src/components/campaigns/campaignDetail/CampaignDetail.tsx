@@ -7,10 +7,12 @@ import CampaignDescription from './CampaignDescription';
 import StatCards from './StatCards';
 import LeadTracking from './LeadTracking';
 import MessageSequence from './MessageSequence';
-import OutreachSummary from './outreachSummary';
+import OutreachSummary from './outreachSummary'; // Import as a named import, not default
 import ChannelsAndStages from './ChannelsAndStages';
 import CampaignReports from './CampaignReports';
+import CampaignExportImport from './components/CampaignExportImport';
 import { campaignData } from '../campaignData';
+import { leadsData } from './mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 
@@ -19,6 +21,15 @@ const CampaignDetail: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [campaign, setCampaign] = useState<any>(null);
+  const [view, setView] = useState<'table' | 'kanban'>('table');
+  
+  const handleEditCampaign = () => {
+    // Edit campaign logic would go here
+    toast({
+      title: "Edit Campaign",
+      description: "Campaign editing feature is not yet implemented.",
+    });
+  };
   
   useEffect(() => {
     // Simulate API call to fetch campaign details
@@ -75,7 +86,10 @@ const CampaignDetail: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <CampaignHeader campaign={campaign} />
+      <div className="flex justify-between">
+        <CampaignHeader campaign={campaign} onEdit={handleEditCampaign} />
+        <CampaignExportImport campaignId={campaign.id} />
+      </div>
       
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="w-full justify-start mb-6">
@@ -87,9 +101,9 @@ const CampaignDetail: React.FC = () => {
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6">
-          <StatCards stats={campaign} />
+          <StatCards campaign={campaign} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CampaignDescription campaign={campaign} />
+            <CampaignDescription data={campaign} />
             <ChannelsAndStages campaign={campaign} />
           </div>
           <Separator />
@@ -97,7 +111,12 @@ const CampaignDetail: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="leads" className="space-y-6">
-          <LeadTracking campaign={campaign} />
+          <LeadTracking 
+            campaign={campaign} 
+            leadsData={leadsData} 
+            view={view} 
+            setView={setView} 
+          />
         </TabsContent>
         
         <TabsContent value="sequence" className="space-y-6">
@@ -109,11 +128,19 @@ const CampaignDetail: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="settings" className="space-y-6">
-          <h2 className="text-xl font-semibold">Campaign Settings</h2>
-          <p className="text-muted-foreground">
-            Configure your campaign settings, notifications, and automation rules.
-          </p>
-          {/* Settings content would go here */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Campaign Settings</h2>
+            <p className="text-muted-foreground">
+              Configure your campaign settings, notifications, and automation rules.
+            </p>
+            <div className="mt-4">
+              <h3 className="text-lg font-medium mb-2">Export & Import</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Download your campaign configuration or upload a previously exported one.
+              </p>
+              <CampaignExportImport campaignId={campaign.id} />
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

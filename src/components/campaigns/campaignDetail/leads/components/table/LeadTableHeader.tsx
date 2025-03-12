@@ -34,7 +34,7 @@ const LeadTableHeader: React.FC<LeadTableHeaderProps> = ({
       )}
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Lead</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Company</th>
-      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Contact</th>
+      <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Platforms</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Contacted</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Follow-up Date</th>
       <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Stage</th>

@@ -1,7 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Mail, Phone, MessageSquare } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { MoreHorizontal, Mail, Phone, MessageSquare, Calendar, Edit2, ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import StageBadge from '../../../badges/StageBadge';
 import { Lead, Campaign } from '../../types';
 import {

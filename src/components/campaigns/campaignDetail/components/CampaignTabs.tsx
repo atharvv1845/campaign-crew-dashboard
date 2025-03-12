@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Lead } from '../leads/types';
@@ -38,20 +37,9 @@ const CampaignTabs: React.FC<CampaignTabsProps> = ({
       console.log('Found leads array:', campaign.leads.length);
       
       return campaign.leads.map((lead: any, index: number) => ({
-        id: lead.id || index + 1,
-        name: lead.firstName ? `${lead.firstName} ${lead.lastName || ''}` : lead.name || '',
-        email: lead.email || '',
-        company: lead.company || '',
-        currentStage: lead.status || lead.currentStage || 'New',
-        lastContacted: lead.lastContacted || '',
-        followUpDate: lead.followUpDate || '',
-        notes: lead.notes || '',
-        assignedTo: lead.assignedTo || '',
-        linkedin: lead.linkedin || lead.socialProfiles?.linkedin || '',
-        twitter: lead.twitter || lead.socialProfiles?.twitter || '',
-        whatsapp: lead.whatsapp || lead.socialProfiles?.whatsapp || '',
-        facebook: lead.facebook || lead.socialProfiles?.facebook || '',
-        instagram: lead.instagram || lead.socialProfiles?.instagram || ''
+        ...lead,
+        id: lead.id || `lead-${index}`,
+        currentStage: lead.status || lead.currentStage || 'New'
       }));
     }
     

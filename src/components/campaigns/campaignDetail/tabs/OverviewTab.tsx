@@ -14,6 +14,17 @@ interface OverviewTabProps {
 }
 
 const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData, updateCampaign }) => {
+  // Process leads to ensure required fields with defaults
+  const processedLeads = leadsData.map(lead => ({
+    ...lead,
+    id: lead.id,
+    currentStage: lead.currentStage || lead.status || 'New Lead',
+    name: lead.name || 
+          (lead.firstName && lead.lastName ? `${lead.firstName} ${lead.lastName}` : 
+          lead.firstName || lead.lastName || `Lead #${lead.id}`),
+    lastContacted: lead.lastContacted || lead.lastContact || '',
+  }));
+
   return (
     <div className="space-y-6">
       <CampaignDescription campaign={campaign} />
@@ -51,17 +62,22 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData, updateCa
               <ul className="mt-2 space-y-2">
                 <li className="flex justify-between">
                   <span className="text-muted-foreground">Total Leads:</span>
-                  <span className="font-medium">{leadsData.length}</span>
+                  <span className="font-medium">{processedLeads.length}</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-muted-foreground">Contacted:</span>
-                  <span className="font-medium">{leadsData.filter(l => l.currentStage !== 'New Lead').length}</span>
+                  <span className="font-medium">
+                    {processedLeads.filter(l => l.currentStage !== 'New Lead').length}
+                  </span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-muted-foreground">Response Rate:</span>
                   <span className="font-medium">
-                    {leadsData.length > 0 
-                      ? Math.round((leadsData.filter(l => l.currentStage !== 'New Lead' && l.currentStage !== 'Contacted').length / leadsData.length) * 100) 
+                    {processedLeads.length > 0 
+                      ? Math.round((processedLeads.filter(l => 
+                          l.currentStage !== 'New Lead' && 
+                          l.currentStage !== 'Contacted'
+                        ).length / processedLeads.length) * 100) 
                       : 0}%
                   </span>
                 </li>
@@ -75,9 +91,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData, updateCa
         </CardContent>
       </Card>
 
-      <StatCards campaign={campaign} leadsData={leadsData} />
-      <ChannelsAndStages campaign={campaign} leadsData={leadsData} />
-      <OutreachSummary campaign={campaign} teamMembers={campaign.teamMembers} />
+      <StatCards campaign={campaign} leadsData={processedLeads} />
+      <ChannelsAndStages campaign={campaign} leadsData={processedLeads} />
+      <OutreachSummary campaign={campaign} leadsData={processedLeads} teamMembers={campaign.teamMembers} />
     </div>
   );
 };

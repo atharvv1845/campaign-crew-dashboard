@@ -27,12 +27,13 @@ export function useNodeOperations({
 
         if (type === 'message') {
           const messageData = data as MessageStepData;
+          const nodeLabel = messageData.label || `Message ${id}`;
           newNode = {
             id,
             type: 'messageNode',
             position: { x: 250, y: nodes.length * 150 + 100 },
             data: {
-              label: messageData.label || `Message ${id}`,
+              label: nodeLabel,
               channel: messageData.channel || 'email',
               message: messageData.message,
               assignedTo: messageData.assignedTo,
@@ -42,24 +43,26 @@ export function useNodeOperations({
           };
         } else if (type === 'delay') {
           const delayData = data as DelayStepData;
+          const nodeLabel = delayData.label || `Delay ${id}`;
           newNode = {
             id,
             type: 'delayNode',
             position: { x: 250, y: nodes.length * 150 + 100 },
             data: {
-              label: delayData.label || `Delay ${id}`,
+              label: nodeLabel,
               days: delayData.days,
               hours: delayData.hours,
             },
           };
         } else {
           const conditionData = data as ConditionStepData;
+          const nodeLabel = conditionData.label || `Condition ${id}`;
           newNode = {
             id,
             type: 'conditionNode',
             position: { x: 250, y: nodes.length * 150 + 100 },
             data: {
-              label: conditionData.label || `Condition ${id}`,
+              label: nodeLabel,
               condition: conditionData.condition,
               action: conditionData.action,
               targetStage: conditionData.targetStage,
@@ -68,7 +71,7 @@ export function useNodeOperations({
           };
         }
 
-        setNodes([...nodes, newNode]);
+        setNodes((prevNodes) => [...prevNodes, newNode]);
 
         // If there are existing nodes, create an edge from the last node to the new node
         if (nodes.length > 0) {
@@ -79,7 +82,7 @@ export function useNodeOperations({
             target: id,
             animated: true,
           };
-          setEdges([...edges, newEdge]);
+          setEdges((prevEdges) => [...prevEdges, newEdge]);
         }
         
         console.log("Added new node:", newNode);
@@ -94,11 +97,12 @@ export function useNodeOperations({
         if (node.id === nodeId) {
           if (nodeType === 'message' && node.type === 'messageNode') {
             const messageData = data as MessageStepData;
+            const nodeLabel = messageData.label || node.data.label;
             return {
               ...node,
               data: {
                 ...node.data,
-                label: messageData.label || node.data.label,
+                label: nodeLabel,
                 message: messageData.message,
                 channel: messageData.channel || node.data.channel,
                 assignedTo: messageData.assignedTo,
@@ -108,22 +112,24 @@ export function useNodeOperations({
             };
           } else if (nodeType === 'delay' && node.type === 'delayNode') {
             const delayData = data as DelayStepData;
+            const nodeLabel = delayData.label || node.data.label;
             return {
               ...node,
               data: {
                 ...node.data,
-                label: delayData.label || node.data.label,
+                label: nodeLabel,
                 days: delayData.days,
                 hours: delayData.hours,
               },
             };
           } else if (nodeType === 'condition' && node.type === 'conditionNode') {
             const conditionData = data as ConditionStepData;
+            const nodeLabel = conditionData.label || node.data.label;
             return {
               ...node,
               data: {
                 ...node.data,
-                label: conditionData.label || node.data.label,
+                label: nodeLabel,
                 condition: conditionData.condition,
                 action: conditionData.action,
                 targetStage: conditionData.targetStage,

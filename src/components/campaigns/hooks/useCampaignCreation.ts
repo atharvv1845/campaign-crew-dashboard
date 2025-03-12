@@ -86,7 +86,7 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
     }
 
     // Create new campaign or update existing
-    const campaignId = existingCampaign ? existingCampaign.id : Math.max(...campaignData.map(c => c.id), 0) + 1;
+    const campaignId = existingCampaign ? existingCampaign.id : Math.max(...campaignData.map(c => Number(c.id)), 0) + 1;
     const newCampaign = {
       id: campaignId,
       name: formData.name,
@@ -130,7 +130,7 @@ const useCampaignCreation = (onClose: () => void, existingCampaign?: any) => {
 
     // Close the form with animation
     handleClose();
-  }, [formData, existingCampaign, toast, onClose, handleClose]);
+  }, [formData, existingCampaign, toast, handleClose]);
 
   return {
     currentStep,

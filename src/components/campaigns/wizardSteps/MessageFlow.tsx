@@ -127,13 +127,17 @@ const MessageFlow: React.FC<MessageFlowProps> = ({ formData, setFormData, onNext
   };
 
   const handleSaveNode = () => {
-    if (!nodeData.message && nodeType === 'message') {
-      toast({
-        title: "Validation Error",
-        description: "Message content is required",
-        variant: "destructive"
-      });
-      return;
+    // Validate required fields based on node type
+    if (nodeType === 'message') {
+      const messageData = nodeData as any;
+      if (!messageData.message) {
+        toast({
+          title: "Validation Error",
+          description: "Message content is required",
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     if (selectedNode) {

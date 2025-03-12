@@ -83,6 +83,7 @@ export interface MessageStep {
 
 // Message step specific data
 export interface MessageStepData {
+  label?: string;
   message: string;
   assignedTo: string;
   templateId?: string;
@@ -92,23 +93,18 @@ export interface MessageStepData {
 
 // Delay step data
 export interface DelayStepData {
+  label?: string;
   days: number;
   hours?: number;
 }
 
 // Condition step data
 export interface ConditionStepData {
+  label?: string;
   condition: string;
   action: string;
   targetStage?: string;
   waitDays?: number;
-}
-
-// Flow data structure
-export interface FlowData {
-  steps: Record<string, FlowStepData>;
-  connections: Array<{from: string, to: string}>;
-  startNode: string | null;
 }
 
 // Default stages for new campaigns

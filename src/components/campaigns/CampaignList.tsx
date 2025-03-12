@@ -12,7 +12,7 @@ const CampaignList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [campaigns, setCampaigns] = useState(campaignData);
   
-  // Update campaigns when campaignData changes
+  // Update campaigns when campaignData changes or when a modal closes
   useEffect(() => {
     setCampaigns([...campaignData]);
   }, [showCreateCampaign]);

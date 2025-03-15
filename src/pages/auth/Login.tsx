@@ -12,6 +12,7 @@ const Login = () => {
             <p className="text-sm text-muted-foreground">Sign in to your account to continue</p>
           </div>
           <SignIn
+            afterSignInUrl="/dashboard"
             appearance={{
               elements: {
                 formButtonPrimary: 

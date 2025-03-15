@@ -12,6 +12,7 @@ const SignUpPage = () => {
             <p className="text-sm text-muted-foreground">Sign up to get started</p>
           </div>
           <SignUp
+            afterSignUpUrl="/dashboard"
             appearance={{
               elements: {
                 formButtonPrimary: 

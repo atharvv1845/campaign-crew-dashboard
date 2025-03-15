@@ -27,60 +27,64 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 function App() {
   return (
-    <ClerkProvider 
-      publishableKey={CLERK_PUBLISHABLE_KEY}
-      clerkJSVersion="5.56.0-snapshot.v20250312225817"
-      signInUrl="/login"
-      signUpUrl="/signup"
-      signInFallbackRedirectUrl="/dashboard"
-      signUpFallbackRedirectUrl="/"
-      signInForceRedirectUrl="/dashboard"
-      signUpForceRedirectUrl="/"
-      afterSignOutUrl="/"
-    >
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ClerkProvider 
+        publishableKey={CLERK_PUBLISHABLE_KEY}
+      >
         <Router>
           <Routes>
             {/* Public routes */}
-            <Route path="/login" element={
-              <SignedOut>
-                <Login />
-              </SignedOut>
-            } />
-            <Route path="/signup" element={
-              <SignedOut>
-                <SignUp />
-              </SignedOut>
-            } />
+            <Route
+              path="/login"
+              element={
+                <SignedOut>
+                  <Login />
+                </SignedOut>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <SignedOut>
+                  <SignUp />
+                </SignedOut>
+              }
+            />
             
             {/* Protected routes */}
-            <Route path="/" element={
-              <SignedIn>
-                <Navigate to="/dashboard" replace />
-              </SignedIn>
-            } />
+            <Route
+              path="/"
+              element={
+                <SignedIn>
+                  <Navigate to="/dashboard" replace />
+                </SignedIn>
+              }
+            />
             
-            <Route path="/*" element={
-              <SignedIn>
-                <MainLayout>
-                  <Routes>
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="campaigns" element={<Campaigns />} />
-                    <Route path="campaigns/:id" element={<CampaignDetail />} />
-                    <Route path="leads" element={<Leads />} />
-                    <Route path="messaging" element={<Messaging />} />
-                    <Route path="reports" element={<Reports />} />
-                    <Route path="team" element={<Team />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </MainLayout>
-              </SignedIn>
-            } />
+            <Route
+              path="/*"
+              element={
+                <SignedIn>
+                  <MainLayout>
+                    <Routes>
+                      <Route path="dashboard" element={<Dashboard />} />
+                      <Route path="campaigns" element={<Campaigns />} />
+                      <Route path="campaigns/:id" element={<CampaignDetail />} />
+                      <Route path="leads" element={<Leads />} />
+                      <Route path="messaging" element={<Messaging />} />
+                      <Route path="reports" element={<Reports />} />
+                      <Route path="team" element={<Team />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </MainLayout>
+                </SignedIn>
+              }
+            />
           </Routes>
           <Toaster />
         </Router>
-      </QueryClientProvider>
-    </ClerkProvider>
+      </ClerkProvider>
+    </QueryClientProvider>
   );
 }
 

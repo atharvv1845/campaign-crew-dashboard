@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Send, Save, ChevronLeft, Plus, X, Mail, Twitter, Linkedin, Facebook, Instagram } from 'lucide-react';
+import { MessageSquare, Send, Save, ChevronLeft, Plus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { MessageScript } from './MessageTemplates';
@@ -27,8 +27,6 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ editingScript, onSaveComple
   const [variables, setVariables] = useState<string[]>([]);
   const [newVariable, setNewVariable] = useState('');
   const [activeTab, setActiveTab] = useState('edit');
-  const [showCustomPlatform, setShowCustomPlatform] = useState(false);
-  const [customPlatform, setCustomPlatform] = useState('');
   
   const { toast } = useToast();
 
@@ -136,31 +134,6 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ editingScript, onSaveComple
     }, 0);
   };
 
-  // Handle adding custom platform
-  const handleAddCustomPlatform = () => {
-    if (!customPlatform.trim()) return;
-    
-    setPlatform(customPlatform.toLowerCase().trim());
-    setShowCustomPlatform(false);
-    
-    // Save custom platform to localStorage for future use
-    const savedPlatforms = JSON.parse(localStorage.getItem('customPlatforms') || '[]');
-    if (!savedPlatforms.includes(customPlatform.toLowerCase().trim())) {
-      savedPlatforms.push(customPlatform.toLowerCase().trim());
-      localStorage.setItem('customPlatforms', JSON.stringify(savedPlatforms));
-    }
-  };
-
-  // Get custom platforms from localStorage
-  const getCustomPlatforms = () => {
-    try {
-      return JSON.parse(localStorage.getItem('customPlatforms') || '[]');
-    } catch (error) {
-      console.error("Error loading custom platforms:", error);
-      return [];
-    }
-  };
-
   // Mock campaigns for dropdown
   const campaigns = [
     "Tech Startup Outreach",
@@ -168,9 +141,6 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ editingScript, onSaveComple
     "SMB Campaign",
     "Social Media Promotion"
   ];
-  
-  // Load custom platforms
-  const customPlatforms = getCustomPlatforms();
 
   return (
     <div className="space-y-4">
@@ -205,117 +175,20 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ editingScript, onSaveComple
               
               <div className="space-y-2">
                 <Label htmlFor="platform">Platform</Label>
-                {!showCustomPlatform ? (
-                  <Select value={platform} onValueChange={(value) => {
-                    if (value === "custom") {
-                      setShowCustomPlatform(true);
-                    } else {
-                      setPlatform(value);
-                    }
-                  }}>
-                    <SelectTrigger id="platform">
-                      <SelectValue placeholder="Select platform" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="linkedin">
-                        <div className="flex items-center">
-                          <Linkedin className="h-4 w-4 mr-2" />
-                          <span>LinkedIn</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="email">
-                        <div className="flex items-center">
-                          <Mail className="h-4 w-4 mr-2" />
-                          <span>Email</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="whatsapp">
-                        <div className="flex items-center">
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          <span>WhatsApp</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="facebook">
-                        <div className="flex items-center">
-                          <Facebook className="h-4 w-4 mr-2" />
-                          <span>Facebook</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="twitter">
-                        <div className="flex items-center">
-                          <Twitter className="h-4 w-4 mr-2" />
-                          <span>Twitter</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="instagram">
-                        <div className="flex items-center">
-                          <Instagram className="h-4 w-4 mr-2" />
-                          <span>Instagram</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="telegram">
-                        <div className="flex items-center">
-                          <Send className="h-4 w-4 mr-2" />
-                          <span>Telegram</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="sms">
-                        <div className="flex items-center">
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          <span>SMS</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="phone">
-                        <div className="flex items-center">
-                          <Send className="h-4 w-4 mr-2" />
-                          <span>Phone Call</span>
-                        </div>
-                      </SelectItem>
-                      
-                      {/* Display saved custom platforms */}
-                      {customPlatforms.map((platform: string) => (
-                        <SelectItem key={platform} value={platform}>
-                          <div className="flex items-center">
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            <span className="capitalize">{platform}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                      
-                      <SelectItem value="custom">
-                        <div className="flex items-center text-primary">
-                          <Plus className="h-4 w-4 mr-2" />
-                          <span>Add Custom Platform</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      value={customPlatform}
-                      onChange={(e) => setCustomPlatform(e.target.value)}
-                      placeholder="Enter platform name"
-                      className="flex-1"
-                    />
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      onClick={handleAddCustomPlatform}
-                      disabled={!customPlatform.trim()}
-                    >
-                      Add
-                    </Button>
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => setShowCustomPlatform(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                )}
+                <Select value={platform} onValueChange={setPlatform}>
+                  <SelectTrigger id="platform">
+                    <SelectValue placeholder="Select platform" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="phone">Phone Call</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -376,7 +249,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ editingScript, onSaveComple
               
               {variables.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs text-muted-foreground mb-2">Click to insert at cursor position:</p>
+                  <p className="text-sm text-muted-foreground mb-2">Click to insert at cursor position:</p>
                   <div className="flex flex-wrap gap-2">
                     {variables.map((variable, index) => (
                       <Badge 

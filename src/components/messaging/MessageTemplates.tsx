@@ -181,10 +181,6 @@ const MessageTemplates: React.FC<MessageTemplatesProps> = ({ onEditScript }) => 
             <SelectItem value="email">Email</SelectItem>
             <SelectItem value="whatsapp">WhatsApp</SelectItem>
             <SelectItem value="facebook">Facebook</SelectItem>
-            <SelectItem value="twitter">Twitter</SelectItem>
-            <SelectItem value="instagram">Instagram</SelectItem>
-            <SelectItem value="telegram">Telegram</SelectItem>
-            <SelectItem value="sms">SMS</SelectItem>
           </SelectContent>
         </Select>
         
@@ -194,104 +190,92 @@ const MessageTemplates: React.FC<MessageTemplatesProps> = ({ onEditScript }) => 
         </Button>
       </div>
       
-      {/* No templates message */}
-      {templates.length === 0 ? (
-        <div className="text-center py-12 border border-dashed rounded-md">
-          <MessageSquare className="h-12 w-12 mb-2 mx-auto text-muted-foreground opacity-20" />
-          <h3 className="text-lg font-medium">No message templates yet</h3>
-          <p className="text-muted-foreground mb-6 mt-2">
-            Create your first message template to use in your outreach campaigns
-          </p>
-          <Button onClick={() => onEditScript()}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create First Template
-          </Button>
-        </div>
-      ) : filteredTemplates.length === 0 ? (
+      {/* No results message */}
+      {filteredTemplates.length === 0 && (
         <div className="text-center py-8">
           <p className="text-muted-foreground">No templates found. Try adjusting your filters or create a new template.</p>
         </div>
-      ) : (
-        /* Templates grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTemplates.map((template) => (
-            <Card key={template.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <div className="p-5 border-b border-border">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium text-base">{template.name}</h4>
-                    <div className="flex items-center mt-1 gap-1">
-                      <Badge variant="outline" className={cn("px-2 py-0.5 text-xs", getPlatformColor(template.platform))}>
-                        {getPlatformIcon(template.platform)}
-                        <span className="ml-1">{template.platform.charAt(0).toUpperCase() + template.platform.slice(1)}</span>
-                      </Badge>
-                      {template.campaignName && (
-                        <Badge variant="outline" className="px-2 py-0.5 text-xs">
-                          {template.campaignName}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => handleCopyScript(template.content)} title="Copy to clipboard">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => onEditScript(template)} title="Edit template">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDeleteScript(template.id)} title="Delete template">
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                {template.subject && (
-                  <p className="text-sm font-medium mt-2">Subject: {template.subject}</p>
-                )}
-              </div>
-              
-              <div className="p-5 border-b border-border">
-                <p className="text-sm text-muted-foreground line-clamp-3">{template.content}</p>
-                
-                {template.variables && template.variables.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {template.variables.map((variable, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {variable}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-5 grid grid-cols-3 gap-2 bg-muted/10">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
-                    <Mail className="h-3 w-3" />
-                    <span>Sent</span>
-                  </div>
-                  <p className="text-sm font-medium">{template.usageCount.toLocaleString()}</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
-                    <Check className="h-3 w-3" />
-                    <span>Response</span>
-                  </div>
-                  <p className="text-sm font-medium">{template.responseRate}%</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
-                    <Clock className="h-3 w-3" />
-                    <span>Last Used</span>
-                  </div>
-                  <p className="text-sm font-medium">{template.lastUsed}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
       )}
+      
+      {/* Templates grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredTemplates.map((template) => (
+          <Card key={template.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <div className="p-5 border-b border-border">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-medium text-base">{template.name}</h4>
+                  <div className="flex items-center mt-1 gap-1">
+                    <Badge variant="outline" className={cn("px-2 py-0.5 text-xs", getPlatformColor(template.platform))}>
+                      {getPlatformIcon(template.platform)}
+                      <span className="ml-1">{template.platform.charAt(0).toUpperCase() + template.platform.slice(1)}</span>
+                    </Badge>
+                    {template.campaignName && (
+                      <Badge variant="outline" className="px-2 py-0.5 text-xs">
+                        {template.campaignName}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => handleCopyScript(template.content)} title="Copy to clipboard">
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onEditScript(template)} title="Edit template">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleDeleteScript(template.id)} title="Delete template">
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              {template.subject && (
+                <p className="text-sm font-medium mt-2">Subject: {template.subject}</p>
+              )}
+            </div>
+            
+            <div className="p-5 border-b border-border">
+              <p className="text-sm text-muted-foreground line-clamp-3">{template.content}</p>
+              
+              {template.variables && template.variables.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {template.variables.map((variable, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {variable}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="p-5 grid grid-cols-3 gap-2 bg-muted/10">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
+                  <Mail className="h-3 w-3" />
+                  <span>Sent</span>
+                </div>
+                <p className="text-sm font-medium">{template.usageCount.toLocaleString()}</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
+                  <Check className="h-3 w-3" />
+                  <span>Response</span>
+                </div>
+                <p className="text-sm font-medium">{template.responseRate}%</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
+                  <Clock className="h-3 w-3" />
+                  <span>Last Used</span>
+                </div>
+                <p className="text-sm font-medium">{template.lastUsed}</p>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

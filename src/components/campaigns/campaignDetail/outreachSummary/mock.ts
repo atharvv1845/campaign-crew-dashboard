@@ -15,7 +15,7 @@ export interface OutreachData {
   }>;
 }
 
-// Reset outreach data to zero values
+// Reset outreach data to zero values with empty team performance
 export const outreachMockData: OutreachData = {
   today: 0,
   thisWeek: 0,

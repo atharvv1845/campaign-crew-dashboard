@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { fetchAllCampaigns, fetchAllLeads, updateLeadGlobal } from '@/lib/api/campaignApi';
 import LeadDetailDrawer from './LeadDetailDrawer';
+import { useTeamStore } from '@/hooks/useTeamStore';
 
 const LeadTable: React.FC = () => {
   const { toast } = useToast();
@@ -31,6 +32,9 @@ const LeadTable: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
   const [statusOptions, setStatusOptions] = useState<string[]>([]);
   const [campaignOptions, setCampaignOptions] = useState<{id: string | number, name: string}[]>([]);
+  
+  // Get actual team members from our store
+  const storedTeamMembers = useTeamStore(state => state.teamMembers);
   
   const itemsPerPage = 10;
 
@@ -59,29 +63,55 @@ const LeadTable: React.FC = () => {
       }));
       
       setCampaignOptions(allCampaignOptions);
-      
-      // Extract team members from all campaigns
-      const allTeamMembers = new Set<string>();
-      campaigns.forEach(campaign => {
-        if (campaign.teamMembers && Array.isArray(campaign.teamMembers)) {
-          campaign.teamMembers.forEach(member => allTeamMembers.add(member));
-        }
-      });
-      
-      setTeamMembers(Array.from(allTeamMembers));
     }
   }, [campaigns]);
+  
+  // Set team members from store
+  useEffect(() => {
+    if (storedTeamMembers && storedTeamMembers.length > 0) {
+      const names = storedTeamMembers.map(member => member.name);
+      setTeamMembers(names);
+    }
+  }, [storedTeamMembers]);
 
   // Process leads when data is loaded
   useEffect(() => {
     if (leadsData && Array.isArray(leadsData)) {
-      setAllLeads(leadsData);
+      // Convert any LeadData to Lead type
+      const typedLeads = leadsData.map(lead => ({
+        id: lead.id,
+        name: lead.name || 'Unknown',
+        email: lead.email,
+        phone: lead.phone,
+        company: lead.company,
+        title: lead.title,
+        status: lead.status || 'New',
+        currentStage: lead.currentStage || lead.status || 'New',
+        campaign: lead.campaign,
+        campaignId: lead.campaignId,
+        lastContact: lead.lastContact || lead.lastContacted,
+        firstContactDate: lead.firstContactDate,
+        nextFollowUpDate: lead.nextFollowUpDate || lead.followUpDate,
+        assignedTo: lead.assignedTo || lead.assignedTeamMember,
+        linkedin: lead.linkedin,
+        twitter: lead.twitter,
+        facebook: lead.facebook,
+        instagram: lead.instagram,
+        whatsapp: lead.whatsapp,
+        notes: lead.notes,
+        socialProfiles: lead.socialProfiles,
+        contactMethods: lead.contactMethods,
+        contacted: lead.contacted,
+        contactPlatforms: lead.contactPlatforms
+      }));
+      
+      setAllLeads(typedLeads);
       
       // Extract all status options from leads
       const allStatuses = new Set<string>();
-      leadsData.forEach(lead => {
+      typedLeads.forEach(lead => {
         if (lead.status) allStatuses.add(lead.status);
-        if (lead.currentStage) allStatuses.add(lead.currentStage);
+        if (lead.currentStage && lead.currentStage !== lead.status) allStatuses.add(lead.currentStage);
       });
       
       setStatusOptions(Array.from(allStatuses));

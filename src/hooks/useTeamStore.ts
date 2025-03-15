@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TeamMember } from '@/components/team/types';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TeamState {
   teamMembers: TeamMember[];
@@ -13,10 +14,17 @@ interface TeamState {
 export const useTeamStore = create<TeamState>()(
   persist(
     (set) => ({
-      teamMembers: [], // Removed initial mock data
-      addTeamMember: (member) => set((state) => ({
-        teamMembers: [...state.teamMembers, member]
-      })),
+      teamMembers: [], // No mock data, only user-added team members
+      addTeamMember: (member) => set((state) => {
+        // Ensure member has an ID
+        const memberWithId = {
+          ...member,
+          id: member.id || uuidv4()
+        };
+        return {
+          teamMembers: [...state.teamMembers, memberWithId]
+        };
+      }),
       removeTeamMember: (id) => set((state) => ({
         teamMembers: state.teamMembers.filter(member => member.id !== id)
       })),

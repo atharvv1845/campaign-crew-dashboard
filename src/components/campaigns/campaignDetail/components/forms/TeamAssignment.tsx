@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTeamStore } from '@/hooks/useTeamStore';
 
 interface TeamMember {
   value: string;
@@ -17,14 +18,23 @@ interface TeamMember {
 interface TeamAssignmentProps {
   value: string;
   onChange: (value: string) => void;
-  options: TeamMember[];
+  options?: TeamMember[];
 }
 
 const TeamAssignment: React.FC<TeamAssignmentProps> = ({
   value,
   onChange,
-  options
+  options: providedOptions
 }) => {
+  // Get team members from store if options aren't provided
+  const storeTeamMembers = useTeamStore(state => state.teamMembers);
+  
+  // If options are explicitly provided, use those; otherwise, use team members from store
+  const options = providedOptions || storeTeamMembers.map(member => ({
+    value: member.id,
+    label: member.name
+  }));
+
   return (
     <div className="space-y-2">
       <Label>Assigned To</Label>
@@ -36,6 +46,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({
           <SelectValue placeholder="Select team member" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="unassigned">Unassigned</SelectItem>
           {options.length > 0 ? (
             options.map(option => (
               <SelectItem key={option.value} value={option.value}>

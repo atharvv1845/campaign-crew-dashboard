@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { useTeamStore } from '@/hooks/useTeamStore';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface TeamAssignmentProps {
   formData: CampaignFormData;
@@ -17,16 +19,9 @@ interface TeamAssignmentProps {
   onBack: () => void;
 }
 
-// Mock team members data
-const teamMembers = [
-  { id: 'user1', name: 'John Smith', avatar: '👤', workload: 'Low' },
-  { id: 'user2', name: 'Sarah Lee', avatar: '👤', workload: 'Medium' },
-  { id: 'user3', name: 'Alex Chen', avatar: '👤', workload: 'High' },
-  { id: 'user4', name: 'Mia Johnson', avatar: '👤', workload: 'Low' },
-  { id: 'user5', name: 'David Kim', avatar: '👤', workload: 'Medium' },
-];
-
 const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, onNext, onBack }) => {
+  const { teamMembers } = useTeamStore();
+  
   // Initialize teamAssignments if it doesn't exist
   useEffect(() => {
     if (!formData.teamAssignments) {
@@ -43,7 +38,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
         team: teamMembers.map(member => member.id)
       }));
     }
-  }, [formData, setFormData]);
+  }, [formData, setFormData, teamMembers]);
 
   // Assign a team member to a channel
   const assignTeamMember = (channelId: string, memberId: string) => {
@@ -80,6 +75,23 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
     
     if (displayNames.length <= 2) return displayNames.join(', ');
     return `${displayNames[0]} +${displayNames.length - 1} more`;
+  };
+  
+  const getWorkloadLabel = (memberId: string) => {
+    const assignedChannelsCount = Object.values(formData.teamAssignments || {})
+      .filter(assignments => assignments.includes(memberId)).length;
+    
+    if (assignedChannelsCount === 0) return 'Low';
+    if (assignedChannelsCount < 3) return 'Medium';
+    return 'High';
+  };
+  
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase();
   };
 
   // Selected channels from previous step
@@ -127,7 +139,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
                         <div className="text-sm font-medium px-2 py-1.5 text-muted-foreground">
                           Select team members:
                         </div>
-                        {teamMembers.map(member => {
+                        {teamMembers.filter(m => m.status === 'Active').map(member => {
                           const isAssigned = getAssignedMembers(channel.id).includes(member.id);
                           return (
                             <DropdownMenuItem 
@@ -136,11 +148,14 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
                               className="flex items-center justify-between cursor-pointer"
                             >
                               <div className="flex items-center gap-2">
-                                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-sm">
-                                  {member.avatar}
-                                </span>
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={member.avatar} />
+                                  <AvatarFallback className="text-xs">
+                                    {getInitials(member.name)}
+                                  </AvatarFallback>
+                                </Avatar>
                                 <span>{member.name}</span>
-                                <span className="text-xs text-muted-foreground">({member.workload})</span>
+                                <span className="text-xs text-muted-foreground">({getWorkloadLabel(member.id)})</span>
                               </div>
                               {isAssigned && (
                                 <Check className="h-4 w-4 text-primary" />
@@ -161,14 +176,17 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
         <div className="mt-6">
           <h4 className="text-sm font-medium mb-2">Available Team Members</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {teamMembers.map(member => (
+            {teamMembers.filter(m => m.status === 'Active').map(member => (
               <div key={member.id} className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-muted/10">
-                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-sm">
-                  {member.avatar}
-                </div>
+                <Avatar>
+                  <AvatarImage src={member.avatar} />
+                  <AvatarFallback>
+                    {getInitials(member.name)}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <p className="text-sm font-medium">{member.name}</p>
-                  <p className="text-xs text-muted-foreground">Workload: {member.workload}</p>
+                  <p className="text-xs text-muted-foreground">Workload: {getWorkloadLabel(member.id)}</p>
                 </div>
               </div>
             ))}

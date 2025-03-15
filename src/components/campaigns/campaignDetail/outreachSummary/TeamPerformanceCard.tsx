@@ -2,9 +2,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from 'lucide-react';
+import { useTeamStore } from '@/hooks/useTeamStore';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface TeamMemberPerformance {
   member: string;
+  memberId: string;
   responses: number;
   positive: number;
 }
@@ -14,6 +17,24 @@ interface TeamPerformanceCardProps {
 }
 
 const TeamPerformanceCard: React.FC<TeamPerformanceCardProps> = ({ teamPerformance }) => {
+  const { teamMembers } = useTeamStore();
+  
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase();
+  };
+  
+  const getMemberAvatar = (memberId: string) => {
+    const member = teamMembers.find(m => m.id === memberId);
+    return {
+      name: member?.name || "Team Member",
+      avatar: member?.avatar || ""
+    };
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -27,11 +48,20 @@ const TeamPerformanceCard: React.FC<TeamPerformanceCardProps> = ({ teamPerforman
           {teamPerformance.map((member, index) => {
             // Calculate positive response rate
             const positiveRate = Math.round((member.positive / member.responses) * 100);
+            const memberDetails = getMemberAvatar(member.memberId);
             
             return (
               <div key={index} className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">{member.member}</span>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={memberDetails.avatar} />
+                      <AvatarFallback className="text-xs">
+                        {getInitials(memberDetails.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{member.member}</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-muted/30 px-2 py-0.5 rounded-full">
                       {member.responses} responses

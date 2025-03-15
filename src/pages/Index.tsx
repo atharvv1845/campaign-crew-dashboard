@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeroWithMockup } from '@/components/ui/hero-with-mockup';
 import { CheckCircle, BarChart2, RefreshCw, ArrowRight, ChevronRight, Mail, Rocket, Shield, Users, LayoutDashboard, ListChecks, UserPlus, PieChart, Globe, UsersRound, Plus, Clipboard, MessageSquare, BarChart, Eye, Phone } from 'lucide-react';
+import { TestimonialsSection } from '@/components/blocks/testimonials-with-marquee';
 
 const Index = () => {
   const {
@@ -37,19 +38,48 @@ const Index = () => {
     description: "Assign roles, leave comments, and track activity logs."
   }];
 
-  const testimonials = [{
-    quote: "This tool made our campaign tracking so much easier. No more messy spreadsheets!",
-    author: "Marketing Manager",
-    position: "XYZ Corp."
-  }, {
-    quote: "We love the simplicity and control. No unwanted automation—just powerful insights.",
-    author: "CEO",
-    position: "ABC Agency"
-  }, {
-    quote: "Since using Campaign Crew, our team has been able to focus on what matters - connecting with leads.",
-    author: "Marketing Director",
-    position: "Global Enterprises"
-  }];
+  const testimonials = [
+    {
+      author: {
+        name: "Marketing Manager",
+        position: "XYZ Corp.",
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
+      },
+      text: "This tool made our campaign tracking so much easier. No more messy spreadsheets!"
+    },
+    {
+      author: {
+        name: "CEO",
+        position: "ABC Agency",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+      },
+      text: "We love the simplicity and control. No unwanted automation—just powerful insights."
+    },
+    {
+      author: {
+        name: "Marketing Director",
+        position: "Global Enterprises",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
+      },
+      text: "Since using Campaign Crew, our team has been able to focus on what matters - connecting with leads."
+    },
+    {
+      author: {
+        name: "Sales Manager",
+        position: "Tech Solutions Inc.",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
+      },
+      text: "The lead management features have transformed how we follow up with prospects. Our conversion rates are up 30%!"
+    },
+    {
+      author: {
+        name: "Growth Specialist",
+        position: "Startup Ventures",
+        avatar: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face"
+      },
+      text: "Finally a campaign tool that doesn't try to automate everything but still gives us powerful insights and organization."
+    }
+  ];
 
   const useCases = [{
     icon: <BarChart2 className="h-10 w-10 text-primary" />,
@@ -245,30 +275,15 @@ const Index = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 bg-black/30">
-          <div className="container">
-            <h2 className="text-3xl font-bold text-center mb-16 text-white">Customer Testimonials</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => <Card key={index} className="bg-black/60 border border-white/10 p-6 shadow relative glass-card">
-                  <div className="absolute -top-4 left-6 text-5xl text-primary">"</div>
-                  <CardContent className="pt-4 px-0">
-                    <blockquote className="mb-4 relative z-10 pt-4">
-                      <p className="italic text-gray-300">{testimonial.quote}</p>
-                    </blockquote>
-                    <div className="mt-4">
-                      <p className="font-semibold text-white">{testimonial.author}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.position}</p>
-                    </div>
-                  </CardContent>
-                </Card>)}
-            </div>
-            <div className="mt-10 text-center">
-              <Button className="bg-primary text-black font-medium hover:bg-primary/90">
-                See More Reviews <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </section>
+        <TestimonialsSection
+          title="Customer Testimonials"
+          description="Hear from marketing and sales teams who have transformed their campaign management with Campaign Crew"
+          testimonials={testimonials}
+          actionButton={{
+            text: "See More Reviews",
+            href: "#reviews"
+          }}
+        />
 
         {/* Contact Sales Section */}
         <section className="py-20 bg-black/50" id="contact-sales">
@@ -349,6 +364,7 @@ const Index = () => {
         </section>
       </main>
 
+      {/* Footer Section */}
       <footer className="border-t border-white/10 bg-black py-12">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

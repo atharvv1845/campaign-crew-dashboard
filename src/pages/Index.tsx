@@ -5,91 +5,150 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeroWithMockup } from '@/components/ui/hero-with-mockup';
-import { CheckCircle, BarChart2, RefreshCw, ArrowRight, ChevronRight, Mail, Rocket, Shield, Users, Code } from 'lucide-react';
+import { 
+  CheckCircle, 
+  BarChart2, 
+  RefreshCw, 
+  ArrowRight, 
+  ChevronRight, 
+  Mail, 
+  Rocket, 
+  Shield, 
+  Users, 
+  LayoutDashboard, 
+  ListChecks, 
+  UserPlus, 
+  PieChart, 
+  Globe, 
+  UsersRound, 
+  Plus, 
+  Clipboard, 
+  MessageSquare, 
+  BarChart, 
+  Eye, 
+  Phone 
+} from 'lucide-react';
 
 const Index = () => {
   const { user } = useAuth();
 
   const features = [
     {
-      icon: <BarChart2 className="h-12 w-12 text-primary" />,
-      title: "Live Campaign Analytics",
-      description: "Get real-time insights into your campaign performance with our powerful analytics dashboard.",
+      icon: <LayoutDashboard className="h-12 w-12 text-primary" />,
+      title: "Centralized Dashboard",
+      description: "See campaign progress, response rates, and leads in real-time.",
     },
     {
-      icon: <CheckCircle className="h-12 w-12 text-primary" />,
-      title: "Lead Tracking & Status Updates",
-      description: "Easily track leads and update their status with our intuitive drag-and-drop interface.",
+      icon: <ListChecks className="h-12 w-12 text-primary" />,
+      title: "Custom Status Tracking",
+      description: "Update campaign status anytime and keep teams aligned.",
     },
     {
-      icon: <Mail className="h-12 w-12 text-primary" />,
-      title: "Automated Outreach",
-      description: "Set up automated email sequences to nurture leads and improve conversion rates.",
+      icon: <UserPlus className="h-12 w-12 text-primary" />,
+      title: "Lead Management",
+      description: "Organize leads, responses, and follow-ups in one place.",
     },
     {
-      icon: <Rocket className="h-12 w-12 text-primary" />,
-      title: "Conversion Rate Optimization",
-      description: "Optimize your campaigns with AI-powered insights to maximize your conversion rates.",
+      icon: <PieChart className="h-12 w-12 text-primary" />,
+      title: "Performance Insights",
+      description: "Track campaign effectiveness with built-in reporting.",
+    },
+    {
+      icon: <Globe className="h-12 w-12 text-primary" />,
+      title: "Multi-Channel Support",
+      description: "Manage campaigns across email, calls, and social media.",
+    },
+    {
+      icon: <UsersRound className="h-12 w-12 text-primary" />,
+      title: "Team Collaboration",
+      description: "Assign roles, leave comments, and track activity logs.",
     }
   ];
 
   const testimonials = [
     {
-      quote: "Campaign Crew has transformed how we manage our marketing campaigns. We've seen a 40% increase in conversions!",
-      author: "Sarah Johnson",
-      position: "Marketing Director, TechSolutions Inc."
+      quote: "This tool made our campaign tracking so much easier. No more messy spreadsheets!",
+      author: "Marketing Manager",
+      position: "XYZ Corp."
     },
     {
-      quote: "The analytics dashboard gives us insights we never had before. It's like having a marketing consultant at your fingertips.",
-      author: "Michael Chen",
-      position: "Growth Lead, Startup Ventures"
+      quote: "We love the simplicity and control. No unwanted automation—just powerful insights.",
+      author: "CEO",
+      position: "ABC Agency"
     },
     {
-      quote: "I can finally track all my leads in one place. The time savings alone has made this worth every penny.",
-      author: "Emma Watson",
-      position: "Sales Manager, Global Enterprises"
+      quote: "Since using Campaign Crew, our team has been able to focus on what matters - connecting with leads.",
+      author: "Marketing Director",
+      position: "Global Enterprises"
     }
   ];
 
-  const pricingPlans = [
+  const useCases = [
     {
-      name: "Free",
-      price: "$0",
-      description: "Perfect for individuals just starting out",
-      features: [
-        "Up to 3 campaigns",
-        "100 leads",
-        "Basic analytics",
-        "Email support"
-      ]
+      icon: <BarChart2 className="h-10 w-10 text-primary" />,
+      title: "Marketing Teams",
+      description: "Track multiple campaigns in one place."
     },
     {
-      name: "Pro",
-      price: "$49",
-      period: "/month",
-      description: "For growing businesses and teams",
-      popular: true,
-      features: [
-        "Unlimited campaigns",
-        "10,000 leads",
-        "Advanced analytics",
-        "Priority support",
-        "Team collaboration",
-        "Custom integrations"
-      ]
+      icon: <MessageSquare className="h-10 w-10 text-primary" />,
+      title: "Sales Teams",
+      description: "Keep leads organized and follow up with prospects."
     },
     {
-      name: "Enterprise",
-      price: "Custom",
-      description: "For large organizations with complex needs",
-      features: [
-        "Everything in Pro",
-        "Unlimited leads",
-        "Dedicated account manager",
-        "Custom reporting",
-        "SLA guarantee",
-        "API access"
-      ]
+      icon: <BarChart className="h-10 w-10 text-primary" />,
+      title: "Consulting Agencies",
+      description: "Manage outreach campaigns for clients."
+    },
+    {
+      icon: <Rocket className="h-10 w-10 text-primary" />,
+      title: "Startups & SMBs",
+      description: "Improve marketing efforts with data-driven decisions."
+    }
+  ];
+
+  const howItWorks = [
+    {
+      number: "1",
+      title: "Create a Campaign",
+      description: "Define your campaign, set goals, and choose channels."
+    },
+    {
+      number: "2",
+      title: "Add Leads & Assign Tasks",
+      description: "Track outreach efforts and team responsibilities."
+    },
+    {
+      number: "3",
+      title: "Monitor Responses & Update Status",
+      description: "Adjust campaign status as you progress."
+    },
+    {
+      number: "4",
+      title: "Analyze Results & Improve Strategy",
+      description: "Use reports to refine future campaigns."
+    }
+  ];
+
+  const advantages = [
+    {
+      icon: <Shield className="h-6 w-6 text-primary" />,
+      title: "No Automation Overload",
+      description: "You control every step of the campaign."
+    },
+    {
+      icon: <LayoutDashboard className="h-6 w-6 text-primary" />,
+      title: "Simple Yet Powerful UI",
+      description: "Easy-to-use interface with deep functionality."
+    },
+    {
+      icon: <RefreshCw className="h-6 w-6 text-primary" />,
+      title: "Real-Time Status Updates",
+      description: "Keep track of every lead and campaign update."
+    },
+    {
+      icon: <Users className="h-6 w-6 text-primary" />,
+      title: "Built for Teams",
+      description: "Collaborate, comment, and share updates effortlessly."
     }
   ];
 
@@ -108,7 +167,7 @@ const Index = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <Link to="/dashboard">
-                <Button className="bg-primary text-white hover:bg-primary/90">Go to Dashboard</Button>
+                <Button className="bg-primary text-black font-medium hover:bg-primary/90">Go to Dashboard</Button>
               </Link>
             ) : (
               <>
@@ -116,7 +175,7 @@ const Index = () => {
                   <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Login</Button>
                 </Link>
                 <Link to="/signup">
-                  <Button className="bg-primary text-white hover:bg-primary/90">Sign Up</Button>
+                  <Button className="bg-primary text-black font-medium hover:bg-primary/90">Sign Up</Button>
                 </Link>
               </>
             )}
@@ -127,35 +186,63 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <HeroWithMockup
-          title="Supercharge Your Campaigns"
-          description="Track, manage, and optimize your marketing outreach with ease. Unlock the power of intelligent campaign management today."
+          title="Effortless Campaign Management, Maximum Results!"
+          description="Track, manage, and optimize your marketing campaigns—without automation. Take full control of your outreach strategy."
           primaryCta={{
-            text: user ? "Go to Dashboard" : "Get Started for Free",
+            text: user ? "Go to Dashboard 🚀" : "Get Started 🚀",
             href: user ? "/dashboard" : "/signup",
           }}
           secondaryCta={{
-            text: "See Features",
-            href: "#features",
-            icon: <ChevronRight className="mr-2 h-4 w-4" />,
+            text: "See It In Action 👀",
+            href: "#how-it-works",
+            icon: <Eye className="mr-2 h-4 w-4" />,
           }}
           mockupImage={{
-            src: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+            src: "/campaign-crew-dashboard.png",
             alt: "Campaign Crew Dashboard",
-            width: 1200,
+            width: 1280,
             height: 800,
           }}
         />
         
-        {/* Features Section */}
-        <section className="py-20 bg-black/30" id="features">
+        {/* What is this SaaS section */}
+        <section className="py-20 bg-black/30" id="use-cases">
           <div className="container">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 text-white">Powerful Features</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Everything you need to manage your marketing campaigns effectively
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 text-white">What is Campaign Crew?</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Manage your outreach campaigns across multiple channels with ease. Designed for businesses, agencies, and teams 
+                that want full control over their campaign process—without relying on automation.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+            <div className="mt-12">
+              <h3 className="text-2xl font-semibold text-white text-center mb-8">Who is it for?</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {useCases.map((useCase, index) => (
+                  <Card key={index} className="bg-black/50 border-white/10 hover:shadow-md transition-shadow hover:-translate-y-1 duration-300">
+                    <CardContent className="p-6">
+                      <div className="mb-4 inline-flex p-3 rounded-full bg-primary/10">{useCase.icon}</div>
+                      <h3 className="text-xl font-semibold mb-2 text-white">{useCase.title}</h3>
+                      <p className="text-muted-foreground">{useCase.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-20 bg-black/50" id="features">
+          <div className="container">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold mb-4 text-white">Key Features & Use Cases</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Everything you need to manage campaigns effectively
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((feature, index) => (
                 <Card key={index} className="bg-black/50 border-white/10 hover:shadow-md transition-shadow hover:-translate-y-1 duration-300">
                   <CardContent className="p-6">
@@ -166,100 +253,71 @@ const Index = () => {
                 </Card>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Dashboard Preview Section */}
-        <section className="py-20 bg-black/50">
-          <div className="container">
-            <div className="flex flex-col lg:flex-row items-center gap-12">
-              <div className="lg:w-1/2">
-                <h2 className="text-3xl font-bold mb-6 text-white">Streamline Your Campaign Management</h2>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Our intuitive dashboard gives you a complete overview of your campaigns, leads, and performance metrics in one place.
-                </p>
-                <ul className="space-y-4">
-                  {[
-                    "Track multiple campaigns simultaneously",
-                    "Monitor lead progress in real-time",
-                    "Analyze performance with detailed metrics",
-                    "Collaborate with your team seamlessly"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                      <span className="text-gray-300">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link to="/signup" className="mt-8 inline-block">
-                  <Button className="mt-6 bg-primary text-white hover:bg-primary/90 group">
-                    Get Started
-                    <ChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              </div>
-              <div className="lg:w-1/2 relative">
-                <div className="relative">
-                  <div className="absolute inset-0 translate-x-4 translate-y-4 bg-primary/20 rounded-xl"></div>
-                  <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-xl">
-                    <img 
-                      src="https://placehold.co/800x500/0F172A/3B82F6?text=Campaign+Crew+Dashboard"
-                      alt="Dashboard Preview" 
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="mt-10 text-center">
+              <p className="text-lg text-primary italic">Each feature ensures you stay in control—without automation dictating your strategy.</p>
             </div>
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section className="py-20 bg-black/30" id="pricing">
+        {/* How It Works Section */}
+        <section className="py-20 bg-black/30" id="how-it-works">
           <div className="container">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 text-white">Simple, Transparent Pricing</h2>
+              <h2 className="text-3xl font-bold mb-4 text-white">How It Works</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Choose the plan that works best for your business
+                A simple step-by-step process to streamline your campaign management
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {pricingPlans.map((plan, index) => (
-                <Card key={index} className={`${plan.popular ? 'border-primary border-2 shadow-xl' : 'border border-white/10'} bg-black/50 relative`}>
-                  <CardContent className="p-6">
-                    {plan.popular && (
-                      <div className="absolute top-0 right-0 bg-primary text-white py-1 px-3 uppercase text-xs font-bold tracking-wider transform translate-x-2 -translate-y-2 rounded-bl-lg rounded-tr-lg shadow">
-                        Popular
-                      </div>
-                    )}
-                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-                    <div className="my-4 flex items-end">
-                      <span className="text-4xl font-bold text-white">{plan.price}</span>
-                      {plan.period && <span className="text-muted-foreground ml-1">{plan.period}</span>}
-                    </div>
-                    <p className="text-muted-foreground mb-6">{plan.description}</p>
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-start">
-                          <CheckCircle className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-300">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button className={`w-full ${plan.popular ? 'bg-primary text-white hover:bg-primary/90' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'}`}>
-                      {plan.name === "Enterprise" ? "Contact Sales" : "Get Started"}
-                    </Button>
-                  </CardContent>
-                </Card>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {howItWorks.map((step, index) => (
+                <div key={index} className="flex flex-col items-center text-center">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary text-black font-bold text-lg mb-4">
+                    {step.number}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.description}</p>
+                </div>
               ))}
+            </div>
+            <div className="mt-12 text-center">
+              <Button className="bg-primary text-black font-medium hover:bg-primary/90">
+                Watch Demo <Eye className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Choose Us Section */}
+        <section className="py-20 bg-black/50" id="why-us">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 text-white">Why Choose Us?</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Unlike other platforms, we offer:
+              </p>
+            </div>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-8">
+                {advantages.map((advantage, index) => (
+                  <div key={index} className="flex items-start space-x-4">
+                    <div className="mt-1 bg-primary/10 p-2 rounded-md">
+                      {advantage.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2 text-white">{advantage.title}</h3>
+                      <p className="text-muted-foreground">{advantage.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 bg-black/50">
+        <section className="py-20 bg-black/30">
           <div className="container">
-            <h2 className="text-3xl font-bold text-center mb-16 text-white">What Our Users Say</h2>
+            <h2 className="text-3xl font-bold text-center mb-16 text-white">Customer Testimonials</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
                 <Card key={index} className="bg-black/60 border border-white/10 p-6 shadow relative glass-card">
@@ -276,22 +334,114 @@ const Index = () => {
                 </Card>
               ))}
             </div>
+            <div className="mt-10 text-center">
+              <Button className="bg-primary text-black font-medium hover:bg-primary/90">
+                See More Reviews <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Sales Section */}
+        <section className="py-20 bg-black/50" id="contact-sales">
+          <div className="container">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-4 text-white">Contact Sales</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                Let's discuss how our platform fits your needs!
+              </p>
+              <p className="text-lg text-white max-w-3xl mx-auto mb-8">
+                Talk to our experts and get a custom solution for your business.
+              </p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto">
+              <Card className="bg-black/70 border border-white/20">
+                <CardContent className="p-8">
+                  <form className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label htmlFor="name" className="text-white">Full Name</label>
+                        <input 
+                          type="text" 
+                          id="name" 
+                          className="w-full p-3 rounded-md bg-black/50 border border-white/20 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          placeholder="John Smith"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="company" className="text-white">Company</label>
+                        <input 
+                          type="text" 
+                          id="company" 
+                          className="w-full p-3 rounded-md bg-black/50 border border-white/20 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          placeholder="ABC Company"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label htmlFor="email" className="text-white">Email</label>
+                        <input 
+                          type="email" 
+                          id="email" 
+                          className="w-full p-3 rounded-md bg-black/50 border border-white/20 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          placeholder="john@company.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="phone" className="text-white">Phone Number</label>
+                        <input 
+                          type="tel" 
+                          id="phone" 
+                          className="w-full p-3 rounded-md bg-black/50 border border-white/20 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          placeholder="+1 (555) 123-4567"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="message" className="text-white">How can we help?</label>
+                      <textarea 
+                        id="message" 
+                        rows={4}
+                        className="w-full p-3 rounded-md bg-black/50 border border-white/20 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="Tell us about your campaign management needs..."
+                      ></textarea>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button className="bg-primary text-black font-medium hover:bg-primary/90 px-8">
+                        Schedule a Call <Phone className="ml-2 h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
+                        Contact Sales Now <Mail className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+              <p className="text-center mt-6 text-muted-foreground">We'll help you streamline your campaign management process!</p>
+            </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-primary/90 text-white">
+        <section className="py-20 bg-primary/90 text-black">
           <div className="container text-center">
-            <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Campaign Management?</h2>
+            <h2 className="text-3xl font-bold mb-6">Take Full Control of Your Campaigns Today!</h2>
             <p className="text-xl max-w-2xl mx-auto mb-8">
-              Join thousands of marketers who've improved their campaign performance with Campaign Crew.
+              No automation distractions. Just smart, effective campaign management.
             </p>
-            <Link to={user ? "/dashboard" : "/signup"}>
-              <Button size="lg" className="bg-white text-primary rounded-md px-8 hover:shadow-lg hover:bg-gray-100 group">
-                {user ? "Go to Dashboard" : "Start Your Free Trial Today"}
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link to={user ? "/dashboard" : "/signup"}>
+                <Button size="lg" className="bg-black text-white rounded-md px-8 hover:bg-black/90 group">
+                  {user ? "Go to Dashboard" : "Start for Free"}
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Button size="lg" className="bg-white text-black rounded-md px-8 hover:bg-gray-100 border border-black/10">
+                Book a Demo <Eye className="ml-2" />
               </Button>
-            </Link>
+            </div>
           </div>
         </section>
       </main>
@@ -308,33 +458,33 @@ const Index = () => {
                 />
                 <h3 className="text-lg font-semibold text-white">Campaign Crew</h3>
               </div>
-              <p className="text-gray-400">Streamline your outreach campaigns for better results.</p>
+              <p className="text-gray-400">Take full control of your outreach campaigns.</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4 text-white">Product</h3>
               <ul className="space-y-2">
-                <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Use Cases</a></li>
+                <li><a href="#features" className="text-gray-400 hover:text-primary transition-colors">Features</a></li>
+                <li><a href="#why-us" className="text-gray-400 hover:text-primary transition-colors">Why Choose Us</a></li>
+                <li><a href="#how-it-works" className="text-gray-400 hover:text-primary transition-colors">How It Works</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Use Cases</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4 text-white">Company</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">About</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Blog</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Careers</a></li>
+                <li><a href="#contact-sales" className="text-gray-400 hover:text-primary transition-colors">Contact</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4 text-white">Legal</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">GDPR</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Cookie Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">GDPR</a></li>
               </ul>
             </div>
           </div>

@@ -88,7 +88,7 @@ export function HeroWithMockup({
               size="lg"
               className={cn(
                 "bg-primary hover:bg-primary/90",
-                "text-primary-foreground shadow-lg",
+                "text-black font-medium shadow-lg",
                 "transition-all duration-300",
               )}
             >
@@ -100,8 +100,8 @@ export function HeroWithMockup({
               size="lg"
               variant="ghost"
               className={cn(
-                "text-foreground/80",
-                "border border-white/20 hover:bg-white/10",
+                "text-primary font-medium",
+                "border border-primary hover:bg-primary/10",
                 "transition-all duration-300",
               )}
             >

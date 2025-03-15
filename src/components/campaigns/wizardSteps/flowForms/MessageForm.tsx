@@ -46,15 +46,16 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Assigned To</Label>
+          <Label>Assigned To (Optional)</Label>
           <Select 
             value={data.assignedTo || ''} 
             onValueChange={(value) => onChange({ ...data, assignedTo: value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select team member" />
+              <SelectValue placeholder="Select team member (optional)" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Unassigned</SelectItem>
               <SelectItem value="john">John Smith</SelectItem>
               <SelectItem value="sarah">Sarah Lee</SelectItem>
               <SelectItem value="mike">Mike Johnson</SelectItem>

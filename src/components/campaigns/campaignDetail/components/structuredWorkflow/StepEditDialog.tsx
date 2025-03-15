@@ -59,15 +59,16 @@ const StepEditDialog: React.FC<StepEditDialogProps> = ({
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Assigned To</Label>
+                  <Label>Assigned To (Optional)</Label>
                   <Select
                     value={editingStep.assignedTo || ''}
                     onValueChange={(value) => onEditingStepChange({...editingStep, assignedTo: value})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select team member" />
+                      <SelectValue placeholder="Select team member (optional)" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="">Unassigned</SelectItem>
                       <SelectItem value="John Smith">John Smith</SelectItem>
                       <SelectItem value="Sarah Lee">Sarah Lee</SelectItem>
                       <SelectItem value="Mike Johnson">Mike Johnson</SelectItem>

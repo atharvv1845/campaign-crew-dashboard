@@ -70,7 +70,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
   // Get assigned member names for display
   const getAssignedMemberNames = (channelId: string) => {
     const assignedIds = getAssignedMembers(channelId);
-    if (assignedIds.length === 0) return 'Assign team members';
+    if (assignedIds.length === 0) return 'Assign team members (optional)';
     
     const assignedMembers = teamMembers.filter(member => assignedIds.includes(member.id));
     const displayNames = assignedMembers.map(member => member.name);
@@ -109,7 +109,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
       <div>
         <h3 className="text-lg font-medium mb-2">Assign Team Members</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Assign team members to each outreach channel. You can assign multiple members to each channel.
+          Optionally assign team members to each outreach channel. You can proceed without assigning anyone.
         </p>
         
         {noTeamMembers ? (
@@ -117,11 +117,14 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
             <UserPlus className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">No Team Members Added Yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              You need to add team members before you can assign them to this campaign.
+              You can add team members to assign them to this campaign, or continue without team assignments.
             </p>
-            <Link to="/team">
-              <Button variant="default">Add Team Members</Button>
-            </Link>
+            <div className="space-x-4">
+              <Link to="/team">
+                <Button variant="outline">Add Team Members</Button>
+              </Link>
+              <Button variant="default" onClick={onNext}>Continue Without Assigning</Button>
+            </div>
           </div>
         ) : (
           <>

@@ -37,13 +37,13 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({
 
   return (
     <div className="space-y-2">
-      <Label>Assigned To</Label>
+      <Label>Assigned To (Optional)</Label>
       <Select 
         value={value || ''}
         onValueChange={onChange}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Select team member" />
+          <SelectValue placeholder="Select team member (optional)" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="unassigned">Unassigned</SelectItem>

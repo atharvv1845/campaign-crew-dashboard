@@ -72,7 +72,7 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
               <th className="px-4 py-2 text-left font-medium">Email</th>
               <th className="px-4 py-2 text-left font-medium">Company</th>
               <th className="px-4 py-2 text-left font-medium">Status</th>
-              <th className="px-4 py-2 text-left font-medium">Assigned To</th>
+              <th className="px-4 py-2 text-left font-medium">Assigned To (Optional)</th>
               <th className="px-4 py-2 text-right font-medium">Actions</th>
             </tr>
           </thead>

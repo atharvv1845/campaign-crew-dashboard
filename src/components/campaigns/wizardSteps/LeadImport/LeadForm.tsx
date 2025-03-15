@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ExternalLink } from 'lucide-react';
 import { LeadData } from '../../types/campaignTypes';
 
 interface LeadFormProps {
@@ -66,105 +66,140 @@ const LeadForm: React.FC<LeadFormProps> = ({
         </div>
         
         {/* Contact methods - conditionally render based on selected platforms */}
-        {showEmail && (
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={currentLead.email || ''}
-              onChange={handleLeadInputChange}
-              placeholder="Email"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
+        <div className="col-span-2">
+          <h5 className="text-sm font-medium mb-3">Contact Platforms</h5>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {showEmail && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">Email</span>
+                  <span className="text-xs text-muted-foreground">(Primary contact)</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={currentLead.email || ''}
+                  onChange={handleLeadInputChange}
+                  placeholder="Email address"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
+            
+            {showPhone && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">Phone</span>
+                  <span className="text-xs text-muted-foreground">(with country code)</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={currentLead.phone || ''}
+                  onChange={handleLeadInputChange}
+                  pattern="[0-9+-\\s()]+"
+                  placeholder="+1 (555) 123-4567"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
           </div>
-        )}
-        
-        {showPhone && (
-          <div>
-            <label className="block text-sm font-medium mb-1">Phone</label>
-            <input
-              type="tel"
-              name="phone"
-              value={currentLead.phone || ''}
-              onChange={handleLeadInputChange}
-              pattern="[0-9+-\\s()]+"
-              placeholder="Phone"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
-        )}
+        </div>
         
         {/* Social profiles - conditionally render based on selected platforms */}
-        {showTwitter && (
-          <div>
-            <label className="block text-sm font-medium mb-1">Twitter/X</label>
-            <input
-              type="text"
-              name="social-twitter"
-              value={currentLead.socialProfiles?.twitter || ''}
-              onChange={handleLeadInputChange}
-              placeholder="Twitter handle or URL"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
+        <div className="col-span-2">
+          <h5 className="text-sm font-medium mb-3">Social Profiles</h5>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {showLinkedIn && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">LinkedIn</span>
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </label>
+                <input
+                  type="text"
+                  name="social-linkedin"
+                  value={currentLead.socialProfiles?.linkedin || ''}
+                  onChange={handleLeadInputChange}
+                  placeholder="https://linkedin.com/in/username"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
+            
+            {showTwitter && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">Twitter/X</span>
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </label>
+                <input
+                  type="text"
+                  name="social-twitter"
+                  value={currentLead.socialProfiles?.twitter || ''}
+                  onChange={handleLeadInputChange}
+                  placeholder="https://twitter.com/username"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
+            
+            {showFacebook && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">Facebook</span>
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </label>
+                <input
+                  type="text"
+                  name="social-facebook"
+                  value={currentLead.socialProfiles?.facebook || ''}
+                  onChange={handleLeadInputChange}
+                  placeholder="https://facebook.com/username"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
+            
+            {showInstagram && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">Instagram</span>
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </label>
+                <input
+                  type="text"
+                  name="social-instagram"
+                  value={currentLead.socialProfiles?.instagram || ''}
+                  onChange={handleLeadInputChange}
+                  placeholder="https://instagram.com/username"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
+            
+            {showWhatsApp && (
+              <div>
+                <label className="flex items-center text-sm font-medium mb-1">
+                  <span className="mr-1">WhatsApp</span>
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                </label>
+                <input
+                  type="text"
+                  name="social-whatsapp"
+                  value={currentLead.socialProfiles?.whatsapp || ''}
+                  onChange={handleLeadInputChange}
+                  placeholder="+1 (555) 123-4567"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            )}
           </div>
-        )}
-        
-        {showLinkedIn && (
-          <div>
-            <label className="block text-sm font-medium mb-1">LinkedIn</label>
-            <input
-              type="text"
-              name="social-linkedin"
-              value={currentLead.socialProfiles?.linkedin || ''}
-              onChange={handleLeadInputChange}
-              placeholder="LinkedIn profile URL"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
+          
+          <div className="mt-3 text-xs text-muted-foreground">
+            <p>Enter full URLs for social profiles (or usernames for some platforms)</p>
           </div>
-        )}
-
-        {showInstagram && (
-          <div>
-            <label className="block text-sm font-medium mb-1">Instagram</label>
-            <input
-              type="text"
-              name="social-instagram"
-              value={currentLead.socialProfiles?.instagram || ''}
-              onChange={handleLeadInputChange}
-              placeholder="Instagram handle or URL"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
-        )}
-        
-        {showFacebook && (
-          <div>
-            <label className="block text-sm font-medium mb-1">Facebook</label>
-            <input
-              type="text"
-              name="social-facebook"
-              value={currentLead.socialProfiles?.facebook || ''}
-              onChange={handleLeadInputChange}
-              placeholder="Facebook profile URL"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
-        )}
-        
-        {showWhatsApp && (
-          <div>
-            <label className="block text-sm font-medium mb-1">WhatsApp</label>
-            <input
-              type="text"
-              name="social-whatsapp"
-              value={currentLead.socialProfiles?.whatsapp || ''}
-              onChange={handleLeadInputChange}
-              placeholder="WhatsApp number with country code"
-              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
-        )}
+        </div>
       </div>
       
       {/* Action buttons */}

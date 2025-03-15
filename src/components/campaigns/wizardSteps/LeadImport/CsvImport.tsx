@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CampaignFormData } from '../../types/campaignTypes';
 import { useToast } from "@/hooks/use-toast";
@@ -67,8 +68,37 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
       const initialStageId = formData.stages[0]?.id || '';
       const newLeads = await processLeadsFromCsv(csvFile, csvMapping, initialStageId, generateId);
       
+      // Add contact platforms to each lead based on campaign settings
+      const leadsWithPlatforms = newLeads.map(lead => {
+        // Initialize contactPlatforms array
+        let leadPlatforms: string[] = [];
+        
+        // Add platforms based on the presence of data
+        if (formData.contactPlatforms) {
+          formData.contactPlatforms.forEach(platform => {
+            // Check if lead has data for this platform
+            if (
+              (platform === 'email' && lead.email) ||
+              (platform === 'phone' && lead.phone) ||
+              (platform === 'linkedin' && lead.linkedin) ||
+              (platform === 'twitter' && lead.twitter) ||
+              (platform === 'facebook' && lead.facebook) ||
+              (platform === 'instagram' && lead.instagram) ||
+              (platform === 'whatsapp' && lead.whatsapp)
+            ) {
+              leadPlatforms.push(platform);
+            }
+          });
+        }
+        
+        return {
+          ...lead,
+          contactPlatforms: leadPlatforms
+        };
+      });
+      
       // No validation - Accept all leads
-      const validLeads = newLeads;
+      const validLeads = leadsWithPlatforms;
       
       if (validLeads.length === 0) {
         toast({
@@ -115,13 +145,18 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
     }
   };
 
+  // Generate CSV template with all selected contact platforms
+  const handleDownloadTemplate = () => {
+    downloadCsvTemplate(formData.contactPlatforms);
+  };
+
   return (
     <div className="space-y-6">
       <FileUpload 
         csvFile={csvFile}
         handleFileChange={handleFileChange}
         handleCancelFile={handleCancelFile}
-        downloadTemplate={downloadCsvTemplate}
+        downloadTemplate={handleDownloadTemplate}
       />
       
       {csvFile && (
@@ -131,6 +166,7 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
               csvHeaders={csvHeaders}
               csvMapping={csvMapping}
               onMappingChange={handleMappingChange}
+              contactPlatforms={formData.contactPlatforms}
             />
           )}
           

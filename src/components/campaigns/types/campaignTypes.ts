@@ -19,6 +19,7 @@ export interface CampaignFormData {
   notes?: string;
   shareNotes?: boolean;
   stepFlows?: Record<string, MessageStep[]>;
+  contactPlatforms?: string[]; // Platforms for contacting leads (email, phone, social media)
 }
 
 // Campaign data structure
@@ -41,6 +42,7 @@ export interface CampaignData {
     edges: Edge[];
   };
   contacted?: number;
+  contactPlatforms?: string[]; // Platforms for contacting leads
 }
 
 // Lead data structure
@@ -48,6 +50,7 @@ export interface LeadData {
   id: string;
   firstName: string;
   lastName: string;
+  name?: string;
   company?: string;
   email: string;
   phone?: string;
@@ -63,6 +66,8 @@ export interface LeadData {
   };
   source?: string;
   statusName?: string; // Added this optional property for temporary use during import
+  contactPlatforms?: string[]; // Platforms this lead can be contacted on
+  campaignId: string | number;
 }
 
 // Stage data structure

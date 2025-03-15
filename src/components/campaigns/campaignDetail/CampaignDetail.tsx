@@ -47,13 +47,24 @@ const CampaignDetail: React.FC = () => {
             whatsapp: Math.random() > 0.9 ? `+1234567890${i}` : undefined,
           };
           
+          // Generate random contact platforms
+          const contactPlatforms: string[] = [];
+          if (Math.random() > 0.3) contactPlatforms.push('email');
+          if (Math.random() > 0.5) contactPlatforms.push('phone');
+          if (socialProfiles.linkedin) contactPlatforms.push('linkedin');
+          if (socialProfiles.twitter) contactPlatforms.push('twitter');
+          if (socialProfiles.facebook) contactPlatforms.push('facebook');
+          if (socialProfiles.instagram) contactPlatforms.push('instagram');
+          if (socialProfiles.whatsapp) contactPlatforms.push('whatsapp');
+          
           return {
             id: `${i + 1}`,
             name: `Lead ${i + 1}`,
-            email: `lead${i + 1}@example.com`,
+            email: Math.random() > 0.3 ? `lead${i + 1}@example.com` : undefined,
             phone: Math.random() > 0.5 ? `(123) 456-${7890 + i}` : undefined,
             company: `Company ${i + 1}`,
             status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
+            currentStage: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
             lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             campaignId: id,
             // Add social profiles
@@ -62,7 +73,9 @@ const CampaignDetail: React.FC = () => {
             facebook: socialProfiles.facebook,
             instagram: socialProfiles.instagram,
             whatsapp: socialProfiles.whatsapp,
-            socialProfiles: socialProfiles
+            socialProfiles: socialProfiles,
+            contactPlatforms: contactPlatforms,
+            assignedTo: Math.random() > 0.5 ? ['John Doe', 'Jane Smith', 'Mike Johnson'][Math.floor(Math.random() * 3)] : undefined
           };
         });
         
@@ -86,6 +99,11 @@ const CampaignDetail: React.FC = () => {
       // Ensure team members exist
       if (!foundCampaign.teamMembers) {
         foundCampaign.teamMembers = ['John Doe', 'Jane Smith', 'Mike Johnson'];
+      }
+      
+      // Ensure contactPlatforms exist
+      if (!foundCampaign.contactPlatforms) {
+        foundCampaign.contactPlatforms = ['email', 'phone', 'linkedin'];
       }
       
       setCampaign(foundCampaign);
@@ -137,7 +155,7 @@ const CampaignDetail: React.FC = () => {
     navigate('/campaigns');
   };
 
-  const handleUpdateLead = (leadId: number | string, value: string) => {
+  const handleUpdateLead = (leadId: string | number, value: string) => {
     // Check if this is a special field update (contains ':::')
     if (value.includes(':::')) {
       const [field, fieldValue] = value.split(':::');
@@ -177,6 +195,34 @@ const CampaignDetail: React.FC = () => {
         description: `Lead status has been changed to ${value}`,
       });
     }
+  };
+
+  const handleLeadClick = (lead: Lead) => {
+    // Here we would open the lead detail view
+    console.log("Lead clicked:", lead);
+    // For now, just show a toast
+    toast({
+      title: "Lead Selected",
+      description: `${lead.name} selected`,
+    });
+  };
+
+  const handleLeadUpdate = (updatedLead: Lead) => {
+    // Update the lead data
+    const updatedLeadsData = campaign.leadsData.map((lead: Lead) => 
+      lead.id === updatedLead.id ? updatedLead : lead
+    );
+    
+    setCampaign(prev => ({
+      ...prev,
+      leadsData: updatedLeadsData
+    }));
+    
+    // Show success message
+    toast({
+      title: "Lead updated",
+      description: "Lead contact information has been updated",
+    });
   };
 
   return (
@@ -244,7 +290,9 @@ const CampaignDetail: React.FC = () => {
             <LeadTable 
               leads={campaign.leadsData} 
               campaign={campaign}
-              onStatusChange={handleUpdateLead} 
+              onStatusChange={handleUpdateLead}
+              onLeadClick={handleLeadClick}
+              onUpdateLead={handleLeadUpdate}
             />
           ) : (
             <div className="text-center py-12">

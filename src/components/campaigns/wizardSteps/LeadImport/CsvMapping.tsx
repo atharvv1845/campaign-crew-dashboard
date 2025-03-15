@@ -5,15 +5,17 @@ interface CsvMappingProps {
   csvHeaders: string[];
   csvMapping: Record<string, string>;
   onMappingChange: (header: string, value: string) => void;
+  contactPlatforms?: string[];
 }
 
 const CsvMapping: React.FC<CsvMappingProps> = ({ 
   csvHeaders, 
   csvMapping, 
-  onMappingChange 
+  onMappingChange,
+  contactPlatforms = []
 }) => {
   // Mapping options for CSV columns
-  const mappingOptions = [
+  const defaultMappingOptions = [
     { value: 'name', label: 'Full Name' },
     { value: 'firstName', label: 'First Name' },
     { value: 'lastName', label: 'Last Name' },
@@ -24,16 +26,28 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
     { value: 'currentStage', label: 'Stage' },
     { value: 'assignedTo', label: 'Assigned To' },
     { value: 'notes', label: 'Notes' },
-    { value: 'linkedin', label: 'LinkedIn' },
-    { value: 'twitter', label: 'Twitter' },
-    { value: 'facebook', label: 'Facebook' },
-    { value: 'instagram', label: 'Instagram' },
-    { value: 'whatsapp', label: 'WhatsApp' },
-    { value: 'lastContacted', label: 'Last Contact Date' },
-    { value: 'firstContacted', label: 'First Contact Date' },
-    { value: 'followUpDate', label: 'Next Follow Up Date' },
+    { value: 'lastContact', label: 'Last Contact Date' },
+    { value: 'firstContactDate', label: 'First Contact Date' },
+    { value: 'nextFollowUpDate', label: 'Next Follow Up Date' },
     { value: 'source', label: 'Lead Source' },
   ];
+
+  // Add platform-specific options based on selected contact platforms
+  const platformMappingOptions = [
+    { value: 'linkedin', label: 'LinkedIn', platform: 'linkedin' },
+    { value: 'twitter', label: 'Twitter', platform: 'twitter' },
+    { value: 'facebook', label: 'Facebook', platform: 'facebook' },
+    { value: 'instagram', label: 'Instagram', platform: 'instagram' },
+    { value: 'whatsapp', label: 'WhatsApp', platform: 'whatsapp' },
+  ];
+
+  // Filter platform options based on selected contact platforms
+  const filteredPlatformOptions = contactPlatforms.length > 0
+    ? platformMappingOptions.filter(option => contactPlatforms.includes(option.platform))
+    : platformMappingOptions;
+
+  // Combine default options with filtered platform options
+  const mappingOptions = [...defaultMappingOptions, ...filteredPlatformOptions];
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">

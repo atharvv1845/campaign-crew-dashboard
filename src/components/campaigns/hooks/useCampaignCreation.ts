@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -23,7 +24,8 @@ const defaultFormData: CampaignFormData = {
     nodes: [],
     edges: []
   },
-  teamAssignments: {}
+  teamAssignments: {},
+  contactPlatforms: ['email', 'phone', 'linkedin'] // Default contact platforms
 };
 
 const transformLeadData = (leadData: any, campaignId: number | string): Lead => {
@@ -45,6 +47,12 @@ const transformLeadData = (leadData: any, campaignId: number | string): Lead => 
     firstContactDate: leadData.firstContactDate || leadData.firstContacted,
     nextFollowUpDate: leadData.nextFollowUpDate || leadData.followUpDate,
     currentStage: leadData.currentStage || leadData.status,
+    contactPlatforms: leadData.contactPlatforms || [],
+    linkedin: leadData.socialProfiles?.linkedin,
+    twitter: leadData.socialProfiles?.twitter,
+    facebook: leadData.socialProfiles?.facebook,
+    instagram: leadData.socialProfiles?.instagram,
+    whatsapp: leadData.socialProfiles?.whatsapp,
   };
 };
 
@@ -70,7 +78,8 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
           nodes: [],
           edges: []
         },
-        teamAssignments: {}
+        teamAssignments: {},
+        contactPlatforms: existingCampaign.contactPlatforms || defaultFormData.contactPlatforms
       };
       
       setFormData(transformedData);
@@ -151,7 +160,8 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         contacted: 0,
         messageFlow: formData.messageFlow || { nodes: [], edges: [] },
         stages: normalizedStages,
-        leadsData: transformedLeads // Duplicate leads in leadsData for backward compatibility
+        leadsData: transformedLeads, // Duplicate leads in leadsData for backward compatibility
+        contactPlatforms: formData.contactPlatforms // Include contact platforms
       };
 
       if (existingCampaign) {

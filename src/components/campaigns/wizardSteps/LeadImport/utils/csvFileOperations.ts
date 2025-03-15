@@ -1,8 +1,26 @@
 
 import { CsvParseResult } from '../hooks/types';
 
-export const generateCsvTemplate = () => {
-  const headers = ['First Name', 'Last Name', 'Email', 'Company', 'Phone', 'LinkedIn', 'Twitter', 'Status', 'Assigned To', 'Notes'];
+export const generateCsvTemplate = (contactPlatforms?: string[]) => {
+  // Base headers that are always included
+  const baseHeaders = ['First Name', 'Last Name', 'Email', 'Company', 'Phone', 'Status', 'Assigned To', 'Notes'];
+  
+  // Platform headers that are included only if selected
+  const platformHeaders: string[] = [];
+  
+  if (contactPlatforms && contactPlatforms.length > 0) {
+    if (contactPlatforms.includes('linkedin')) platformHeaders.push('LinkedIn');
+    if (contactPlatforms.includes('twitter')) platformHeaders.push('Twitter');
+    if (contactPlatforms.includes('facebook')) platformHeaders.push('Facebook');
+    if (contactPlatforms.includes('instagram')) platformHeaders.push('Instagram');
+    if (contactPlatforms.includes('whatsapp')) platformHeaders.push('WhatsApp');
+  } else {
+    // If no platforms specified, include all by default
+    platformHeaders.push('LinkedIn', 'Twitter', 'Facebook', 'Instagram', 'WhatsApp');
+  }
+  
+  // Combine all headers
+  const headers = [...baseHeaders, ...platformHeaders];
   const csvContent = headers.join(',') + '\n';
   
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -34,6 +52,12 @@ export const parseInitialMapping = (headers: string[]): Record<string, string> =
       initialMapping[header] = 'linkedin';
     } else if (lowerHeader.includes('twitter')) {
       initialMapping[header] = 'twitter';
+    } else if (lowerHeader.includes('facebook')) {
+      initialMapping[header] = 'facebook';
+    } else if (lowerHeader.includes('instagram')) {
+      initialMapping[header] = 'instagram';
+    } else if (lowerHeader.includes('whatsapp')) {
+      initialMapping[header] = 'whatsapp';
     } else if (lowerHeader.includes('status')) {
       initialMapping[header] = 'status';
     } else if (lowerHeader.includes('assign') || lowerHeader.includes('rep')) {

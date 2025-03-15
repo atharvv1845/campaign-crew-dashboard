@@ -5,6 +5,17 @@ import { cn } from '@/lib/utils';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
 
+// Available contact platforms
+const availablePlatforms = [
+  { id: 'email', name: 'Email', icon: 'mail' },
+  { id: 'phone', name: 'Phone', icon: 'phone' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'linkedin' },
+  { id: 'twitter', name: 'Twitter', icon: 'twitter' },
+  { id: 'instagram', name: 'Instagram', icon: 'instagram' },
+  { id: 'facebook', name: 'Facebook', icon: 'facebook' },
+  { id: 'whatsapp', name: 'WhatsApp', icon: 'message-circle' },
+];
+
 interface CampaignSetupProps {
   formData: CampaignFormData;
   setFormData: React.Dispatch<React.SetStateAction<CampaignFormData>>;
@@ -26,6 +37,17 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
         : [...prev.channels, channelId];
       
       return { ...prev, channels };
+    });
+  };
+
+  // Handler for toggling contact platforms
+  const togglePlatform = (platformId: string) => {
+    setFormData(prev => {
+      const contactPlatforms = prev.contactPlatforms?.includes(platformId)
+        ? prev.contactPlatforms.filter(p => p !== platformId)
+        : [...(prev.contactPlatforms || []), platformId];
+      
+      return { ...prev, contactPlatforms };
     });
   };
 
@@ -107,6 +129,35 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
               <p className="text-xs text-destructive">Select at least one channel</p>
             )}
           </div>
+
+          {/* Contact Platform Selection */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Select Contact Platforms</h3>
+            <p className="text-sm text-muted-foreground">Choose the platforms you'll use to contact leads</p>
+            
+            <div className="grid grid-cols-2 gap-3">
+              {availablePlatforms.map(platform => (
+                <button
+                  key={platform.id}
+                  type="button"
+                  onClick={() => togglePlatform(platform.id)}
+                  className={cn(
+                    "flex items-center justify-between p-3 rounded-lg border border-border transition-colors",
+                    formData.contactPlatforms?.includes(platform.id) 
+                      ? "bg-primary/10 border-primary" 
+                      : "hover:bg-muted/20"
+                  )}
+                >
+                  <span>{platform.name}</span>
+                  {formData.contactPlatforms?.includes(platform.id) && (
+                    <span className="flex items-center justify-center w-5 h-5 bg-primary rounded-full text-primary-foreground">
+                      <Check className="h-3 w-3" />
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         
         {/* Right column - Preview */}
@@ -138,6 +189,27 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
                         className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
                       >
                         {channel?.name}
+                      </span>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-sm font-medium">Contact Platforms:</span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {!formData.contactPlatforms || formData.contactPlatforms.length === 0 ? (
+                  <span className="text-sm text-muted-foreground">No platforms selected</span>
+                ) : (
+                  formData.contactPlatforms.map(platformId => {
+                    const platform = availablePlatforms.find(p => p.id === platformId);
+                    return (
+                      <span 
+                        key={platformId}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                      >
+                        {platform?.name}
                       </span>
                     );
                   })

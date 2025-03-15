@@ -33,6 +33,8 @@ export interface Lead {
     instagram?: string;
     whatsapp?: string;
   };
+  // Contact platforms
+  contactPlatforms?: string[];  // Array of enabled contact platforms for this lead
   // Metadata
   source?: string;
   createdAt?: string;
@@ -58,4 +60,6 @@ export interface Campaign {
   stages: CampaignStage[];
   description?: string;
   leadsData?: Lead[];
+  channels?: string[];         // Communication channels used in this campaign
+  contactPlatforms?: string[]; // Contact platforms enabled for this campaign
 }

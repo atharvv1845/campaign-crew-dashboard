@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, onToggle }) => {
   return (
     <aside 
       className={cn(
-        "fixed top-0 left-0 h-screen bg-background z-30 border-r border-border transition-all duration-300",
+        "fixed top-0 left-0 h-screen bg-black z-30 border-r border-border transition-all duration-300",
         expanded ? "w-64" : "w-16"
       )}
     >

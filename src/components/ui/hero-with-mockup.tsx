@@ -56,11 +56,11 @@ export function HeroWithMockup({
           <h1
             className={cn(
               "inline-block animate-appear",
-              "bg-gradient-to-b from-foreground via-foreground/90 to-muted-foreground",
+              "bg-gradient-to-b from-white via-white/90 to-white/80",
               "bg-clip-text text-transparent",
               "text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl",
               "leading-[1.1] sm:leading-[1.1]",
-              "drop-shadow-sm dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]",
+              "drop-shadow-sm",
             )}
           >
             {title}
@@ -87,9 +87,8 @@ export function HeroWithMockup({
               asChild
               size="lg"
               className={cn(
-                "bg-gradient-to-b from-primary to-primary/90 dark:from-primary/90 dark:to-primary/80",
-                "hover:from-primary/95 hover:to-primary/85 dark:hover:from-primary/80 dark:hover:to-primary/70",
-                "text-white shadow-lg",
+                "bg-primary hover:bg-primary/90",
+                "text-primary-foreground shadow-lg",
                 "transition-all duration-300",
               )}
             >
@@ -102,7 +101,7 @@ export function HeroWithMockup({
               variant="ghost"
               className={cn(
                 "text-foreground/80",
-                "border border-muted-foreground/20 hover:bg-muted-foreground/10",
+                "border border-white/20 hover:bg-white/10",
                 "transition-all duration-300",
               )}
             >
@@ -118,8 +117,8 @@ export function HeroWithMockup({
             <Mockup
               className={cn(
                 "animate-appear opacity-0 [animation-delay:700ms]",
-                "shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)]",
-                "border-white/10",
+                "shadow-[0_0_50px_-12px_rgba(255,193,7,0.3)]",
+                "border-primary/20",
               )}
             >
               <img

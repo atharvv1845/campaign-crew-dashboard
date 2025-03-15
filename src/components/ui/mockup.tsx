@@ -11,11 +11,11 @@ export function Mockup({ children, className }: MockupProps) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border bg-black/50 shadow-xl",
+        "relative overflow-hidden rounded-lg border bg-black shadow-xl",
         className
       )}
     >
-      <div className="flex items-center justify-start border-b border-white/10 bg-black/70 px-4 py-2.5">
+      <div className="flex items-center justify-start border-b border-white/10 bg-black px-4 py-2.5">
         <div className="flex space-x-2">
           <div className="h-3 w-3 rounded-full bg-rose-500" />
           <div className="h-3 w-3 rounded-full bg-yellow-500" />

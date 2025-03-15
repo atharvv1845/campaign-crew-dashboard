@@ -26,11 +26,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#3B82F6', // Bright Blue
-					foreground: '#FFFFFF' // White
+					DEFAULT: '#FFC107', // Golden Yellow from logo
+					foreground: '#000000' // Black
 				},
 				secondary: {
-					DEFAULT: '#334155', // Slate
+					DEFAULT: '#222222', // Dark Gray
 					foreground: '#FFFFFF' // White
 				},
 				destructive: {
@@ -38,12 +38,12 @@ export default {
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: '#1E293B', // Dark slate for muted in dark mode
-					foreground: '#94A3B8' // Lighter slate for text
+					DEFAULT: '#1E1E1E', // Very dark gray for muted areas
+					foreground: '#AAAAAA' // Light gray for muted text
 				},
 				accent: {
-					DEFAULT: '#1E293B', // Dark blue accent
-					foreground: '#EFF6FF' // Light blue foreground
+					DEFAULT: '#333333', // Dark gray accent
+					foreground: '#FFC107' // Golden Yellow
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -54,14 +54,14 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				sidebar: {
-					DEFAULT: '#0F172A', // Very dark blue
+					DEFAULT: '#000000', // Black
 					foreground: '#FFFFFF', // White
-					primary: '#3B82F6', // Bright Blue
-					'primary-foreground': '#FFFFFF', // White
-					accent: '#1E293B', // Dark slate
+					primary: '#FFC107', // Golden Yellow
+					'primary-foreground': '#000000', // Black
+					accent: '#333333', // Dark gray
 					'accent-foreground': '#FFFFFF', // White
-					border: '#1E293B', // Dark slate
-					ring: '#3B82F6' // Bright Blue
+					border: '#333333', // Dark gray
+					ring: '#FFC107' // Golden Yellow
 				}
 			},
 			borderRadius: {

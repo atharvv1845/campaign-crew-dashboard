@@ -150,14 +150,11 @@ const Index = () => {
           <div className="flex items-center space-x-4">
             {user ? <Link to="/dashboard">
                 <Button className="bg-primary text-black font-medium hover:bg-primary/90">Go to Dashboard</Button>
-              </Link> : <>
-                <Link to="/login">
-                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Login</Button>
-                </Link>
-                <Link to="/signup">
-                  <Button className="bg-primary text-black font-medium hover:bg-primary/90">Sign Up</Button>
-                </Link>
-              </>}
+              </Link> : 
+              <a href="#contact-sales">
+                <Button className="bg-primary text-black font-medium hover:bg-primary/90">Contact Sales</Button>
+              </a>
+            }
           </div>
         </div>
       </header>
@@ -165,8 +162,8 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <HeroWithMockup title="Effortless Campaign Management, Maximum Results!" description="Track, manage, and optimize your marketing campaigns—without automation. Take full control of your outreach strategy." primaryCta={{
-        text: user ? "Go to Dashboard 🚀" : "Get Started 🚀",
-        href: user ? "/dashboard" : "/signup"
+        text: user ? "Go to Dashboard 🚀" : "Contact Sales 🚀",
+        href: user ? "/dashboard" : "#contact-sales",
       }} secondaryCta={{
         text: "See It In Action 👀",
         href: "#how-it-works",
@@ -183,7 +180,7 @@ const Index = () => {
           <div className="container">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4 text-white">What is Campaign Crew?</h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
                 Manage your outreach campaigns across multiple channels with ease. Designed for businesses, agencies, and teams 
                 that want full control over their campaign process—without relying on automation.
               </p>
@@ -254,9 +251,11 @@ const Index = () => {
                 </div>)}
             </div>
             <div className="mt-12 text-center">
-              <Button className="bg-primary text-black font-medium hover:bg-primary/90">
-                Watch Demo <Eye className="ml-2 h-4 w-4" />
-              </Button>
+              <a href="#contact-sales">
+                <Button className="bg-primary text-black font-medium hover:bg-primary/90">
+                  Contact Sales <Phone className="ml-2 h-4 w-4" />
+                </Button>
+              </a>
             </div>
           </div>
         </section>
@@ -351,12 +350,12 @@ const Index = () => {
               No automation distractions. Just smart, effective campaign management.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link to={user ? "/dashboard" : "/signup"}>
+              <a href="#contact-sales">
                 <Button size="lg" className="bg-black text-white rounded-md px-8 hover:bg-black/90 group">
-                  {user ? "Go to Dashboard" : "Start for Free"}
+                  Contact Sales
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
-              </Link>
+              </a>
               <Button size="lg" className="bg-white text-black rounded-md px-8 hover:bg-gray-100 border border-black/10">
                 Book a Demo <Eye className="ml-2" />
               </Button>

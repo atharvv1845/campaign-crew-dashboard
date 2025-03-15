@@ -50,15 +50,11 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
     platform: platform.id
   }));
 
-  // Filter platform options based on selected contact platforms
-  const filteredPlatformOptions = contactPlatforms.length > 0
-    ? [...platformMappingOptions, ...customPlatformOptions].filter(option => 
-        contactPlatforms.includes(option.platform)
-      )
-    : [...platformMappingOptions, ...customPlatformOptions];
+  // Combine all platform options regardless of selected contact platforms
+  const allPlatformOptions = [...platformMappingOptions, ...customPlatformOptions];
 
-  // Combine default options with filtered platform options
-  const mappingOptions = [...defaultMappingOptions, ...filteredPlatformOptions];
+  // Combine default options with all platform options
+  const mappingOptions = [...defaultMappingOptions, ...allPlatformOptions];
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
@@ -84,11 +80,34 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                     className="w-full px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="">-- Select Field --</option>
-                    {mappingOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                    {/* Basic fields group */}
+                    <optgroup label="Basic Information">
+                      {defaultMappingOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                    
+                    {/* Platform fields group */}
+                    <optgroup label="Contact Platforms">
+                      {platformMappingOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                    
+                    {/* Custom platform fields, if any */}
+                    {customPlatformOptions.length > 0 && (
+                      <optgroup label="Custom Platforms">
+                        {customPlatformOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
                   </select>
                 </td>
               </tr>

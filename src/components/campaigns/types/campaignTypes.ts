@@ -49,7 +49,7 @@ export interface CampaignData {
 
 // Lead data structure
 export interface LeadData {
-  id: string;
+  id: string | number;
   firstName: string;
   lastName: string;
   name?: string;
@@ -74,6 +74,9 @@ export interface LeadData {
   lastContact?: string;
   firstContactDate?: string;
   nextFollowUpDate?: string;
+  
+  // For consistency with existing code using these properties
+  currentStage?: string;
 }
 
 // Stage data structure

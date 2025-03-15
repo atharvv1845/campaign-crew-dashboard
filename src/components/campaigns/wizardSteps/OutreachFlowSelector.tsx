@@ -4,9 +4,10 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Edit, ArrowRight, MessageSquare, Clock, ArrowRightFromLine } from 'lucide-react';
+import { Edit, ArrowRight, MessageSquare, Clock, ArrowRightFromLine, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import StepIcon from '@/components/messaging/outreachFlow/StepIcon';
+import { Input } from '@/components/ui/input';
 
 interface OutreachFlow {
   id: number;
@@ -29,6 +30,8 @@ const OutreachFlowSelector: React.FC<OutreachFlowSelectorProps> = ({
 }) => {
   const [flows, setFlows] = useState<OutreachFlow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showNewFlowInput, setShowNewFlowInput] = useState(false);
+  const [newFlowName, setNewFlowName] = useState('');
   const { toast } = useToast();
 
   // Load flows from localStorage
@@ -55,6 +58,41 @@ const OutreachFlowSelector: React.FC<OutreachFlowSelectorProps> = ({
   }, [toast]);
 
   const selectedFlow = flows.find(flow => flow.id === selectedFlowId);
+
+  const handleCreateFlow = () => {
+    if (!newFlowName.trim()) {
+      toast({
+        title: "Flow name required",
+        description: "Please enter a name for the new flow",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create a new flow
+    const newFlow = {
+      id: Date.now(),
+      name: newFlowName,
+      steps: []
+    };
+
+    // Add to local storage
+    const updatedFlows = [...flows, newFlow];
+    localStorage.setItem(OUTREACH_FLOWS_STORAGE_KEY, JSON.stringify(updatedFlows));
+    
+    // Update state
+    setFlows(updatedFlows);
+    onSelectFlow(newFlow.id);
+    
+    // Reset input
+    setNewFlowName('');
+    setShowNewFlowInput(false);
+    
+    toast({
+      title: "Flow created",
+      description: `"${newFlowName}" has been created successfully.`
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -153,21 +191,57 @@ const OutreachFlowSelector: React.FC<OutreachFlowSelectorProps> = ({
       ) : (
         <div className="text-center py-6 border border-dashed rounded-md">
           <p className="text-muted-foreground text-sm">
-            No outreach flow selected. Select an existing flow or create a new one in the Messaging section.
+            No outreach flow selected. Select an existing flow or create a new one.
           </p>
         </div>
       )}
 
       <div className="mt-4 flex justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            window.open('/messaging?tab=flow', '_blank');
-          }}
-        >
-          Create New Flow
-        </Button>
+        {showNewFlowInput ? (
+          <div className="flex-1 flex gap-2">
+            <Input
+              value={newFlowName}
+              onChange={(e) => setNewFlowName(e.target.value)}
+              placeholder="Enter flow name"
+              className="flex-1"
+              autoFocus
+            />
+            <Button
+              onClick={handleCreateFlow}
+              disabled={!newFlowName.trim()}
+            >
+              Create
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNewFlowInput(false);
+                setNewFlowName('');
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                window.open('/messaging?tab=flow', '_blank');
+              }}
+            >
+              Open Flows Page
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setShowNewFlowInput(true)}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              New Flow
+            </Button>
+          </>
+        )}
         {selectedFlow && (
           <Button
             size="sm"

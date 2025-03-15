@@ -1,50 +1,171 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from '@/components/ui/tabs';
+import { 
+  BarChart3, 
+  PieChart, 
+  LineChart,
+  Users, 
+  MessageSquare,
+  Download,
+  Filter
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import ReportsDashboard from '@/components/reports/ReportsDashboard';
+import CampaignReports from '@/components/reports/CampaignReports';
+import LeadReports from '@/components/reports/LeadReports';
+import TeamReports from '@/components/reports/TeamReports';
+import MessagingReports from '@/components/reports/MessagingReports';
+import ReportsFilters from '@/components/reports/ReportsFilters';
 
 const ReportsPage: React.FC = () => {
+  const [dateRange, setDateRange] = useState<{from: Date | undefined, to: Date | undefined}>({
+    from: undefined,
+    to: undefined
+  });
+  const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
+  const [selectedTeamMembers, setSelectedTeamMembers] = useState<string[]>([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleExport = (format: 'csv' | 'pdf' | 'excel') => {
+    console.log(`Exporting in ${format} format`);
+    // In a real app, this would trigger an API call to generate the export
+  };
+
   return (
-    <div className="container mx-auto py-6">
-      <div className="bg-background border rounded-lg shadow-sm p-6">
-        <h1 className="text-2xl font-semibold mb-6">Reports & Analytics</h1>
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h1 className="text-2xl font-semibold">Reports & Analytics</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="border rounded-lg p-6 bg-card">
-            <h2 className="text-lg font-medium mb-4">Campaign Performance</h2>
-            <p className="text-muted-foreground">View detailed metrics on campaign effectiveness and ROI.</p>
-            <button className="mt-4 text-primary text-sm font-medium">Generate Report →</button>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4 mr-2" />
+            Filters
+          </Button>
           
-          <div className="border rounded-lg p-6 bg-card">
-            <h2 className="text-lg font-medium mb-4">Lead Conversion</h2>
-            <p className="text-muted-foreground">Track lead progression through your sales pipeline.</p>
-            <button className="mt-4 text-primary text-sm font-medium">Generate Report →</button>
-          </div>
-          
-          <div className="border rounded-lg p-6 bg-card">
-            <h2 className="text-lg font-medium mb-4">Team Performance</h2>
-            <p className="text-muted-foreground">Measure individual and team outreach effectiveness.</p>
-            <button className="mt-4 text-primary text-sm font-medium">Generate Report →</button>
-          </div>
-          
-          <div className="border rounded-lg p-6 bg-card">
-            <h2 className="text-lg font-medium mb-4">Response Analytics</h2>
-            <p className="text-muted-foreground">Analyze response rates across different channels.</p>
-            <button className="mt-4 text-primary text-sm font-medium">Generate Report →</button>
-          </div>
-          
-          <div className="border rounded-lg p-6 bg-card">
-            <h2 className="text-lg font-medium mb-4">Content Performance</h2>
-            <p className="text-muted-foreground">See which message templates get the best engagement.</p>
-            <button className="mt-4 text-primary text-sm font-medium">Generate Report →</button>
-          </div>
-          
-          <div className="border rounded-lg p-6 bg-card">
-            <h2 className="text-lg font-medium mb-4">Custom Reports</h2>
-            <p className="text-muted-foreground">Build and save your own custom analytics dashboards.</p>
-            <button className="mt-4 text-primary text-sm font-medium">Create Report →</button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleExport('csv')}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              CSV
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleExport('excel')}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Excel
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleExport('pdf')}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              PDF
+            </Button>
           </div>
         </div>
       </div>
+      
+      {showFilters && (
+        <ReportsFilters 
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          selectedCampaigns={selectedCampaigns}
+          setSelectedCampaigns={setSelectedCampaigns}
+          selectedTeamMembers={selectedTeamMembers}
+          setSelectedTeamMembers={setSelectedTeamMembers}
+          selectedPlatforms={selectedPlatforms}
+          setSelectedPlatforms={setSelectedPlatforms}
+        />
+      )}
+      
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            <span>Dashboard</span>
+          </TabsTrigger>
+          <TabsTrigger value="campaigns" className="flex items-center gap-2">
+            <PieChart className="h-4 w-4" />
+            <span>Campaign Reports</span>
+          </TabsTrigger>
+          <TabsTrigger value="leads" className="flex items-center gap-2">
+            <LineChart className="h-4 w-4" />
+            <span>Lead Reports</span>
+          </TabsTrigger>
+          <TabsTrigger value="team" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span>Team Performance</span>
+          </TabsTrigger>
+          <TabsTrigger value="messaging" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            <span>Messaging Reports</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="dashboard" className="pt-4">
+          <ReportsDashboard 
+            dateRange={dateRange}
+            selectedCampaigns={selectedCampaigns}
+            selectedTeamMembers={selectedTeamMembers}
+            selectedPlatforms={selectedPlatforms}
+          />
+        </TabsContent>
+        
+        <TabsContent value="campaigns" className="pt-4">
+          <CampaignReports 
+            dateRange={dateRange}
+            selectedCampaigns={selectedCampaigns}
+            selectedTeamMembers={selectedTeamMembers}
+            selectedPlatforms={selectedPlatforms}
+          />
+        </TabsContent>
+        
+        <TabsContent value="leads" className="pt-4">
+          <LeadReports 
+            dateRange={dateRange}
+            selectedCampaigns={selectedCampaigns}
+            selectedTeamMembers={selectedTeamMembers}
+            selectedPlatforms={selectedPlatforms}
+          />
+        </TabsContent>
+        
+        <TabsContent value="team" className="pt-4">
+          <TeamReports 
+            dateRange={dateRange}
+            selectedCampaigns={selectedCampaigns}
+            selectedTeamMembers={selectedTeamMembers}
+            selectedPlatforms={selectedPlatforms}
+          />
+        </TabsContent>
+        
+        <TabsContent value="messaging" className="pt-4">
+          <MessagingReports 
+            dateRange={dateRange}
+            selectedCampaigns={selectedCampaigns}
+            selectedTeamMembers={selectedTeamMembers}
+            selectedPlatforms={selectedPlatforms}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

@@ -36,11 +36,17 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({
           <SelectValue placeholder="Select team member" />
         </SelectTrigger>
         <SelectContent>
-          {options.map(option => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
+          {options.length > 0 ? (
+            options.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))
+          ) : (
+            <div className="py-2 px-2 text-sm text-muted-foreground">
+              No team members available
+            </div>
+          )}
         </SelectContent>
       </Select>
     </div>

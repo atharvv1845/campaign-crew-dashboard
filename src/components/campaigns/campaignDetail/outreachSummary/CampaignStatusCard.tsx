@@ -43,22 +43,36 @@ const CampaignStatusCard: React.FC<CampaignStatusCardProps> = ({ campaign, teamM
             <span className="text-sm">Team Members</span>
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="text-xs bg-muted/20 px-2 py-1 rounded-full">
-                {member}
-              </div>
-            ))}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="rounded-full h-6 text-xs"
-              onClick={handleAddTeamMember}
-            >
-              + Add
-            </Button>
-          </div>
+          {teamMembers.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {teamMembers.map((member, index) => (
+                <div key={index} className="text-xs bg-muted/20 px-2 py-1 rounded-full">
+                  {member}
+                </div>
+              ))}
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-full h-6 text-xs"
+                onClick={handleAddTeamMember}
+              >
+                + Add
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="text-xs text-muted-foreground">No team members assigned</div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-full h-6 text-xs w-fit"
+                onClick={handleAddTeamMember}
+              >
+                + Add Team Member
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

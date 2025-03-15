@@ -95,7 +95,6 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
       <td className="py-3 px-4">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => onLeadClick(lead)}>
           <Avatar className="h-8 w-8">
-            <AvatarImage src={lead.avatar} />
             <AvatarFallback>{getInitials(lead.name)}</AvatarFallback>
           </Avatar>
           <div>
@@ -149,17 +148,23 @@ const LeadTableRow: React.FC<LeadTableRowProps> = ({
             <SelectItem value="">
               <span className="text-muted-foreground">Unassigned</span>
             </SelectItem>
-            {teamMembers.filter(m => m.status === 'Active').map(member => (
-              <SelectItem key={member.id} value={member.id}>
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={member.avatar} />
-                    <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-                  </Avatar>
-                  <span>{member.name}</span>
-                </div>
-              </SelectItem>
-            ))}
+            {teamMembers.length > 0 ? (
+              teamMembers.filter(m => m.status === 'Active').map(member => (
+                <SelectItem key={member.id} value={member.id}>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={member.avatar} />
+                      <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
+                    </Avatar>
+                    <span>{member.name}</span>
+                  </div>
+                </SelectItem>
+              ))
+            ) : (
+              <div className="py-2 px-2 text-sm text-muted-foreground">
+                No team members available
+              </div>
+            )}
           </SelectContent>
         </Select>
       </td>

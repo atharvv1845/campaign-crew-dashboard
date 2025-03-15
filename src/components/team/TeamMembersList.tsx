@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { TeamMember } from './types';
-import { MoreHorizontal, Pencil, Trash2, Mail } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Mail, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,8 +68,12 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
 
   if (teamMembers.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        No team members found.
+      <div className="text-center py-12 border rounded-md">
+        <UserPlus className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-lg font-medium mb-2">No team members added yet</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Add team members to collaborate on campaigns and manage leads together.
+        </p>
       </div>
     );
   }

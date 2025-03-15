@@ -114,38 +114,50 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
           
           <div>
             <h3 className="font-medium mb-3">Campaigns</h3>
-            <div className="max-h-40 overflow-y-auto space-y-2">
-              {campaignData.map((campaign) => (
-                <div key={campaign.id.toString()} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`campaign-${campaign.id}`} 
-                    checked={selectedCampaigns.includes(campaign.id.toString())}
-                    onCheckedChange={() => handleCampaignToggle(campaign.id.toString())}
-                  />
-                  <Label htmlFor={`campaign-${campaign.id}`} className="text-sm">
-                    {campaign.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
+            {campaignData.length > 0 ? (
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {campaignData.map((campaign) => (
+                  <div key={campaign.id.toString()} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`campaign-${campaign.id}`} 
+                      checked={selectedCampaigns.includes(campaign.id.toString())}
+                      onCheckedChange={() => handleCampaignToggle(campaign.id.toString())}
+                    />
+                    <Label htmlFor={`campaign-${campaign.id}`} className="text-sm">
+                      {campaign.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                No campaigns available
+              </div>
+            )}
           </div>
           
           <div>
             <h3 className="font-medium mb-3">Team Members</h3>
-            <div className="max-h-40 overflow-y-auto space-y-2">
-              {teamMembers.map((member) => (
-                <div key={member.id} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={`member-${member.id}`} 
-                    checked={selectedTeamMembers.includes(member.id)}
-                    onCheckedChange={() => handleTeamMemberToggle(member.id)}
-                  />
-                  <Label htmlFor={`member-${member.id}`} className="text-sm">
-                    {member.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
+            {teamMembers.length > 0 ? (
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {teamMembers.map((member) => (
+                  <div key={member.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`member-${member.id}`} 
+                      checked={selectedTeamMembers.includes(member.id)}
+                      onCheckedChange={() => handleTeamMemberToggle(member.id)}
+                    />
+                    <Label htmlFor={`member-${member.id}`} className="text-sm">
+                      {member.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                No team members available
+              </div>
+            )}
           </div>
           
           <div>

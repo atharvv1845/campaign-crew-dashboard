@@ -109,9 +109,13 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
                       className="w-full px-2 py-1 text-xs rounded border border-border"
                     >
                       <option value="">Unassigned</option>
-                      {teamMembers.map(member => (
-                        <option key={member} value={member}>{member}</option>
-                      ))}
+                      {teamMembers.length > 0 ? (
+                        teamMembers.map(member => (
+                          <option key={member} value={member}>{member}</option>
+                        ))
+                      ) : (
+                        <option disabled>No team members available</option>
+                      )}
                     </select>
                   ) : (
                     <span>{lead.assignedTo || '-'}</span>

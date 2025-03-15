@@ -133,8 +133,13 @@ export const getMessageMetricsData = (): MessageMetric[] => {
 
 // Generate team performance data
 export const getTeamPerformanceData = (teamMembers: TeamMember[]): PerformanceMetric[] => {
+  // If there are no team members, return an empty array
+  if (teamMembers.length === 0) {
+    return [];
+  }
+  
   return teamMembers.map(member => {
-    // Generate random performance metrics
+    // Generate performance metrics
     const leadsAssigned = Math.floor(Math.random() * 50) + 20;
     const leadsContacted = Math.floor(leadsAssigned * (Math.random() * 0.3 + 0.6)); // 60-90% contact rate
     const leadsResponded = Math.floor(leadsContacted * (Math.random() * 0.4 + 0.2)); // 20-60% response rate

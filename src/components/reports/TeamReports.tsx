@@ -23,6 +23,7 @@ import { DataTable } from '@/components/reports/DataTable';
 import { PerformanceMetric } from '@/components/reports/types';
 import { getTeamPerformanceData } from '@/components/reports/utils';
 import { useTeamStore } from '@/hooks/useTeamStore';
+import { UserPlus } from 'lucide-react';
 
 interface TeamReportsProps {
   dateRange: { from: Date | undefined; to: Date | undefined };
@@ -49,6 +50,40 @@ const TeamReports: React.FC<TeamReportsProps> = ({
   
   // Generate team performance metrics
   const performanceMetrics: PerformanceMetric[] = getTeamPerformanceData(filteredTeamMembers);
+  
+  // Check if there are team members to display
+  if (teamMembers.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <UserPlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-xl font-medium mb-2">No Team Members Added Yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Add team members to see performance metrics and reports. Team reports will show
+              productivity, conversion rates, and other key metrics.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  // If filtered team members are empty but there are team members, show a message
+  if (filteredTeamMembers.length === 0 && teamMembers.length > 0) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <h3 className="text-xl font-medium mb-2">No Matching Team Members</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              No team members match your current filter selections. Try adjusting your filters to view team performance data.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   
   // Team performance comparison data
   const performanceComparisonData = performanceMetrics.map(metric => ({

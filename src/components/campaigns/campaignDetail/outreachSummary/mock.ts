@@ -9,6 +9,7 @@ export interface OutreachData {
   notReplied: number;
   teamPerformance: Array<{
     member: string;
+    memberId: string;
     responses: number;
     positive: number;
   }>;

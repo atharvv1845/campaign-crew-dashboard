@@ -35,6 +35,25 @@ const TeamPerformanceCard: React.FC<TeamPerformanceCardProps> = ({ teamPerforman
     };
   };
 
+  // If there are no teamPerformance data or no team members, show empty state
+  if (teamPerformance.length === 0 || teamMembers.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-medium flex items-center">
+            <Users className="h-4 w-4 mr-2" />
+            Team Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4 text-sm text-muted-foreground">
+            No team performance data available.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="pb-2">

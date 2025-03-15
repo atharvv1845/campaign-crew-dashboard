@@ -32,11 +32,6 @@ export const processLeadData = (
       notes: '',
       platformLinks: '',
       assignedTo: '',
-      linkedin: '',
-      twitter: '',
-      facebook: '',
-      instagram: '',
-      whatsapp: '',
       socialProfiles: {}
     };
     
@@ -83,53 +78,30 @@ export const processLeadData = (
         leadData.assignedTo = value;
       } else if (mappingKey === 'notes') {
         leadData.notes = value;
+      } else if (mappingKey === 'lastContact') {
+        leadData.lastContact = value;
+      } else if (mappingKey === 'firstContactDate') {
+        leadData.firstContactDate = value;
+      } else if (mappingKey === 'nextFollowUpDate') {
+        leadData.nextFollowUpDate = value;
+      } else if (mappingKey === 'source') {
+        leadData.source = value;
       } else if (mappingKey === 'linkedin') {
-        leadData.linkedin = value;
         leadData.socialProfiles.linkedin = value;
       } else if (mappingKey === 'twitter') {
-        leadData.twitter = value;
         leadData.socialProfiles.twitter = value;
       } else if (mappingKey === 'facebook') {
-        leadData.facebook = value;
         leadData.socialProfiles.facebook = value;
       } else if (mappingKey === 'instagram') {
-        leadData.instagram = value;
         leadData.socialProfiles.instagram = value;
       } else if (mappingKey === 'whatsapp') {
-        leadData.whatsapp = value;
         leadData.socialProfiles.whatsapp = value;
-      } else if (mappingKey === 'platformLinks') {
-        leadData.platformLinks = value;
-        
-        // Try to extract individual links if platformLinks contains URLs
-        if (value) {
-          const urls = value.split(/[\s,;]+/);
-          
-          urls.forEach(url => {
-            if (url.includes('linkedin.com')) {
-              leadData.linkedin = url;
-              leadData.socialProfiles.linkedin = url;
-            } else if (url.includes('twitter.com') || url.includes('x.com')) {
-              leadData.twitter = url;
-              leadData.socialProfiles.twitter = url;
-            } else if (url.includes('facebook.com')) {
-              leadData.facebook = url;
-              leadData.socialProfiles.facebook = url;
-            } else if (url.includes('instagram.com')) {
-              leadData.instagram = url;
-              leadData.socialProfiles.instagram = url;
-            } else if (url.includes('wa.me') || url.includes('whatsapp')) {
-              leadData.whatsapp = url;
-              leadData.socialProfiles.whatsapp = url;
-            }
-          });
+      } else if (mappingKey.startsWith('platform_')) {
+        // Handle custom platforms (keys starting with 'platform_')
+        const platformId = mappingKey.replace('platform_', '');
+        if (platformId && value) {
+          leadData.socialProfiles[platformId] = value;
         }
-      } else if (mappingKey === 'lastContacted') {
-        leadData.lastContacted = value;
-      } else if (mappingKey === 'firstContacted') {
-        leadData.firstContacted = value;
-      } else if (mappingKey === 'followUpDate') {
-        leadData.followUpDate = value;
       }
     });
 

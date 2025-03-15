@@ -34,7 +34,7 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
     { value: 'source', label: 'Lead Source' },
   ];
 
-  // Add platform-specific options based on selected contact platforms
+  // Standard platform options
   const platformMappingOptions = [
     { value: 'linkedin', label: 'LinkedIn', platform: 'linkedin' },
     { value: 'twitter', label: 'Twitter', platform: 'twitter' },
@@ -43,18 +43,12 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
     { value: 'whatsapp', label: 'WhatsApp', platform: 'whatsapp' },
   ];
 
-  // Add custom platform options
+  // Custom platform options - prefix the value with 'platform_' to identify it in the processor
   const customPlatformOptions = customPlatforms.map(platform => ({
-    value: platform.id,
+    value: `platform_${platform.id}`,
     label: platform.name,
     platform: platform.id
   }));
-
-  // Combine all platform options regardless of selected contact platforms
-  const allPlatformOptions = [...platformMappingOptions, ...customPlatformOptions];
-
-  // Combine default options with all platform options
-  const mappingOptions = [...defaultMappingOptions, ...allPlatformOptions];
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
@@ -89,8 +83,8 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                       ))}
                     </optgroup>
                     
-                    {/* Platform fields group */}
-                    <optgroup label="Contact Platforms">
+                    {/* Platform fields group - show all standard platforms */}
+                    <optgroup label="Standard Platforms">
                       {platformMappingOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -98,7 +92,7 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
                       ))}
                     </optgroup>
                     
-                    {/* Custom platform fields, if any */}
+                    {/* Custom platform fields - show all custom platforms if any */}
                     {customPlatformOptions.length > 0 && (
                       <optgroup label="Custom Platforms">
                         {customPlatformOptions.map(option => (

@@ -28,7 +28,7 @@ const Index = () => {
 
   const testimonials = [
     {
-      quote: "OutreachPilot has transformed how we manage our marketing campaigns. We've seen a 40% increase in conversions!",
+      quote: "Campaign Crew has transformed how we manage our marketing campaigns. We've seen a 40% increase in conversions!",
       author: "Sarah Johnson",
       position: "Marketing Director, TechSolutions Inc."
     },
@@ -48,7 +48,14 @@ const Index = () => {
     <div className="flex flex-col min-h-screen">
       <header className="border-b border-border bg-background py-4 sticky top-0 z-10">
         <div className="container flex items-center justify-between">
-          <h1 className="text-2xl font-bold">OutreachPilot</h1>
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/0ad6094e-df44-49fa-a82e-e59b86c8263f.png" 
+              alt="Campaign Crew Logo" 
+              className="h-10" 
+            />
+            <h1 className="text-2xl font-bold">Campaign Crew</h1>
+          </div>
           <div className="flex items-center space-x-4">
             {user ? (
               <Link to="/dashboard">
@@ -72,6 +79,13 @@ const Index = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-primary/10 to-secondary/10 py-24 md:py-32">
           <div className="container text-center">
+            <div className="flex justify-center mb-8">
+              <img 
+                src="/lovable-uploads/0ad6094e-df44-49fa-a82e-e59b86c8263f.png" 
+                alt="Campaign Crew Logo" 
+                className="h-24" 
+              />
+            </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Effortless Campaign Management for Your Business</h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12">
               Track leads, update statuses, and improve conversions – all in one place.
@@ -136,7 +150,7 @@ const Index = () => {
           <div className="container text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Campaign Management?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              Join thousands of marketers who've improved their campaign performance with OutreachPilot.
+              Join thousands of marketers who've improved their campaign performance with Campaign Crew.
             </p>
             <Link to={user ? "/dashboard" : "/signup"}>
               <Button size="lg" className="rounded-full px-8">
@@ -151,7 +165,14 @@ const Index = () => {
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">OutreachPilot</h3>
+              <div className="flex items-center gap-2 mb-4">
+                <img 
+                  src="/lovable-uploads/0ad6094e-df44-49fa-a82e-e59b86c8263f.png" 
+                  alt="Campaign Crew Logo" 
+                  className="h-8" 
+                />
+                <h3 className="text-lg font-semibold">Campaign Crew</h3>
+              </div>
               <p className="text-muted-foreground">Streamline your outreach campaigns for better results.</p>
             </div>
             <div>
@@ -183,7 +204,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} OutreachPilot. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Campaign Crew. All rights reserved.</p>
           </div>
         </div>
       </footer>

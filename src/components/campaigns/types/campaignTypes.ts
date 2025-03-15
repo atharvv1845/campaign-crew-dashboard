@@ -30,7 +30,7 @@ export interface CampaignData {
   status: string;
   type: string;
   channels: string[];
-  leads: number;
+  leads: number | LeadData[];
   responses: number;
   positive: number;
   negative: number;

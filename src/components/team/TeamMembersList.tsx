@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import EditTeamMemberDialog from './EditTeamMemberDialog';
+import DeleteTeamMemberDialog from './DeleteTeamMemberDialog';
 
 interface TeamMembersListProps {
   teamMembers: TeamMember[];
@@ -23,9 +24,14 @@ interface TeamMembersListProps {
 
 const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate, onRemove }) => {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
 
   const handleEdit = (member: TeamMember) => {
     setEditingMember(member);
+  };
+
+  const handleDelete = (member: TeamMember) => {
+    setDeletingMember(member);
   };
 
   const handleUpdate = (member: TeamMember) => {
@@ -129,7 +135,7 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       className="text-destructive focus:text-destructive" 
-                      onClick={() => onRemove(member.id)}
+                      onClick={() => handleDelete(member)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Remove
@@ -150,6 +156,13 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
           onUpdate={handleUpdate}
         />
       )}
+
+      <DeleteTeamMemberDialog
+        open={!!deletingMember}
+        onOpenChange={() => setDeletingMember(null)}
+        teamMember={deletingMember}
+        onConfirm={onRemove}
+      />
     </div>
   );
 };

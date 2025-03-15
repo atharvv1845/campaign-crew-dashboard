@@ -43,7 +43,7 @@ const formSchema = z.object({
   phone: z.string().optional(),
   role: z.string({ required_error: "Please select a role" }),
   bio: z.string().optional(),
-  status: z.string(),
+  status: z.enum(["Active", "Pending", "Inactive"]),
 });
 
 const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({ 
@@ -84,7 +84,7 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
       phone: values.phone || "",
       role: values.role,
       bio: values.bio || "",
-      status: values.status,
+      status: values.status as "Active" | "Pending" | "Inactive",
     };
     onUpdate(updatedTeamMember);
   };

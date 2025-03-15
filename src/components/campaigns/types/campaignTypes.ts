@@ -19,7 +19,7 @@ export interface CampaignFormData {
   notes?: string;
   shareNotes?: boolean;
   stepFlows?: Record<string, MessageStep[]>;
-  contactPlatforms?: string[]; // Platforms for contacting leads (email, phone, social media)
+  contactPlatforms?: string[]; // Platforms for contacting leads (same as channels)
   customPlatforms?: Array<{ id: string; name: string }>; // Custom contact platforms added by user
 }
 
@@ -43,8 +43,8 @@ export interface CampaignData {
     edges: Edge[];
   };
   contacted?: number;
-  contactPlatforms?: string[]; // Platforms for contacting leads
-  customPlatforms?: Array<{ id: string; name: string }>; // Custom contact platforms added by user
+  contactPlatforms?: string[]; // Same as channels
+  customPlatforms?: Array<{ id: string; name: string }>;
 }
 
 // Lead data structure
@@ -69,7 +69,7 @@ export interface LeadData {
   };
   source?: string;
   statusName?: string; // Added this optional property for temporary use during import
-  contactPlatforms?: string[]; // Platforms this lead can be contacted on
+  contactPlatforms?: string[]; // Platforms this lead can be contacted on (same as channels)
   campaignId: string | number;
   lastContact?: string;
   firstContactDate?: string;

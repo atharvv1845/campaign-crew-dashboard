@@ -5,17 +5,6 @@ import { cn } from '@/lib/utils';
 import { CampaignFormData } from '../types/campaignTypes';
 import { availableChannels } from '../constants/channels';
 
-// Available contact platforms
-const availablePlatforms = [
-  { id: 'email', name: 'Email', icon: 'mail' },
-  { id: 'phone', name: 'Phone', icon: 'phone' },
-  { id: 'linkedin', name: 'LinkedIn', icon: 'linkedin' },
-  { id: 'twitter', name: 'Twitter', icon: 'twitter' },
-  { id: 'instagram', name: 'Instagram', icon: 'instagram' },
-  { id: 'facebook', name: 'Facebook', icon: 'facebook' },
-  { id: 'whatsapp', name: 'WhatsApp', icon: 'message-circle' },
-];
-
 interface CampaignSetupProps {
   formData: CampaignFormData;
   setFormData: React.Dispatch<React.SetStateAction<CampaignFormData>>;
@@ -32,25 +21,19 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handler for toggling channels
+  // Handler for toggling channels/platforms
   const toggleChannel = (channelId: string) => {
     setFormData(prev => {
       const channels = prev.channels.includes(channelId)
         ? prev.channels.filter(c => c !== channelId)
         : [...prev.channels, channelId];
       
-      return { ...prev, channels };
-    });
-  };
-
-  // Handler for toggling contact platforms
-  const togglePlatform = (platformId: string) => {
-    setFormData(prev => {
-      const contactPlatforms = prev.contactPlatforms?.includes(platformId)
-        ? prev.contactPlatforms.filter(p => p !== platformId)
-        : [...(prev.contactPlatforms || []), platformId];
-      
-      return { ...prev, contactPlatforms };
+      // Since channels and contactPlatforms are the same, update both
+      return { 
+        ...prev, 
+        channels, 
+        contactPlatforms: channels
+      };
     });
   };
 
@@ -58,12 +41,14 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
   const addCustomPlatform = () => {
     if (customPlatform.trim()) {
       const newPlatformId = customPlatform.toLowerCase().replace(/\s+/g, '-');
-      // Add to contact platforms
+      
+      // Add to both channels and contactPlatforms
       setFormData(prev => {
-        const updatedPlatforms = [...(prev.contactPlatforms || []), newPlatformId];
+        const updatedChannels = [...prev.channels, newPlatformId];
         return { 
           ...prev, 
-          contactPlatforms: updatedPlatforms,
+          channels: updatedChannels,
+          contactPlatforms: updatedChannels,
           customPlatforms: [...(prev.customPlatforms || []), { id: newPlatformId, name: customPlatform }]
         };
       });
@@ -77,9 +62,9 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
   // Check if the form is valid
   const isValid = formData.name.trim() !== '' && formData.channels.length > 0;
 
-  // Get all platforms, including custom ones
-  const allPlatforms = [
-    ...availablePlatforms,
+  // Get all channels, including custom ones
+  const allChannels = [
+    ...availableChannels,
     ...(formData.customPlatforms || []).map(p => ({ id: p.id, name: p.name, icon: 'external-link' }))
   ];
 
@@ -127,13 +112,13 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
             </div>
           </div>
           
-          {/* Channel Selection */}
+          {/* Combined Channel/Platform Selection */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Select Outreach Channels</h3>
-            <p className="text-sm text-muted-foreground">Choose the channels you'll use for this campaign</p>
+            <h3 className="text-lg font-medium">Select Contact Channels</h3>
+            <p className="text-sm text-muted-foreground">Choose the channels you'll use to reach your leads</p>
             
             <div className="grid grid-cols-2 gap-3">
-              {availableChannels.map(channel => (
+              {allChannels.map(channel => (
                 <button
                   key={channel.id}
                   type="button"
@@ -153,38 +138,6 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
                   )}
                 </button>
               ))}
-            </div>
-            {formData.channels.length === 0 && (
-              <p className="text-xs text-destructive">Select at least one channel</p>
-            )}
-          </div>
-
-          {/* Contact Platform Selection */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Select Contact Platforms</h3>
-            <p className="text-sm text-muted-foreground">Choose how you'll reach out to your leads</p>
-            
-            <div className="grid grid-cols-2 gap-3">
-              {allPlatforms.map(platform => (
-                <button
-                  key={platform.id}
-                  type="button"
-                  onClick={() => togglePlatform(platform.id)}
-                  className={cn(
-                    "flex items-center justify-between p-3 rounded-lg border border-border transition-colors",
-                    formData.contactPlatforms?.includes(platform.id) 
-                      ? "bg-primary/10 border-primary" 
-                      : "hover:bg-muted/20"
-                  )}
-                >
-                  <span>{platform.name}</span>
-                  {formData.contactPlatforms?.includes(platform.id) && (
-                    <span className="flex items-center justify-center w-5 h-5 bg-primary rounded-full text-primary-foreground">
-                      <Check className="h-3 w-3" />
-                    </span>
-                  )}
-                </button>
-              ))}
               
               {/* Custom Platform Add Button */}
               <button
@@ -193,9 +146,13 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
                 className="flex items-center justify-center p-3 rounded-lg border border-dashed border-border hover:bg-muted/10 transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                <span>Add Custom Platform</span>
+                <span>Add Custom Channel</span>
               </button>
             </div>
+            
+            {formData.channels.length === 0 && (
+              <p className="text-xs text-destructive">Select at least one channel</p>
+            )}
             
             {/* Custom Platform Input */}
             {showCustomPlatformInput && (
@@ -204,7 +161,7 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
                   type="text"
                   value={customPlatform}
                   onChange={(e) => setCustomPlatform(e.target.value)}
-                  placeholder="Enter platform name (e.g., Slack)"
+                  placeholder="Enter channel name (e.g., Slack)"
                   className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
                 <button
@@ -252,34 +209,13 @@ const CampaignSetup: React.FC<CampaignSetupProps> = ({ formData, setFormData, on
                   <span className="text-sm text-muted-foreground">No channels selected</span>
                 ) : (
                   formData.channels.map(channelId => {
-                    const channel = availableChannels.find(c => c.id === channelId);
+                    const channel = allChannels.find(c => c.id === channelId);
                     return (
                       <span 
                         key={channelId}
                         className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
                       >
                         {channel?.name}
-                      </span>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-
-            <div>
-              <span className="text-sm font-medium">Contact Platforms:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {!formData.contactPlatforms || formData.contactPlatforms.length === 0 ? (
-                  <span className="text-sm text-muted-foreground">No platforms selected</span>
-                ) : (
-                  formData.contactPlatforms.map(platformId => {
-                    const platform = allPlatforms.find(p => p.id === platformId);
-                    return (
-                      <span 
-                        key={platformId}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                      >
-                        {platform?.name}
                       </span>
                     );
                   })

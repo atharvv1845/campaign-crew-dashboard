@@ -25,7 +25,7 @@ const defaultFormData: CampaignFormData = {
     edges: []
   },
   teamAssignments: {},
-  contactPlatforms: ['email', 'phone', 'linkedin'], // Default contact platforms
+  contactPlatforms: [], // Start with empty array
   customPlatforms: [] // Custom platforms defined by the user
 };
 
@@ -65,10 +65,12 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
 
   useEffect(() => {
     if (existingCampaign) {
+      const channels = existingCampaign.channels?.map((c: string) => c.toLowerCase()) || [];
+      
       const transformedData: CampaignFormData = {
         name: existingCampaign.name || '',
         description: existingCampaign.description || '',
-        channels: existingCampaign.channels?.map((c: string) => c.toLowerCase()) || [],
+        channels: channels,
         leads: Array.isArray(existingCampaign.leadsData) ? existingCampaign.leadsData : [],
         flows: [],
         stages: existingCampaign.stages || defaultFormData.stages,
@@ -78,13 +80,23 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
           edges: []
         },
         teamAssignments: {},
-        contactPlatforms: existingCampaign.contactPlatforms || defaultFormData.contactPlatforms,
+        contactPlatforms: channels, // Use the same array as channels
         customPlatforms: existingCampaign.customPlatforms || []
       };
       
       setFormData(transformedData);
     }
   }, [existingCampaign]);
+
+  // Set contactPlatforms to be the same as channels whenever channels change
+  useEffect(() => {
+    if (formData.channels !== formData.contactPlatforms) {
+      setFormData(prev => ({
+        ...prev,
+        contactPlatforms: prev.channels
+      }));
+    }
+  }, [formData.channels, formData.contactPlatforms]);
 
   const nextStep = useCallback(() => {
     if (currentStep < 6) {
@@ -152,7 +164,7 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         messageFlow: formData.messageFlow || { nodes: [], edges: [] },
         stages: normalizedStages,
         leadsData: transformedLeads,
-        contactPlatforms: formData.contactPlatforms,
+        contactPlatforms: formData.channels, // Always use channels
         customPlatforms: formData.customPlatforms
       };
 

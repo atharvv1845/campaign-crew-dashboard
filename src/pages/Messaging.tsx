@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MessageTemplates from '@/components/messaging/MessageTemplates';
 import ScriptEditor from '@/components/messaging/ScriptEditor';
+import OutreachFlow from '@/components/messaging/OutreachFlow';
 
 const Messaging: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('templates');
@@ -19,6 +20,7 @@ const Messaging: React.FC = () => {
             <TabsList className="mb-4">
               <TabsTrigger value="templates">Templates</TabsTrigger>
               <TabsTrigger value="editor">Create/Edit</TabsTrigger>
+              <TabsTrigger value="flow">Outreach Flow</TabsTrigger>
             </TabsList>
             
             <TabsContent value="templates">
@@ -27,6 +29,10 @@ const Messaging: React.FC = () => {
             
             <TabsContent value="editor">
               <ScriptEditor onSaveComplete={() => setActiveTab('templates')} />
+            </TabsContent>
+            
+            <TabsContent value="flow">
+              <OutreachFlow />
             </TabsContent>
           </Tabs>
         </CardContent>

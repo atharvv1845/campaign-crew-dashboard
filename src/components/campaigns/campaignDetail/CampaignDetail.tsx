@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
@@ -35,16 +36,35 @@ const CampaignDetail: React.FC = () => {
       }
       // If there's just a number, create placeholder leads
       else if (typeof foundCampaign.leads === 'number') {
-        // Create minimal placeholder leads
-        const dummyLeads: Lead[] = Array.from({ length: foundCampaign.leads }, (_, i) => ({
-          id: `${i + 1}`,
-          name: `Lead ${i + 1}`,
-          email: `lead${i + 1}@example.com`,
-          company: `Company ${i + 1}`,
-          status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
-          lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          campaignId: id
-        }));
+        // Create more detailed placeholder leads with contact information
+        const dummyLeads: Lead[] = Array.from({ length: foundCampaign.leads }, (_, i) => {
+          // Generate random social profiles for demonstration
+          const socialProfiles = {
+            linkedin: Math.random() > 0.5 ? `linkedin.com/in/lead-${i + 1}` : undefined,
+            twitter: Math.random() > 0.6 ? `twitter.com/lead_${i + 1}` : undefined,
+            facebook: Math.random() > 0.7 ? `facebook.com/lead.${i + 1}` : undefined,
+            instagram: Math.random() > 0.8 ? `instagram.com/lead_${i + 1}` : undefined,
+            whatsapp: Math.random() > 0.9 ? `+1234567890${i}` : undefined,
+          };
+          
+          return {
+            id: `${i + 1}`,
+            name: `Lead ${i + 1}`,
+            email: `lead${i + 1}@example.com`,
+            phone: Math.random() > 0.5 ? `(123) 456-${7890 + i}` : undefined,
+            company: `Company ${i + 1}`,
+            status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
+            lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            campaignId: id,
+            // Add social profiles
+            linkedin: socialProfiles.linkedin,
+            twitter: socialProfiles.twitter,
+            facebook: socialProfiles.facebook,
+            instagram: socialProfiles.instagram,
+            whatsapp: socialProfiles.whatsapp,
+            socialProfiles: socialProfiles
+          };
+        });
         
         foundCampaign.leadsData = dummyLeads;
       } else {

@@ -1,11 +1,14 @@
+
 export interface Lead {
   id: number | string;
   name: string;                 // Required full name
   firstName?: string;           // Optional components
   lastName?: string;
+  fullName?: string;            // Alternative to name
   email?: string;
   phone?: string;
   company?: string;
+  title?: string;               // Job title
   channel?: string;
   status: string;              // Current status
   currentStage?: string;       // For stage tracking
@@ -46,7 +49,7 @@ export interface Campaign {
   id: number | string;
   name: string;
   status: string;
-  leads: Lead[];
+  leads: Lead[] | number;
   responses: number;
   positive: number;
   negative: number;

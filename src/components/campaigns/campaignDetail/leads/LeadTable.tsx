@@ -34,6 +34,8 @@ import StatusBadge from '../components/StatusBadge';
 import { Lead, Campaign } from './types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import LeadPlatformContact from './components/LeadPlatformContact';
+import { useToast } from '@/hooks/use-toast';
 
 interface LeadTableProps {
   leads: Lead[];
@@ -44,13 +46,56 @@ interface LeadTableProps {
 const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [platformFilter, setPlatformFilter] = useState<string>('all');
+  const { toast } = useToast();
   const leadsPerPage = 10;
   
-  const filteredLeads = leads.filter(lead => 
-    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (lead.company && lead.company.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Apply filters (search and platform filters)
+  const filteredLeads = leads.filter(lead => {
+    // Apply search filter
+    const matchesSearch = 
+      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead.company && lead.company.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    // Apply platform filter
+    let matchesPlatform = true;
+    if (platformFilter !== 'all') {
+      switch (platformFilter) {
+        case 'email':
+          matchesPlatform = Boolean(lead.email);
+          break;
+        case 'phone':
+          matchesPlatform = Boolean(lead.phone);
+          break;
+        case 'linkedin':
+          matchesPlatform = Boolean(lead.linkedin);
+          break;
+        case 'twitter':
+          matchesPlatform = Boolean(lead.twitter);
+          break;
+        case 'facebook':
+          matchesPlatform = Boolean(lead.facebook);
+          break;
+        case 'instagram':
+          matchesPlatform = Boolean(lead.instagram);
+          break;
+        case 'whatsapp':
+          matchesPlatform = Boolean(lead.whatsapp);
+          break;
+        case 'social':
+          matchesPlatform = Boolean(
+            lead.linkedin || lead.twitter || lead.facebook || 
+            lead.instagram || lead.whatsapp
+          );
+          break;
+        default:
+          matchesPlatform = true;
+      }
+    }
+    
+    return matchesSearch && matchesPlatform;
+  });
   
   const indexOfLastLead = currentPage * leadsPerPage;
   const indexOfFirstLead = indexOfLastLead - leadsPerPage;
@@ -72,6 +117,17 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }
   const handleTeamMemberChange = (leadId: number | string, teamMember: string) => {
     // Similar to handleDateChange, using the same handler for consistency
     onStatusChange(leadId, 'assignedTeamMember:::' + teamMember);
+  };
+
+  const handleContactUpdate = (leadId: number | string, field: string, value: string) => {
+    // Update lead contact information
+    onStatusChange(leadId, field + ':::' + value);
+    
+    // Show toast notification
+    toast({
+      title: "Contact details updated",
+      description: `Lead ${field} has been updated`,
+    });
   };
   
   const DatePickerPopover = ({ 
@@ -125,6 +181,25 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        
+        {/* Platform Filter */}
+        <Select value={platformFilter} onValueChange={setPlatformFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by platform" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Platforms</SelectItem>
+            <SelectItem value="email">Email Only</SelectItem>
+            <SelectItem value="phone">Phone Only</SelectItem>
+            <SelectItem value="social">Any Social Media</SelectItem>
+            <SelectItem value="linkedin">LinkedIn</SelectItem>
+            <SelectItem value="twitter">Twitter</SelectItem>
+            <SelectItem value="facebook">Facebook</SelectItem>
+            <SelectItem value="instagram">Instagram</SelectItem>
+            <SelectItem value="whatsapp">WhatsApp</SelectItem>
+          </SelectContent>
+        </Select>
+        
         <Button>Export</Button>
       </div>
       
@@ -133,6 +208,7 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }
           <TableHeader>
             <TableRow>
               <TableHead>Lead Name</TableHead>
+              <TableHead>Contact Platforms</TableHead>
               <TableHead>Email/Phone</TableHead>
               <TableHead>Company</TableHead>
               <TableHead>First Contact</TableHead>
@@ -148,6 +224,16 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }
               currentLeads.map((lead) => (
                 <TableRow key={lead.id}>
                   <TableCell className="font-medium">{lead.name}</TableCell>
+                  
+                  {/* Platform Contact Cell */}
+                  <TableCell>
+                    <LeadPlatformContact 
+                      lead={lead} 
+                      editable={true}
+                      onUpdate={handleContactUpdate}
+                    />
+                  </TableCell>
+                  
                   <TableCell>{lead.email || lead.phone || '-'}</TableCell>
                   <TableCell>{lead.company || '-'}</TableCell>
                   
@@ -286,7 +372,7 @@ const LeadTable: React.FC<LeadTableProps> = ({ leads, campaign, onStatusChange }
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="text-center h-24">
+                <TableCell colSpan={10} className="text-center h-24">
                   No leads found.
                 </TableCell>
               </TableRow>

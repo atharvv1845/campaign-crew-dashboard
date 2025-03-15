@@ -1,28 +1,46 @@
 
-export interface OutreachData {
-  today: number;
-  thisWeek: number;
-  thisMonth: number;
-  responseRate: number;
-  positiveResponses: number;
-  negativeResponses: number;
-  notReplied: number;
-  teamPerformance: Array<{
-    member: string;
-    memberId: string;
-    responses: number;
-    positive: number;
-  }>;
-}
-
-// Reset outreach data to zero values with empty team performance
-export const outreachMockData: OutreachData = {
-  today: 0,
-  thisWeek: 0,
-  thisMonth: 0,
-  responseRate: 0,
-  positiveResponses: 0,
-  negativeResponses: 0,
-  notReplied: 0,
-  teamPerformance: []
+export const OutreachData = {
+  campaignStatus: {
+    active: 68,
+    completed: 24,
+    paused: 8
+  },
+  leadsContacted: {
+    total: 350,
+    thisWeek: 42,
+    contacted: 285,
+    pending: 65
+  },
+  responseBreakdown: {
+    positive: 123,
+    neutral: 87,
+    negative: 45,
+    noResponse: 95
+  },
+  teamPerformance: [
+    {
+      memberId: '1',
+      member: 'Sarah Johnson',
+      responses: 48,
+      positive: 22
+    },
+    {
+      memberId: '2',
+      member: 'Michael Chen',
+      responses: 42,
+      positive: 19
+    },
+    {
+      memberId: '3',
+      member: 'Emma Watson',
+      responses: 35,
+      positive: 14
+    },
+    {
+      memberId: '4',
+      member: 'David Kim',
+      responses: 31,
+      positive: 11
+    }
+  ]
 };

@@ -102,8 +102,8 @@ const Index = () => {
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-md py-4 sticky top-0 z-10">
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img alt="Campaign Crew Logo" className="h-10" src="/lovable-uploads/ef555fda-6f23-4255-bcc5-d819165c5987.jpg" />
-            <h1 className="text-2xl font-bold text-white">Campaign Crew</h1>
+            <img alt="Campaign Crew Logo" src="/lovable-uploads/ef555fda-6f23-4255-bcc5-d819165c5987.jpg" className="h-10 object-cover" />
+            
           </div>
           <div className="flex items-center space-x-4">
             {user ? <Link to="/dashboard">

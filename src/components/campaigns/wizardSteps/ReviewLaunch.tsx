@@ -20,10 +20,11 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
   const isLeadsComplete = formData.leads && formData.leads.length > 0;
   const isMessagesComplete = formData.messageFlow && formData.messageFlow.nodes.length > 0;
   const isStagesComplete = formData.stages && formData.stages.length > 0;
-  const isTeamComplete = formData.team && formData.team.length > 0;
+  // Team assignment is optional
+  const hasTeamMembers = formData.team && formData.team.length > 0;
   
-  // Check if campaign is ready to launch
-  const isReadyToLaunch = isSetupComplete && isLeadsComplete && isMessagesComplete && isStagesComplete && isTeamComplete;
+  // Check if campaign is ready to launch - team assignment is no longer required
+  const isReadyToLaunch = isSetupComplete && isLeadsComplete && isMessagesComplete && isStagesComplete;
 
   // Get channel names from IDs
   const getChannelNames = () => {
@@ -63,10 +64,6 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
     
     if (!isMessagesComplete) {
       console.log("Warning: Campaign has no message flow but proceeding anyway for demo purposes");
-    }
-    
-    if (!isTeamComplete) {
-      console.log("Warning: Campaign has no team members but proceeding anyway for demo purposes");
     }
     
     // Proceed with submission
@@ -144,12 +141,13 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
             </div>
             
             <div className="flex items-center gap-2">
-              {isTeamComplete ? (
-                <Check className="h-5 w-5 text-green-500" />
-              ) : (
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-              )}
-              <span className="text-sm">Team Assignment ({formData.team?.length || 0} members)</span>
+              {/* Show check mark for team assignment regardless, since it's optional */}
+              <Check className="h-5 w-5 text-green-500" />
+              <span className="text-sm">
+                Team Assignment {hasTeamMembers 
+                  ? `(${formData.team?.length || 0} members)` 
+                  : '(Optional - none assigned)'}
+              </span>
             </div>
           </div>
         </div>
@@ -162,7 +160,7 @@ export const ReviewLaunch: React.FC<ReviewLaunchProps> = ({ formData, onSubmit, 
           <div>
             <h5 className="font-medium">Campaign not ready</h5>
             <p className="text-sm mt-1">
-              Some sections are incomplete. You can still save as draft, but you won't be able to launch until all sections are complete.
+              Some required sections are incomplete. You can still save as draft, but you won't be able to launch until all required sections are complete.
             </p>
           </div>
         </div>

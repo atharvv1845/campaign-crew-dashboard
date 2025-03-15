@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LeadData } from '../../../types/campaignTypes';
 import { useToast } from '@/hooks/use-toast';
 import StatusBadge from '@/components/leads/StatusBadge';
-import { Pencil, Check, X, UserCheck } from 'lucide-react';
+import { Pencil, Check, X } from 'lucide-react';
 
 interface LeadManagementProps {
   leads: LeadData[];
@@ -118,7 +118,7 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
                       )}
                     </select>
                   ) : (
-                    <span>{lead.assignedTo || '-'}</span>
+                    <span>{lead.assignedTo || 'Unassigned'}</span>
                   )}
                 </td>
                 <td className="px-4 py-2 text-right">

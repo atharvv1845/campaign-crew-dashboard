@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -88,7 +87,6 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
     }
   }, [existingCampaign]);
 
-  // Set contactPlatforms to be the same as channels whenever channels change
   useEffect(() => {
     if (formData.channels !== formData.contactPlatforms) {
       setFormData(prev => ({
@@ -118,10 +116,21 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
   }, [onClose]);
 
   const handleSubmit = useCallback(() => {
-    if (!formData.name.trim()) {
+    console.log("Submitting campaign with data:", formData);
+    
+    if (!formData.name || formData.name.trim() === '') {
       toast({
         title: "Validation Error",
         description: "Campaign name is required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!formData.channels || formData.channels.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please select at least one channel for your campaign",
         variant: "destructive"
       });
       return;
@@ -158,13 +167,13 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         positive: 0,
         negative: 0,
         conversion: '0%',
-        teamMembers: formData.team,
+        teamMembers: formData.team || [],
         createdAt: new Date().toISOString().slice(0, 10),
         contacted: 0,
         messageFlow: formData.messageFlow || { nodes: [], edges: [] },
         stages: normalizedStages,
         leadsData: transformedLeads,
-        contactPlatforms: formData.channels, // Always use channels
+        contactPlatforms: formData.channels,
         customPlatforms: formData.customPlatforms
       };
 

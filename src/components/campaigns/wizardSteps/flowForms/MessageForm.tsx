@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableChannels } from '../../constants/channels';
 import { MessageStepData } from '../../types/campaignTypes';
+import TeamAssignment from '../../campaignDetail/components/forms/TeamAssignment';
 
 interface MessageFormProps {
   data: MessageStepData;
@@ -45,23 +46,10 @@ const MessageForm: React.FC<MessageFormProps> = ({ data, onChange }) => {
       </div>
       
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Assigned To (Optional)</Label>
-          <Select 
-            value={data.assignedTo || ''} 
-            onValueChange={(value) => onChange({ ...data, assignedTo: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select team member (optional)" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Unassigned</SelectItem>
-              <SelectItem value="john">John Smith</SelectItem>
-              <SelectItem value="sarah">Sarah Lee</SelectItem>
-              <SelectItem value="mike">Mike Johnson</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <TeamAssignment 
+          value={data.assignedTo || ''} 
+          onChange={(value) => onChange({ ...data, assignedTo: value })}
+        />
         <div className="space-y-2">
           <Label>Template</Label>
           <Select 

@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { availableChannels } from '../../../constants/channels';
 import { MessageStep } from '../../hooks/sequenceTypes';
+import TeamAssignment from '../forms/TeamAssignment';
+import { useTeamStore } from '@/hooks/useTeamStore';
 
 interface StepEditDialogProps {
   open: boolean;
@@ -24,6 +26,12 @@ const StepEditDialog: React.FC<StepEditDialogProps> = ({
   onEditingStepChange,
   onSave
 }) => {
+  const teamMembers = useTeamStore(state => state.teamMembers);
+  const teamOptions = teamMembers.map(member => ({
+    value: member.id,
+    label: member.name
+  }));
+
   if (!editingStep) return null;
 
   return (
@@ -58,23 +66,11 @@ const StepEditDialog: React.FC<StepEditDialogProps> = ({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Assigned To (Optional)</Label>
-                  <Select
-                    value={editingStep.assignedTo || ''}
-                    onValueChange={(value) => onEditingStepChange({...editingStep, assignedTo: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select team member (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
-                      <SelectItem value="John Smith">John Smith</SelectItem>
-                      <SelectItem value="Sarah Lee">Sarah Lee</SelectItem>
-                      <SelectItem value="Mike Johnson">Mike Johnson</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <TeamAssignment 
+                  value={editingStep.assignedTo || ''}
+                  onChange={(value) => onEditingStepChange({...editingStep, assignedTo: value})}
+                  options={teamOptions}
+                />
               </div>
               
               {editingStep.type === 'email' && (

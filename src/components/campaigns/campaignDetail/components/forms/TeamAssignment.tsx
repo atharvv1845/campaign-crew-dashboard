@@ -46,7 +46,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({
           <SelectValue placeholder="Select team member (optional)" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="unassigned">Unassigned</SelectItem>
+          <SelectItem value="">Unassigned</SelectItem>
           {options.length > 0 ? (
             options.map(option => (
               <SelectItem key={option.value} value={option.value}>

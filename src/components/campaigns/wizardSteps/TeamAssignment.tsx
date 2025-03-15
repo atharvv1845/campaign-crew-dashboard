@@ -37,7 +37,7 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({ formData, setFormData, 
     if (!formData.team) {
       setFormData(prev => ({
         ...prev,
-        team: teamMembers.map(member => member.id)
+        team: []
       }));
     }
   }, [formData, setFormData, teamMembers]);

@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { HeroWithMockup } from '@/components/ui/hero-with-mockup';
 import { CheckCircle, BarChart2, RefreshCw, ArrowRight, ChevronRight, Mail, Rocket, Shield, Users, Code } from 'lucide-react';
 
 const Index = () => {
@@ -125,43 +125,25 @@ const Index = () => {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-b from-blue-50 to-white py-24 md:py-32">
-          <div className="container text-center relative z-10">
-            <div className="flex justify-center mb-8">
-              <img 
-                src="/lovable-uploads/0ad6094e-df44-49fa-a82e-e59b86c8263f.png" 
-                alt="Campaign Crew Logo" 
-                className="h-24" 
-              />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-secondary">Effortless Campaign Management for Your Business</h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12">
-              Track leads, update statuses, and improve conversions – all in one place.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              {user ? (
-                <Link to="/dashboard">
-                  <Button size="lg" className="bg-primary text-white rounded-md px-8 hover:shadow-lg group">
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link to="/signup">
-                    <Button size="lg" className="bg-primary text-white rounded-md px-8 hover:shadow-lg group">
-                      Get Started for Free
-                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                  <Button size="lg" variant="outline" className="rounded-md px-8 border-secondary text-secondary hover:bg-secondary/10">
-                    See Features
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
+        <HeroWithMockup
+          title="Supercharge Your Campaigns"
+          description="Track, manage, and optimize your marketing outreach with ease. Unlock the power of intelligent campaign management today."
+          primaryCta={{
+            text: user ? "Go to Dashboard" : "Get Started for Free",
+            href: user ? "/dashboard" : "/signup",
+          }}
+          secondaryCta={{
+            text: "See Features",
+            href: "#features",
+            icon: <ChevronRight className="mr-2 h-4 w-4" />,
+          }}
+          mockupImage={{
+            src: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+            alt: "Campaign Crew Dashboard",
+            width: 1200,
+            height: 800,
+          }}
+        />
         
         {/* Features Section */}
         <section className="py-20 bg-white" id="features">
@@ -365,3 +347,4 @@ const Index = () => {
 };
 
 export default Index;
+

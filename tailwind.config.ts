@@ -149,6 +149,26 @@ export default {
 					'50%': {
 						opacity: '0.5'
 					}
+				},
+				appear: {
+					from: {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'appear-zoom': {
+					from: {
+						opacity: '0',
+						transform: 'scale(0.95)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'scale(1)'
+					}
 				}
 			},
 			animation: {
@@ -160,7 +180,9 @@ export default {
 				'slide-out-left': 'slide-out-left 0.3s ease-out',
 				'scale-in': 'scale-in 0.2s ease-out',
 				'scale-out': 'scale-out 0.2s ease-out',
-				'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+				'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'appear': 'appear 0.7s ease-out forwards',
+				'appear-zoom': 'appear-zoom 0.7s ease-out forwards'
 			},
 			transitionProperty: {
 				height: 'height',

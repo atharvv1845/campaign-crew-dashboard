@@ -1,84 +1,262 @@
 
-import React from 'react';
-import { Plus, Copy, Edit, Trash, Check, Clock, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Copy, Edit, Trash, Check, Clock, Mail, Search, MessageSquare, Linkedin, Facebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock template data
-const templates = [
-  {
-    id: 1,
-    name: 'Initial Outreach',
-    subject: 'Introducing our new solution for [company]',
-    preview: 'Hi [name], I hope this email finds you well. I wanted to reach out because I noticed...',
-    usageCount: 1432,
-    responseRate: 32,
-    lastUsed: '2 days ago',
-  },
-  {
-    id: 2,
-    name: 'Follow-up #1',
-    subject: 'Following up on my previous email',
-    preview: 'Hi [name], I just wanted to follow up on my previous email to see if you had a chance...',
-    usageCount: 1056,
-    responseRate: 24,
-    lastUsed: '1 day ago',
-  },
-  {
-    id: 3,
-    name: 'Demo Request',
-    subject: 'Quick demo of [product] for [company]?',
-    preview: "Hi [name], I'd like to offer you a personalized demo of our solution that has helped...",
-    usageCount: 873,
-    responseRate: 41,
-    lastUsed: '3 days ago',
-  },
-  {
-    id: 4,
-    name: 'Case Study Share',
-    subject: 'How [similar company] achieved [result]',
-    preview: 'Hi [name], I thought you might be interested in this case study of how we helped...',
-    usageCount: 632,
-    responseRate: 37,
-    lastUsed: '5 days ago',
-  },
-];
+// Types for script templates
+export interface MessageScript {
+  id: number;
+  name: string;
+  platform: string;
+  subject?: string;
+  content: string;
+  usageCount: number;
+  responseRate: number;
+  lastUsed: string;
+  campaignId?: number | string;
+  campaignName?: string;
+  variables?: string[];
+  createdAt: string;
+}
 
-const MessageTemplates: React.FC = () => {
+interface MessageTemplatesProps {
+  onEditScript: (script?: MessageScript) => void;
+}
+
+const MessageTemplates: React.FC<MessageTemplatesProps> = ({ onEditScript }) => {
+  // Mock template data - in a real app, this would come from an API
+  const [templates, setTemplates] = useState<MessageScript[]>([
+    {
+      id: 1,
+      name: 'Initial Outreach',
+      platform: 'linkedin',
+      subject: 'Introducing our new solution for {company}',
+      content: 'Hi {firstName}, I hope this message finds you well. I noticed that {company} has been working on {industry} solutions, and I thought you might be interested in our approach that has helped similar companies achieve {benefit}.',
+      usageCount: 1432,
+      responseRate: 32,
+      lastUsed: '2 days ago',
+      campaignName: 'Tech Startup Outreach',
+      variables: ['{firstName}', '{company}', '{industry}', '{benefit}'],
+      createdAt: '2023-08-15',
+    },
+    {
+      id: 2,
+      name: 'Follow-up #1',
+      platform: 'email',
+      subject: 'Following up on my previous email',
+      content: 'Hi {firstName}, I just wanted to follow up on my previous message to see if you had a chance to consider our proposal for {company}. I'd be happy to provide more information or schedule a quick call.',
+      usageCount: 1056,
+      responseRate: 24,
+      lastUsed: '1 day ago',
+      campaignName: 'Tech Startup Outreach',
+      variables: ['{firstName}', '{company}'],
+      createdAt: '2023-08-20',
+    },
+    {
+      id: 3,
+      name: 'Demo Request',
+      platform: 'whatsapp',
+      content: "Hi {firstName}, I'd like to offer you a personalized demo of our solution that has helped {company} achieve {benefit}. Would you have 15 minutes this week for a quick demonstration?",
+      usageCount: 873,
+      responseRate: 41,
+      lastUsed: '3 days ago',
+      campaignName: 'Enterprise Outreach',
+      variables: ['{firstName}', '{company}', '{benefit}'],
+      createdAt: '2023-09-01',
+    },
+    {
+      id: 4,
+      name: 'Case Study Share',
+      platform: 'email',
+      subject: 'How {similarCompany} achieved {result}',
+      content: 'Hi {firstName}, I thought you might be interested in this case study of how we helped {similarCompany} in the {industry} industry improve their {metric} by {result}. Given {company}\'s recent focus on {focus}, I thought this might be relevant.',
+      usageCount: 632,
+      responseRate: 37,
+      lastUsed: '5 days ago',
+      campaignName: 'Enterprise Outreach',
+      variables: ['{firstName}', '{company}', '{similarCompany}', '{industry}', '{metric}', '{result}', '{focus}'],
+      createdAt: '2023-09-10',
+    },
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [campaignFilter, setCampaignFilter] = useState('all');
+  const [platformFilter, setPlatformFilter] = useState('all');
+  const { toast } = useToast();
+
+  // Filter templates based on search and filters
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          template.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCampaign = campaignFilter === 'all' || template.campaignName === campaignFilter;
+    const matchesPlatform = platformFilter === 'all' || template.platform === platformFilter;
+    
+    return matchesSearch && matchesCampaign && matchesPlatform;
+  });
+
+  // Campaigns (unique list from templates)
+  const campaigns = Array.from(new Set(templates.map(t => t.campaignName))).filter(Boolean);
+
+  // Handle copy to clipboard
+  const handleCopyScript = (content: string) => {
+    navigator.clipboard.writeText(content);
+    
+    toast({
+      title: "Copied to clipboard",
+      description: "Message script has been copied to your clipboard",
+    });
+  };
+
+  // Handle delete script
+  const handleDeleteScript = (id: number) => {
+    setTemplates(templates.filter(t => t.id !== id));
+    
+    toast({
+      title: "Script deleted",
+      description: "The message script has been deleted",
+    });
+  };
+
+  // Get platform icon
+  const getPlatformIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'linkedin':
+        return <Linkedin className="h-4 w-4" />;
+      case 'email':
+        return <Mail className="h-4 w-4" />;
+      case 'whatsapp':
+        return <MessageSquare className="h-4 w-4" />;
+      case 'facebook':
+        return <Facebook className="h-4 w-4" />;
+      default:
+        return <MessageSquare className="h-4 w-4" />;
+    }
+  };
+
+  // Get platform color
+  const getPlatformColor = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'linkedin':
+        return 'bg-blue-100 text-blue-800';
+      case 'email':
+        return 'bg-purple-100 text-purple-800';
+      case 'whatsapp':
+        return 'bg-green-100 text-green-800';
+      case 'facebook':
+        return 'bg-indigo-100 text-indigo-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header and actions */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Message Templates</h3>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm shadow-sm hover:bg-primary/90 transition-colors">
-          <Plus className="h-4 w-4" />
-          <span>New Template</span>
-        </button>
+      {/* Filters and search */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-grow">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search templates..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <Select value={campaignFilter} onValueChange={setCampaignFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by campaign" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Campaigns</SelectItem>
+            {campaigns.map((campaign, index) => (
+              <SelectItem key={index} value={campaign || ''}>
+                {campaign}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Select value={platformFilter} onValueChange={setPlatformFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by platform" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Platforms</SelectItem>
+            <SelectItem value="linkedin">LinkedIn</SelectItem>
+            <SelectItem value="email">Email</SelectItem>
+            <SelectItem value="whatsapp">WhatsApp</SelectItem>
+            <SelectItem value="facebook">Facebook</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Button onClick={() => onEditScript()} className="shrink-0">
+          <Plus className="h-4 w-4 mr-2" />
+          New Template
+        </Button>
       </div>
       
+      {/* No results message */}
+      {filteredTemplates.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No templates found. Try adjusting your filters or create a new template.</p>
+        </div>
+      )}
+      
       {/* Templates grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {templates.map((template) => (
-          <div key={template.id} className="glass-card rounded-xl hover-effect">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredTemplates.map((template) => (
+          <Card key={template.id} className="overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-5 border-b border-border">
               <div className="flex justify-between items-start">
-                <h4 className="font-medium text-base">{template.name}</h4>
+                <div>
+                  <h4 className="font-medium text-base">{template.name}</h4>
+                  <div className="flex items-center mt-1 gap-1">
+                    <Badge variant="outline" className={cn("px-2 py-0.5 text-xs", getPlatformColor(template.platform))}>
+                      {getPlatformIcon(template.platform)}
+                      <span className="ml-1">{template.platform.charAt(0).toUpperCase() + template.platform.slice(1)}</span>
+                    </Badge>
+                    {template.campaignName && (
+                      <Badge variant="outline" className="px-2 py-0.5 text-xs">
+                        {template.campaignName}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
                 <div className="flex items-center gap-1">
-                  <button className="p-1 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors">
+                  <Button variant="ghost" size="sm" onClick={() => handleCopyScript(template.content)} title="Copy to clipboard">
                     <Copy className="h-4 w-4" />
-                  </button>
-                  <button className="p-1 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors">
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onEditScript(template)} title="Edit template">
                     <Edit className="h-4 w-4" />
-                  </button>
-                  <button className="p-1 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors">
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleDeleteScript(template.id)} title="Delete template">
                     <Trash className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
-              <p className="text-sm font-medium mt-2">{template.subject}</p>
+              {template.subject && (
+                <p className="text-sm font-medium mt-2">Subject: {template.subject}</p>
+              )}
             </div>
             
             <div className="p-5 border-b border-border">
-              <p className="text-sm text-muted-foreground line-clamp-3">{template.preview}</p>
+              <p className="text-sm text-muted-foreground line-clamp-3">{template.content}</p>
+              
+              {template.variables && template.variables.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {template.variables.map((variable, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {variable}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className="p-5 grid grid-cols-3 gap-2 bg-muted/10">
@@ -106,7 +284,7 @@ const MessageTemplates: React.FC = () => {
                 <p className="text-sm font-medium">{template.lastUsed}</p>
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 export interface LeadData {
   firstName: string;
   lastName: string;

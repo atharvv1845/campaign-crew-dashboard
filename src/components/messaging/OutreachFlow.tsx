@@ -34,6 +34,8 @@ interface OutreachFlow {
   steps: FlowStep[];
 }
 
+const OUTREACH_FLOWS_STORAGE_KEY = 'outreachFlows';
+
 const OutreachFlow: React.FC = () => {
   const [flows, setFlows] = useState<OutreachFlow[]>([]);
   const [currentFlow, setCurrentFlow] = useState<OutreachFlow | null>(null);
@@ -84,7 +86,7 @@ const OutreachFlow: React.FC = () => {
   // Load saved flows from localStorage
   useEffect(() => {
     try {
-      const savedFlows = localStorage.getItem('outreachFlows');
+      const savedFlows = localStorage.getItem(OUTREACH_FLOWS_STORAGE_KEY);
       if (savedFlows) {
         const parsedFlows = JSON.parse(savedFlows);
         setFlows(parsedFlows);
@@ -106,7 +108,7 @@ const OutreachFlow: React.FC = () => {
       const updatedFlows = flows.map(flow => 
         flow.id === currentFlow.id ? currentFlow : flow
       );
-      localStorage.setItem('outreachFlows', JSON.stringify(updatedFlows));
+      localStorage.setItem(OUTREACH_FLOWS_STORAGE_KEY, JSON.stringify(updatedFlows));
       setFlows(updatedFlows);
     }
   }, [currentFlow]);
@@ -224,7 +226,7 @@ const OutreachFlow: React.FC = () => {
     setCurrentFlow(newFlow);
     
     // Save to localStorage
-    localStorage.setItem('outreachFlows', JSON.stringify(updatedFlows));
+    localStorage.setItem(OUTREACH_FLOWS_STORAGE_KEY, JSON.stringify(updatedFlows));
     
     toast({
       title: "Flow created",
@@ -254,7 +256,7 @@ const OutreachFlow: React.FC = () => {
     setFlows(updatedFlows);
     
     // Save to localStorage
-    localStorage.setItem('outreachFlows', JSON.stringify(updatedFlows));
+    localStorage.setItem(OUTREACH_FLOWS_STORAGE_KEY, JSON.stringify(updatedFlows));
     
     toast({
       title: "Flow renamed",
@@ -276,7 +278,7 @@ const OutreachFlow: React.FC = () => {
     }
     
     // Save to localStorage
-    localStorage.setItem('outreachFlows', JSON.stringify(updatedFlows));
+    localStorage.setItem(OUTREACH_FLOWS_STORAGE_KEY, JSON.stringify(updatedFlows));
     
     toast({
       title: "Flow deleted",
@@ -300,11 +302,17 @@ const OutreachFlow: React.FC = () => {
                   <SelectValue placeholder="Select or create a flow" />
                 </SelectTrigger>
                 <SelectContent>
-                  {flows.map(flow => (
-                    <SelectItem key={flow.id} value={flow.id.toString()}>
-                      {flow.name} ({flow.steps.length} steps)
-                    </SelectItem>
-                  ))}
+                  {flows.length === 0 ? (
+                    <div className="p-2 text-center text-muted-foreground">
+                      No flows available. Create one!
+                    </div>
+                  ) : (
+                    flows.map(flow => (
+                      <SelectItem key={flow.id} value={flow.id.toString()}>
+                        {flow.name} ({flow.steps.length} steps)
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               
@@ -430,6 +438,23 @@ const OutreachFlow: React.FC = () => {
                   steps={currentFlow.steps}
                   onEditStep={handleEditStep}
                   onDeleteStep={handleDeleteStep}
+                  onReorderStep={(id, direction) => {
+                    const stepIndex = currentFlow.steps.findIndex(s => s.id === id);
+                    if ((direction === 'up' && stepIndex <= 0) || 
+                        (direction === 'down' && stepIndex >= currentFlow.steps.length - 1)) {
+                      return;
+                    }
+                    
+                    const updatedSteps = [...currentFlow.steps];
+                    const targetIndex = direction === 'up' ? stepIndex - 1 : stepIndex + 1;
+                    [updatedSteps[stepIndex], updatedSteps[targetIndex]] = 
+                      [updatedSteps[targetIndex], updatedSteps[stepIndex]];
+                    
+                    setCurrentFlow({
+                      ...currentFlow,
+                      steps: updatedSteps
+                    });
+                  }}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-72 text-muted-foreground">

@@ -122,7 +122,10 @@ export function HeroWithMockup({
               )}
             >
               <img
-                {...mockupImage}
+                src="/campaign-crew-dashboard.png"
+                alt="Campaign Crew Dashboard"
+                width={1280}
+                height={800}
                 className="w-full h-auto"
                 loading="lazy"
                 decoding="async"

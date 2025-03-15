@@ -21,6 +21,7 @@ export function Mockup({ children, className }: MockupProps) {
           <div className="h-3 w-3 rounded-full bg-yellow-500" />
           <div className="h-3 w-3 rounded-full bg-green-500" />
         </div>
+        <div className="ml-4 text-xs text-white/50">Campaign Crew Dashboard</div>
       </div>
       <div className="relative">{children}</div>
     </div>

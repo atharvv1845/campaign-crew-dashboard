@@ -26,11 +26,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#FFC107', // Bright Yellow
-					foreground: '#212121' // Dark Grey/Black
+					DEFAULT: '#3B82F6', // Bright Blue
+					foreground: '#FFFFFF' // White
 				},
 				secondary: {
-					DEFAULT: '#212121', // Dark Grey/Black
+					DEFAULT: '#334155', // Slate
 					foreground: '#FFFFFF' // White
 				},
 				destructive: {
@@ -38,12 +38,12 @@ export default {
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: '#F5F5F5', // Light Gray
-					foreground: '#757575' // Medium Gray for muted text
+					DEFAULT: '#F1F5F9', // Slate 100
+					foreground: '#64748B' // Slate 500
 				},
 				accent: {
-					DEFAULT: '#F5F5F5', // Light Gray
-					foreground: '#212121' // Dark Grey/Black
+					DEFAULT: '#EFF6FF', // Blue 50
+					foreground: '#334155' // Slate 700
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -54,14 +54,14 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				sidebar: {
-					DEFAULT: '#212121', // Dark Grey/Black
+					DEFAULT: '#334155', // Slate 700
 					foreground: '#FFFFFF', // White
-					primary: '#FFC107', // Bright Yellow
-					'primary-foreground': '#212121', // Dark Grey/Black
-					accent: '#2C2C2C', // Slightly lighter black
+					primary: '#3B82F6', // Bright Blue
+					'primary-foreground': '#FFFFFF', // White
+					accent: '#475569', // Slate 600
 					'accent-foreground': '#FFFFFF', // White
-					border: '#2C2C2C', // Slightly lighter black
-					ring: '#FFC107' // Bright Yellow
+					border: '#475569', // Slate 600
+					ring: '#3B82F6' // Bright Blue
 				}
 			},
 			borderRadius: {

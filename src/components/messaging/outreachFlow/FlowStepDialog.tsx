@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, Linkedin, MessageSquare, Phone, AlertCircle, Clock } from 'lucide-react';
+import { Mail, Linkedin, Twitter, Instagram, Facebook, MessageSquare, Phone, AlertCircle, Clock, Plus, Send } from 'lucide-react';
 import { FlowStep } from '../OutreachFlow';
 import { MessageScript } from '../MessageTemplates';
 
@@ -31,12 +31,16 @@ const FlowStepDialog: React.FC<FlowStepDialogProps> = ({
   const [localStep, setLocalStep] = useState<FlowStep>(step);
   const [activeTab, setActiveTab] = useState<string>("content");
   const [useTemplate, setUseTemplate] = useState<boolean>(false);
+  const [showCustomPlatform, setShowCustomPlatform] = useState<boolean>(false);
+  const [customPlatform, setCustomPlatform] = useState<string>("");
 
   // Reset local state when step changes
   useEffect(() => {
     setLocalStep(step);
     setUseTemplate(false);
     setActiveTab("content");
+    setShowCustomPlatform(false);
+    setCustomPlatform("");
   }, [step]);
 
   const handleSave = () => {
@@ -59,6 +63,30 @@ const FlowStepDialog: React.FC<FlowStepDialogProps> = ({
     }
   };
 
+  const handleAddCustomPlatform = () => {
+    if (customPlatform.trim()) {
+      updateLocalStep({ platform: customPlatform.toLowerCase().trim() });
+      setShowCustomPlatform(false);
+      
+      // Save custom platform to localStorage for future use
+      const savedPlatforms = JSON.parse(localStorage.getItem('customPlatforms') || '[]');
+      if (!savedPlatforms.includes(customPlatform.toLowerCase().trim())) {
+        savedPlatforms.push(customPlatform.toLowerCase().trim());
+        localStorage.setItem('customPlatforms', JSON.stringify(savedPlatforms));
+      }
+    }
+  };
+
+  // Get all platforms including custom ones from localStorage
+  const getCustomPlatforms = () => {
+    try {
+      return JSON.parse(localStorage.getItem('customPlatforms') || '[]');
+    } catch (error) {
+      console.error("Error loading custom platforms:", error);
+      return [];
+    }
+  };
+
   const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'linkedin':
@@ -69,10 +97,23 @@ const FlowStepDialog: React.FC<FlowStepDialogProps> = ({
         return <MessageSquare className="h-4 w-4" />;
       case 'call':
         return <Phone className="h-4 w-4" />;
+      case 'twitter':
+        return <Twitter className="h-4 w-4" />;
+      case 'instagram':
+        return <Instagram className="h-4 w-4" />;
+      case 'facebook':
+        return <Facebook className="h-4 w-4" />;
+      case 'telegram':
+        return <Send className="h-4 w-4" />;
+      case 'sms':
+        return <MessageSquare className="h-4 w-4" />;
       default:
-        return <Mail className="h-4 w-4" />;
+        return <MessageSquare className="h-4 w-4" />;
     }
   };
+
+  // Load custom platforms
+  const customPlatforms = getCustomPlatforms();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -94,40 +135,122 @@ const FlowStepDialog: React.FC<FlowStepDialogProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Platform</Label>
-                  <Select 
-                    value={localStep.platform || 'email'}
-                    onValueChange={(value) => updateLocalStep({ platform: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select platform" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="email">
-                        <div className="flex items-center">
-                          <Mail className="h-4 w-4 mr-2" />
-                          <span>Email</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="linkedin">
-                        <div className="flex items-center">
-                          <Linkedin className="h-4 w-4 mr-2" />
-                          <span>LinkedIn</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="whatsapp">
-                        <div className="flex items-center">
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          <span>WhatsApp</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="call">
-                        <div className="flex items-center">
-                          <Phone className="h-4 w-4 mr-2" />
-                          <span>Call</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {!showCustomPlatform ? (
+                    <>
+                      <Select 
+                        value={localStep.platform || 'email'}
+                        onValueChange={(value) => {
+                          if (value === "custom") {
+                            setShowCustomPlatform(true);
+                          } else {
+                            updateLocalStep({ platform: value });
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select platform" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="email">
+                            <div className="flex items-center">
+                              <Mail className="h-4 w-4 mr-2" />
+                              <span>Email</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="linkedin">
+                            <div className="flex items-center">
+                              <Linkedin className="h-4 w-4 mr-2" />
+                              <span>LinkedIn</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="twitter">
+                            <div className="flex items-center">
+                              <Twitter className="h-4 w-4 mr-2" />
+                              <span>Twitter</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="instagram">
+                            <div className="flex items-center">
+                              <Instagram className="h-4 w-4 mr-2" />
+                              <span>Instagram</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="facebook">
+                            <div className="flex items-center">
+                              <Facebook className="h-4 w-4 mr-2" />
+                              <span>Facebook</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="whatsapp">
+                            <div className="flex items-center">
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              <span>WhatsApp</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="telegram">
+                            <div className="flex items-center">
+                              <Send className="h-4 w-4 mr-2" />
+                              <span>Telegram</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="sms">
+                            <div className="flex items-center">
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              <span>SMS</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="call">
+                            <div className="flex items-center">
+                              <Phone className="h-4 w-4 mr-2" />
+                              <span>Call</span>
+                            </div>
+                          </SelectItem>
+                          
+                          {/* Display saved custom platforms */}
+                          {customPlatforms.map((platform: string) => (
+                            <SelectItem key={platform} value={platform}>
+                              <div className="flex items-center">
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                <span className="capitalize">{platform}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                          
+                          <SelectItem value="custom">
+                            <div className="flex items-center text-primary">
+                              <Plus className="h-4 w-4 mr-2" />
+                              <span>Add Custom Platform</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input 
+                        value={customPlatform}
+                        onChange={(e) => setCustomPlatform(e.target.value)}
+                        placeholder="Enter platform name"
+                        className="flex-1"
+                      />
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        onClick={handleAddCustomPlatform}
+                        disabled={!customPlatform.trim()}
+                      >
+                        Add
+                      </Button>
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => setShowCustomPlatform(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {localStep.platform === 'email' && (

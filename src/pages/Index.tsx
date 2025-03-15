@@ -41,43 +41,48 @@ const Index = () => {
   const testimonials = [
     {
       author: {
-        name: "Marketing Manager",
-        position: "XYZ Corp.",
+        name: "Jennifer Reynolds",
+        position: "Marketing Director",
         avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
       },
-      text: "This tool made our campaign tracking so much easier. No more messy spreadsheets!"
+      text: "Campaign Crew has transformed how we manage our outreach efforts. We've increased our response rates by 47% since switching to this platform!",
+      href: "https://linkedin.com/in/jennifer-reynolds"
     },
     {
       author: {
-        name: "CEO",
-        position: "ABC Agency",
+        name: "Michael Chen",
+        position: "Head of Growth",
         avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
       },
-      text: "We love the simplicity and control. No unwanted automation—just powerful insights."
+      text: "The lead management capabilities are unmatched. We run 12+ campaigns simultaneously and can track every interaction without missing a beat.",
+      href: "https://linkedin.com/in/michael-chen-growth"
     },
     {
       author: {
-        name: "Marketing Director",
-        position: "Global Enterprises",
+        name: "Sophia Martinez",
+        position: "VP of Sales",
         avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
       },
-      text: "Since using Campaign Crew, our team has been able to focus on what matters - connecting with leads."
+      text: "What I love most is the visibility it gives my team. Being able to track every lead's journey has improved our conversion rates significantly.",
+      href: "https://linkedin.com/in/sophia-martinez"
     },
     {
       author: {
-        name: "Sales Manager",
-        position: "Tech Solutions Inc.",
+        name: "David Wilson",
+        position: "CEO",
         avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face"
       },
-      text: "The lead management features have transformed how we follow up with prospects. Our conversion rates are up 30%!"
+      text: "We tried 3 other campaign tools before finding Campaign Crew. It's the perfect balance of control and insight without unnecessary automation.",
+      href: "https://linkedin.com/in/david-wilson-ceo"
     },
     {
       author: {
-        name: "Growth Specialist",
-        position: "Startup Ventures",
+        name: "Aisha Johnson",
+        position: "Marketing Operations",
         avatar: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face"
       },
-      text: "Finally a campaign tool that doesn't try to automate everything but still gives us powerful insights and organization."
+      text: "The multi-channel support has been a game-changer for our team. We can coordinate efforts across email, LinkedIn and calls seamlessly.",
+      href: "https://linkedin.com/in/aisha-johnson-marketing"
     }
   ];
 
@@ -412,3 +417,4 @@ const Index = () => {
 };
 
 export default Index;
+

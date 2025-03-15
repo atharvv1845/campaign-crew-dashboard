@@ -101,7 +101,8 @@ export function HeroWithMockup({
               size="lg"
               variant="ghost"
               className={cn(
-                "text-foreground/80 dark:text-foreground/70",
+                "text-foreground/80",
+                "border border-muted-foreground/20 hover:bg-muted-foreground/10",
                 "transition-all duration-300",
               )}
             >
@@ -117,8 +118,8 @@ export function HeroWithMockup({
             <Mockup
               className={cn(
                 "animate-appear opacity-0 [animation-delay:700ms]",
-                "shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_-12px_rgba(255,255,255,0.1)]",
-                "border-primary/10 dark:border-primary/5",
+                "shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)]",
+                "border-white/10",
               )}
             >
               <img

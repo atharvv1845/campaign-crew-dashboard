@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -93,8 +94,8 @@ const Index = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="border-b border-border bg-white py-4 sticky top-0 z-10 shadow-sm">
+    <div className="flex flex-col min-h-screen bg-background">
+      <header className="border-b border-white/10 bg-black/50 backdrop-blur-md py-4 sticky top-0 z-10">
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
@@ -102,7 +103,7 @@ const Index = () => {
               alt="Campaign Crew Logo" 
               className="h-10" 
             />
-            <h1 className="text-2xl font-bold text-secondary">Campaign Crew</h1>
+            <h1 className="text-2xl font-bold text-white">Campaign Crew</h1>
           </div>
           <div className="flex items-center space-x-4">
             {user ? (
@@ -112,7 +113,7 @@ const Index = () => {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary/10">Login</Button>
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Login</Button>
                 </Link>
                 <Link to="/signup">
                   <Button className="bg-primary text-white hover:bg-primary/90">Sign Up</Button>
@@ -146,20 +147,20 @@ const Index = () => {
         />
         
         {/* Features Section */}
-        <section className="py-20 bg-white" id="features">
+        <section className="py-20 bg-black/30" id="features">
           <div className="container">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 text-secondary">Powerful Features</h2>
+              <h2 className="text-3xl font-bold mb-4 text-white">Powerful Features</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Everything you need to manage your marketing campaigns effectively
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <Card key={index} className="border border-border shadow-sm hover:shadow-md transition-shadow hover:-translate-y-1 duration-300">
+                <Card key={index} className="bg-black/50 border-white/10 hover:shadow-md transition-shadow hover:-translate-y-1 duration-300">
                   <CardContent className="p-6">
                     <div className="mb-4 inline-flex p-3 rounded-full bg-primary/10">{feature.icon}</div>
-                    <h3 className="text-xl font-semibold mb-2 text-secondary">{feature.title}</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
                     <p className="text-muted-foreground">{feature.description}</p>
                   </CardContent>
                 </Card>
@@ -169,11 +170,11 @@ const Index = () => {
         </section>
 
         {/* Dashboard Preview Section */}
-        <section className="py-20 bg-blue-50">
+        <section className="py-20 bg-black/50">
           <div className="container">
             <div className="flex flex-col lg:flex-row items-center gap-12">
               <div className="lg:w-1/2">
-                <h2 className="text-3xl font-bold mb-6 text-secondary">Streamline Your Campaign Management</h2>
+                <h2 className="text-3xl font-bold mb-6 text-white">Streamline Your Campaign Management</h2>
                 <p className="text-lg text-muted-foreground mb-8">
                   Our intuitive dashboard gives you a complete overview of your campaigns, leads, and performance metrics in one place.
                 </p>
@@ -186,7 +187,7 @@ const Index = () => {
                   ].map((item, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                      <span className="text-secondary">{item}</span>
+                      <span className="text-gray-300">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -199,10 +200,10 @@ const Index = () => {
               </div>
               <div className="lg:w-1/2 relative">
                 <div className="relative">
-                  <div className="absolute inset-0 translate-x-4 translate-y-4 bg-blue-200 rounded-xl"></div>
-                  <div className="relative rounded-xl overflow-hidden border border-border shadow-xl">
+                  <div className="absolute inset-0 translate-x-4 translate-y-4 bg-primary/20 rounded-xl"></div>
+                  <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-xl">
                     <img 
-                      src="https://placehold.co/800x500/3B82F6/FFFFFF?text=Campaign+Crew+Dashboard"
+                      src="https://placehold.co/800x500/0F172A/3B82F6?text=Campaign+Crew+Dashboard"
                       alt="Dashboard Preview" 
                       className="w-full"
                     />
@@ -214,26 +215,26 @@ const Index = () => {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-20 bg-white" id="pricing">
+        <section className="py-20 bg-black/30" id="pricing">
           <div className="container">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 text-secondary">Simple, Transparent Pricing</h2>
+              <h2 className="text-3xl font-bold mb-4 text-white">Simple, Transparent Pricing</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Choose the plan that works best for your business
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {pricingPlans.map((plan, index) => (
-                <Card key={index} className={`${plan.popular ? 'border-primary border-2 shadow-lg' : 'border border-border'} relative`}>
+                <Card key={index} className={`${plan.popular ? 'border-primary border-2 shadow-xl' : 'border border-white/10'} bg-black/50 relative`}>
                   <CardContent className="p-6">
                     {plan.popular && (
                       <div className="absolute top-0 right-0 bg-primary text-white py-1 px-3 uppercase text-xs font-bold tracking-wider transform translate-x-2 -translate-y-2 rounded-bl-lg rounded-tr-lg shadow">
                         Popular
                       </div>
                     )}
-                    <h3 className="text-xl font-bold text-secondary">{plan.name}</h3>
+                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
                     <div className="my-4 flex items-end">
-                      <span className="text-4xl font-bold text-secondary">{plan.price}</span>
+                      <span className="text-4xl font-bold text-white">{plan.price}</span>
                       {plan.period && <span className="text-muted-foreground ml-1">{plan.period}</span>}
                     </div>
                     <p className="text-muted-foreground mb-6">{plan.description}</p>
@@ -241,11 +242,11 @@ const Index = () => {
                       {plan.features.map((feature, featureIndex) => (
                         <li key={featureIndex} className="flex items-start">
                           <CheckCircle className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                          <span className="text-secondary">{feature}</span>
+                          <span className="text-gray-300">{feature}</span>
                         </li>
                       ))}
                     </ul>
-                    <Button className={`w-full ${plan.popular ? 'bg-primary text-white hover:bg-primary/90' : 'bg-secondary text-white hover:bg-secondary/90'}`}>
+                    <Button className={`w-full ${plan.popular ? 'bg-primary text-white hover:bg-primary/90' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'}`}>
                       {plan.name === "Enterprise" ? "Contact Sales" : "Get Started"}
                     </Button>
                   </CardContent>
@@ -256,19 +257,19 @@ const Index = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 bg-blue-50">
+        <section className="py-20 bg-black/50">
           <div className="container">
-            <h2 className="text-3xl font-bold text-center mb-16 text-secondary">What Our Users Say</h2>
+            <h2 className="text-3xl font-bold text-center mb-16 text-white">What Our Users Say</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
-                <Card key={index} className="bg-white border border-border p-6 shadow relative">
+                <Card key={index} className="bg-black/60 border border-white/10 p-6 shadow relative glass-card">
                   <div className="absolute -top-4 left-6 text-5xl text-primary">"</div>
                   <CardContent className="pt-4 px-0">
                     <blockquote className="mb-4 relative z-10 pt-4">
-                      <p className="italic text-muted-foreground">{testimonial.quote}</p>
+                      <p className="italic text-gray-300">{testimonial.quote}</p>
                     </blockquote>
                     <div className="mt-4">
-                      <p className="font-semibold text-secondary">{testimonial.author}</p>
+                      <p className="font-semibold text-white">{testimonial.author}</p>
                       <p className="text-sm text-muted-foreground">{testimonial.position}</p>
                     </div>
                   </CardContent>
@@ -279,14 +280,14 @@ const Index = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-blue-600 text-white">
+        <section className="py-20 bg-primary/90 text-white">
           <div className="container text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Campaign Management?</h2>
             <p className="text-xl max-w-2xl mx-auto mb-8">
               Join thousands of marketers who've improved their campaign performance with Campaign Crew.
             </p>
             <Link to={user ? "/dashboard" : "/signup"}>
-              <Button size="lg" className="bg-white text-blue-600 rounded-md px-8 hover:shadow-lg hover:bg-gray-100 group">
+              <Button size="lg" className="bg-white text-primary rounded-md px-8 hover:shadow-lg hover:bg-gray-100 group">
                 {user ? "Go to Dashboard" : "Start Your Free Trial Today"}
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -295,7 +296,7 @@ const Index = () => {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-secondary text-white py-12">
+      <footer className="border-t border-white/10 bg-black py-12">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -303,41 +304,41 @@ const Index = () => {
                 <img 
                   src="/lovable-uploads/0ad6094e-df44-49fa-a82e-e59b86c8263f.png" 
                   alt="Campaign Crew Logo" 
-                  className="h-8 bg-white rounded-full p-1" 
+                  className="h-8 bg-white/10 rounded-full p-1" 
                 />
-                <h3 className="text-lg font-semibold">Campaign Crew</h3>
+                <h3 className="text-lg font-semibold text-white">Campaign Crew</h3>
               </div>
-              <p className="text-gray-300">Streamline your outreach campaigns for better results.</p>
+              <p className="text-gray-400">Streamline your outreach campaigns for better results.</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Product</h3>
+              <h3 className="text-lg font-semibold mb-4 text-white">Product</h3>
               <ul className="space-y-2">
-                <li><a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Integrations</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Use Cases</a></li>
+                <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                <li><a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Use Cases</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <h3 className="text-lg font-semibold mb-4 text-white">Company</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Legal</h3>
+              <h3 className="text-lg font-semibold mb-4 text-white">Legal</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Cookie Policy</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">GDPR</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">GDPR</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+          <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; {new Date().getFullYear()} Campaign Crew. All rights reserved.</p>
           </div>
         </div>
@@ -347,4 +348,3 @@ const Index = () => {
 };
 
 export default Index;
-

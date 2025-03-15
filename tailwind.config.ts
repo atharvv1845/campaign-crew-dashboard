@@ -38,12 +38,12 @@ export default {
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: '#F1F5F9', // Slate 100
-					foreground: '#64748B' // Slate 500
+					DEFAULT: '#1E293B', // Dark slate for muted in dark mode
+					foreground: '#94A3B8' // Lighter slate for text
 				},
 				accent: {
-					DEFAULT: '#EFF6FF', // Blue 50
-					foreground: '#334155' // Slate 700
+					DEFAULT: '#1E293B', // Dark blue accent
+					foreground: '#EFF6FF' // Light blue foreground
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -54,13 +54,13 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				sidebar: {
-					DEFAULT: '#334155', // Slate 700
+					DEFAULT: '#0F172A', // Very dark blue
 					foreground: '#FFFFFF', // White
 					primary: '#3B82F6', // Bright Blue
 					'primary-foreground': '#FFFFFF', // White
-					accent: '#475569', // Slate 600
+					accent: '#1E293B', // Dark slate
 					'accent-foreground': '#FFFFFF', // White
-					border: '#475569', // Slate 600
+					border: '#1E293B', // Dark slate
 					ring: '#3B82F6' // Bright Blue
 				}
 			},

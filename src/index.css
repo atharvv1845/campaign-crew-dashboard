@@ -7,47 +7,6 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-
-    --radius: 1rem;
-
-    --sidebar-background: 220 14% 96%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 221 83% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 92%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 220 14% 90%;
-    --sidebar-ring: 221 83% 53%;
-  }
-
-  .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
@@ -75,6 +34,8 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 224 76% 48%;
+
+    --radius: 1rem;
 
     --sidebar-background: 223 47% 11%;
     --sidebar-foreground: 210 40% 98%;
@@ -144,15 +105,15 @@
 /* Glass morphism styles */
 @layer components {
   .glass {
-    @apply bg-white/80 dark:bg-black/80 backdrop-blur-lg border border-white/20 dark:border-white/10;
+    @apply bg-white/10 backdrop-blur-lg border border-white/10;
   }
 
   .glass-card {
-    @apply bg-white/60 dark:bg-black/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm;
+    @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-sm;
   }
 
   .glass-input {
-    @apply bg-white/40 dark:bg-black/40 backdrop-blur-sm border border-white/20 dark:border-white/10;
+    @apply bg-white/5 backdrop-blur-sm border border-white/10;
   }
 
   .hover-effect {

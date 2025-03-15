@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeroWithMockup } from '@/components/ui/hero-with-mockup';
 import { TestimonialsSection } from '@/components/blocks/testimonials-with-marquee';
-import { CheckCircle, BarChart2, RefreshCw, ArrowRight, ChevronRight, Mail, Rocket, Shield, Users, LayoutDashboard, ListChecks, UserPlus, PieChart, Globe, UsersRound, Plus, Clipboard, MessageSquare, BarChart, Eye, Phone } from 'lucide-react';
+import { CheckCircle, BarChart2, RefreshCw, ArrowRight, ChevronRight, Mail, Rocket, Shield, Users, LayoutDashboard, ListChecks, UserPlus, PieChart, Globe, UsersRound, Plus, Clipboard, MessageSquare, BarChart, Eye, Phone, LogIn } from 'lucide-react';
 
 const Index = () => {
   const {
@@ -148,13 +148,23 @@ const Index = () => {
             
           </div>
           <div className="flex items-center space-x-4">
-            {user ? <Link to="/dashboard">
+            {user ? (
+              <Link to="/dashboard">
                 <Button className="bg-primary text-black font-medium hover:bg-primary/90">Go to Dashboard</Button>
-              </Link> : 
-              <a href="#contact-sales">
-                <Button className="bg-primary text-black font-medium hover:bg-primary/90">Contact Sales</Button>
-              </a>
-            }
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
+                <a href="#contact-sales">
+                  <Button className="bg-primary text-black font-medium hover:bg-primary/90">Contact Sales</Button>
+                </a>
+              </>
+            )}
           </div>
         </div>
       </header>

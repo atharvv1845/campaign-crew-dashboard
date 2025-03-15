@@ -8,13 +8,15 @@ interface LeadFormProps {
   handleLeadInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   addLead: (andAnother: boolean) => void;
   contactPlatforms?: string[];
+  customPlatforms?: Array<{ id: string; name: string }>;
 }
 
 const LeadForm: React.FC<LeadFormProps> = ({ 
   currentLead, 
   handleLeadInputChange,
   addLead,
-  contactPlatforms = []
+  contactPlatforms = [],
+  customPlatforms = []
 }) => {
   // Determine which platform fields to show based on selected contact platforms
   const showEmail = !contactPlatforms.length || contactPlatforms.includes('email');
@@ -37,7 +39,7 @@ const LeadForm: React.FC<LeadFormProps> = ({
             <input
               type="text"
               name="firstName"
-              value={currentLead.firstName}
+              value={currentLead.firstName || ''}
               onChange={handleLeadInputChange}
               placeholder="First Name"
               className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -45,7 +47,7 @@ const LeadForm: React.FC<LeadFormProps> = ({
             <input
               type="text"
               name="lastName"
-              value={currentLead.lastName}
+              value={currentLead.lastName || ''}
               onChange={handleLeadInputChange}
               placeholder="Last Name"
               className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -194,6 +196,30 @@ const LeadForm: React.FC<LeadFormProps> = ({
                 />
               </div>
             )}
+
+            {/* Custom Platforms */}
+            {customPlatforms.map(platform => {
+              // Check if this custom platform is selected
+              if (contactPlatforms.includes(platform.id)) {
+                return (
+                  <div key={platform.id}>
+                    <label className="flex items-center text-sm font-medium mb-1">
+                      <span className="mr-1">{platform.name}</span>
+                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                    </label>
+                    <input
+                      type="text"
+                      name={`social-custom-${platform.id}`}
+                      value={currentLead.socialProfiles?.[platform.id] || ''}
+                      onChange={handleLeadInputChange}
+                      placeholder={`Enter ${platform.name} contact info`}
+                      className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                );
+              }
+              return null;
+            })}
           </div>
           
           <div className="mt-3 text-xs text-muted-foreground">

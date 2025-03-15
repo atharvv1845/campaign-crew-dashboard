@@ -20,6 +20,7 @@ export interface CampaignFormData {
   shareNotes?: boolean;
   stepFlows?: Record<string, MessageStep[]>;
   contactPlatforms?: string[]; // Platforms for contacting leads (email, phone, social media)
+  customPlatforms?: Array<{ id: string; name: string }>; // Custom contact platforms added by user
 }
 
 // Campaign data structure
@@ -43,6 +44,7 @@ export interface CampaignData {
   };
   contacted?: number;
   contactPlatforms?: string[]; // Platforms for contacting leads
+  customPlatforms?: Array<{ id: string; name: string }>; // Custom contact platforms added by user
 }
 
 // Lead data structure
@@ -63,6 +65,7 @@ export interface LeadData {
     instagram?: string;
     facebook?: string;
     whatsapp?: string;
+    [key: string]: string | undefined; // Allow for custom platform fields
   };
   source?: string;
   statusName?: string; // Added this optional property for temporary use during import

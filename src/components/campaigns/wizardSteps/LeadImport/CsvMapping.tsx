@@ -6,13 +6,15 @@ interface CsvMappingProps {
   csvMapping: Record<string, string>;
   onMappingChange: (header: string, value: string) => void;
   contactPlatforms?: string[];
+  customPlatforms?: Array<{ id: string; name: string }>;
 }
 
 const CsvMapping: React.FC<CsvMappingProps> = ({ 
   csvHeaders, 
   csvMapping, 
   onMappingChange,
-  contactPlatforms = []
+  contactPlatforms = [],
+  customPlatforms = []
 }) => {
   // Mapping options for CSV columns
   const defaultMappingOptions = [
@@ -41,10 +43,19 @@ const CsvMapping: React.FC<CsvMappingProps> = ({
     { value: 'whatsapp', label: 'WhatsApp', platform: 'whatsapp' },
   ];
 
+  // Add custom platform options
+  const customPlatformOptions = customPlatforms.map(platform => ({
+    value: platform.id,
+    label: platform.name,
+    platform: platform.id
+  }));
+
   // Filter platform options based on selected contact platforms
   const filteredPlatformOptions = contactPlatforms.length > 0
-    ? platformMappingOptions.filter(option => contactPlatforms.includes(option.platform))
-    : platformMappingOptions;
+    ? [...platformMappingOptions, ...customPlatformOptions].filter(option => 
+        contactPlatforms.includes(option.platform)
+      )
+    : [...platformMappingOptions, ...customPlatformOptions];
 
   // Combine default options with filtered platform options
   const mappingOptions = [...defaultMappingOptions, ...filteredPlatformOptions];

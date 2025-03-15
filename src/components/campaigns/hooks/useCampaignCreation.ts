@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { CampaignFormData } from '../types/campaignTypes';
@@ -24,7 +25,8 @@ const defaultFormData: CampaignFormData = {
     edges: []
   },
   teamAssignments: {},
-  contactPlatforms: ['email', 'phone', 'linkedin'] // Default contact platforms
+  contactPlatforms: ['email', 'phone', 'linkedin'], // Default contact platforms
+  customPlatforms: [] // Custom platforms defined by the user
 };
 
 const transformLeadData = (leadData: any, campaignId: number | string): Lead => {
@@ -76,7 +78,8 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
           edges: []
         },
         teamAssignments: {},
-        contactPlatforms: existingCampaign.contactPlatforms || defaultFormData.contactPlatforms
+        contactPlatforms: existingCampaign.contactPlatforms || defaultFormData.contactPlatforms,
+        customPlatforms: existingCampaign.customPlatforms || []
       };
       
       setFormData(transformedData);
@@ -149,7 +152,8 @@ const useCampaignCreation = (onClose: (campaign?: CampaignFormData) => void, exi
         messageFlow: formData.messageFlow || { nodes: [], edges: [] },
         stages: normalizedStages,
         leadsData: transformedLeads,
-        contactPlatforms: formData.contactPlatforms
+        contactPlatforms: formData.contactPlatforms,
+        customPlatforms: formData.customPlatforms
       };
 
       if (existingCampaign) {

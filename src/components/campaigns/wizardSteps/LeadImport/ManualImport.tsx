@@ -41,7 +41,13 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
     const { name, value } = e.target;
     
     if (name.startsWith('social-')) {
-      const platform = name.replace('social-', '');
+      let platform = name.replace('social-', '');
+      
+      // Handle custom platforms
+      if (platform.startsWith('custom-')) {
+        platform = platform.replace('custom-', '');
+      }
+      
       setCurrentLead(prev => ({
         ...prev,
         socialProfiles: {
@@ -64,6 +70,7 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
     
     if (formData.contactPlatforms) {
       formData.contactPlatforms.forEach(platform => {
+        // Check standard platforms
         if (
           (platform === 'email' && currentLead.email) ||
           (platform === 'phone' && currentLead.phone) ||
@@ -73,6 +80,12 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
           (platform === 'instagram' && currentLead.socialProfiles?.instagram) ||
           (platform === 'whatsapp' && currentLead.socialProfiles?.whatsapp)
         ) {
+          leadPlatforms.push(platform);
+        }
+        
+        // Check custom platforms
+        if (currentLead.socialProfiles?.[platform] && 
+            !['email', 'phone', 'linkedin', 'twitter', 'facebook', 'instagram', 'whatsapp'].includes(platform)) {
           leadPlatforms.push(platform);
         }
       });
@@ -180,6 +193,7 @@ const ManualImport: React.FC<ManualImportProps> = ({ formData, setFormData }) =>
         handleLeadInputChange={handleLeadInputChange}
         addLead={addLead}
         contactPlatforms={formData.contactPlatforms}
+        customPlatforms={formData.customPlatforms}
       />
     </div>
   );

@@ -68,6 +68,9 @@ export interface LeadData {
   statusName?: string; // Added this optional property for temporary use during import
   contactPlatforms?: string[]; // Platforms this lead can be contacted on
   campaignId: string | number;
+  lastContact?: string;
+  firstContactDate?: string;
+  nextFollowUpDate?: string;
 }
 
 // Stage data structure

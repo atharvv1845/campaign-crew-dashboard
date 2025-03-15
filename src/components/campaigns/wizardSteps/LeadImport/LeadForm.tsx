@@ -88,7 +88,7 @@ const LeadForm: React.FC<LeadFormProps> = ({
               name="phone"
               value={currentLead.phone || ''}
               onChange={handleLeadInputChange}
-              pattern="[0-9+-\s()]+"
+              pattern="[0-9+-\\s()]+"
               placeholder="Phone"
               className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             />

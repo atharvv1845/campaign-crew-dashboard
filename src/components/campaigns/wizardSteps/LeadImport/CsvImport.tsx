@@ -80,11 +80,11 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
             if (
               (platform === 'email' && lead.email) ||
               (platform === 'phone' && lead.phone) ||
-              (platform === 'linkedin' && lead.linkedin) ||
-              (platform === 'twitter' && lead.twitter) ||
-              (platform === 'facebook' && lead.facebook) ||
-              (platform === 'instagram' && lead.instagram) ||
-              (platform === 'whatsapp' && lead.whatsapp)
+              (platform === 'linkedin' && lead.socialProfiles?.linkedin) ||
+              (platform === 'twitter' && lead.socialProfiles?.twitter) ||
+              (platform === 'facebook' && lead.socialProfiles?.facebook) ||
+              (platform === 'instagram' && lead.socialProfiles?.instagram) ||
+              (platform === 'whatsapp' && lead.socialProfiles?.whatsapp)
             ) {
               leadPlatforms.push(platform);
             }

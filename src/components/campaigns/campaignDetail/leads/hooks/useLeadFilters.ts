@@ -6,8 +6,8 @@ export function useLeadFilters(leadsData: Lead[]) {
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>(leadsData);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [teamFilter, setTeamFilter] = useState<string | null>(null);
-  const [dateSort, setDateSort] = useState<'lastContacted' | 'followUpDate' | null>(null);
-  const [selectedLeads, setSelectedLeads] = useState<number[]>([]);
+  const [dateSort, setDateSort] = useState<'lastContact' | 'nextFollowUpDate' | null>(null);
+  const [selectedLeads, setSelectedLeads] = useState<(number | string)[]>([]);
 
   // Update filtered leads when data or filters change
   useEffect(() => {
@@ -19,17 +19,17 @@ export function useLeadFilters(leadsData: Lead[]) {
     let filtered = [...leadsData];
     
     if (statusFilter) {
-      filtered = filtered.filter(lead => lead.currentStage === statusFilter);
+      filtered = filtered.filter(lead => lead.currentStage === statusFilter || lead.status === statusFilter);
     }
     
     if (teamFilter) {
-      filtered = filtered.filter(lead => lead.assignedTo === teamFilter);
+      filtered = filtered.filter(lead => lead.assignedTo === teamFilter || lead.assignedTeamMember === teamFilter);
     }
     
     if (dateSort) {
       filtered.sort((a, b) => {
-        const dateA = new Date(dateSort === 'lastContacted' ? a.lastContacted : (a.followUpDate || ''));
-        const dateB = new Date(dateSort === 'lastContacted' ? b.lastContacted : (b.followUpDate || ''));
+        const dateA = new Date(dateSort === 'lastContact' ? (a.lastContact || '') : (a.nextFollowUpDate || ''));
+        const dateB = new Date(dateSort === 'lastContact' ? (b.lastContact || '') : (b.nextFollowUpDate || ''));
         return dateB.getTime() - dateA.getTime(); // Sort descending (newest first)
       });
     }
@@ -46,7 +46,7 @@ export function useLeadFilters(leadsData: Lead[]) {
   };
 
   // Handle lead selection for bulk actions
-  const handleSelectLead = (leadId: number, selected: boolean) => {
+  const handleSelectLead = (leadId: number | string, selected: boolean) => {
     if (selected) {
       setSelectedLeads(prev => [...prev, leadId]);
     } else {

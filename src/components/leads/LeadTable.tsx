@@ -14,7 +14,7 @@ import {
   PaginationPrevious 
 } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/use-toast';
-import { fetchAllCampaigns } from '@/lib/api/campaignApi';
+import { fetchAllCampaigns, fetchAllLeads, updateLeadGlobal } from '@/lib/api/campaignApi';
 import LeadDetailDrawer from './LeadDetailDrawer';
 
 const LeadTable: React.FC = () => {
@@ -34,56 +34,59 @@ const LeadTable: React.FC = () => {
   
   const itemsPerPage = 10;
 
-  // Fetch all campaigns
-  const { data: campaigns, isLoading, error } = useQuery({
+  // Fetch all leads
+  const { data: leadsData, isLoading: isLoadingLeads, error: leadsError } = useQuery({
+    queryKey: ['allLeads'],
+    queryFn: fetchAllLeads
+  });
+
+  // Fetch all campaigns for filtering
+  const { data: campaigns, isLoading: isLoadingCampaigns, error: campaignsError } = useQuery({
     queryKey: ['allCampaigns'],
     queryFn: fetchAllCampaigns
   });
 
-  // Process campaigns to extract leads, team members, and statuses
+  const isLoading = isLoadingLeads || isLoadingCampaigns;
+  const error = leadsError || campaignsError;
+
+  // Process campaigns and leads data
   useEffect(() => {
-    if (campaigns) {
-      const allExtractedLeads: Lead[] = [];
-      const allTeamMembers = new Set<string>();
-      const allStatuses = new Set<string>();
-      const allCampaignOptions: {id: string | number, name: string}[] = [];
+    if (campaigns && Array.isArray(campaigns)) {
+      // Extract campaign options for filtering
+      const allCampaignOptions: {id: string | number, name: string}[] = campaigns.map(campaign => ({
+        id: campaign.id,
+        name: campaign.name
+      }));
       
+      setCampaignOptions(allCampaignOptions);
+      
+      // Extract team members from all campaigns
+      const allTeamMembers = new Set<string>();
       campaigns.forEach(campaign => {
-        // Add campaign to options
-        allCampaignOptions.push({
-          id: campaign.id,
-          name: campaign.name
-        });
-        
-        // Extract team members
-        if (campaign.teamMembers) {
+        if (campaign.teamMembers && Array.isArray(campaign.teamMembers)) {
           campaign.teamMembers.forEach(member => allTeamMembers.add(member));
-        }
-        
-        // Extract leads from campaign
-        if (Array.isArray(campaign.leads)) {
-          const campaignLeads = campaign.leads.map(lead => ({
-            ...lead,
-            campaign: campaign.name,
-            campaignId: campaign.id
-          }));
-          
-          allExtractedLeads.push(...campaignLeads);
-          
-          // Extract status options
-          campaignLeads.forEach(lead => {
-            if (lead.status) allStatuses.add(lead.status);
-            if (lead.currentStage) allStatuses.add(lead.currentStage);
-          });
         }
       });
       
-      setAllLeads(allExtractedLeads);
       setTeamMembers(Array.from(allTeamMembers));
-      setStatusOptions(Array.from(allStatuses));
-      setCampaignOptions(allCampaignOptions);
     }
   }, [campaigns]);
+
+  // Process leads when data is loaded
+  useEffect(() => {
+    if (leadsData && Array.isArray(leadsData)) {
+      setAllLeads(leadsData);
+      
+      // Extract all status options from leads
+      const allStatuses = new Set<string>();
+      leadsData.forEach(lead => {
+        if (lead.status) allStatuses.add(lead.status);
+        if (lead.currentStage) allStatuses.add(lead.currentStage);
+      });
+      
+      setStatusOptions(Array.from(allStatuses));
+    }
+  }, [leadsData]);
 
   // Filter leads based on all filters
   const filteredLeads = allLeads.filter(lead => {
@@ -104,7 +107,8 @@ const LeadTable: React.FC = () => {
     
     // Apply team filter
     const matchesTeam = teamFilter === 'All Team Members' || 
-      lead.assignedTo === teamFilter;
+      lead.assignedTo === teamFilter || 
+      lead.assignedTeamMember === teamFilter;
     
     // Return true if all conditions are met
     return matchesSearch && matchesStatus && matchesCampaign && matchesTeam;
@@ -138,21 +142,40 @@ const LeadTable: React.FC = () => {
   };
 
   // Handle lead update
-  const handleUpdateLead = (updatedLead: Lead) => {
-    // Update the lead in the local state
-    const updatedLeads = allLeads.map(lead => 
-      lead.id === updatedLead.id ? updatedLead : lead
-    );
-    setAllLeads(updatedLeads);
-    
-    // Close the detail drawer
-    setShowDetailDrawer(false);
-    
-    // Show success toast
-    toast({
-      title: "Lead Updated",
-      description: `${updatedLead.name}'s information has been updated.`
-    });
+  const handleUpdateLead = async (updatedLead: Lead) => {
+    try {
+      // Update the lead in the database/API
+      if (updatedLead.campaignId) {
+        await updateLeadGlobal(updatedLead.id, updatedLead);
+        
+        // Update the lead in the local state
+        const updatedLeads = allLeads.map(lead => 
+          lead.id === updatedLead.id ? updatedLead : lead
+        );
+        setAllLeads(updatedLeads);
+        
+        // Close the detail drawer
+        setShowDetailDrawer(false);
+        
+        // Show success toast
+        toast({
+          title: "Lead Updated",
+          description: `${updatedLead.name}'s information has been updated.`
+        });
+      } else {
+        toast({
+          title: "Update Failed",
+          description: "Lead update failed: Missing campaign ID",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Update Failed",
+        description: `Error: ${(error as Error).message}`,
+        variant: "destructive"
+      });
+    }
   };
 
   const resetFilters = () => {

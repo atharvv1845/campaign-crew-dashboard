@@ -24,13 +24,13 @@ export const processLeadData = (
       company: '',
       title: '',
       status: initialStageId,
-      currentStage: '',
+      currentStage: initialStageId,
       source: 'csv',
       lastContact: '',
       firstContactDate: '',
       nextFollowUpDate: '',
       notes: '',
-      platformLinks: '',
+      campaignId: '',
       assignedTo: '',
       socialProfiles: {}
     };

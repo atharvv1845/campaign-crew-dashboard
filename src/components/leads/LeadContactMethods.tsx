@@ -1,63 +1,89 @@
 
 import React from 'react';
-import { Phone, Mail, MessageSquare, Linkedin, Twitter, MessageCircle, Instagram, Facebook } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Linkedin, Twitter, Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-export interface LeadContactMethodsProps {
+interface LeadContactMethodsProps {
   methods: string[];
-  onMethodsChange?: (methods: string[]) => void;
   readOnly?: boolean;
+  onToggle?: (method: string, enabled: boolean) => void;
 }
 
-const icons = {
-  phone: Phone,
-  email: Mail,
-  sms: MessageSquare,
-  linkedin: Linkedin,
-  twitter: Twitter,
-  whatsapp: MessageCircle,
-  instagram: Instagram,
-  facebook: Facebook,
-};
-
-export const LeadContactMethods: React.FC<LeadContactMethodsProps> = ({
+const LeadContactMethods: React.FC<LeadContactMethodsProps> = ({
   methods,
-  onMethodsChange,
   readOnly = false,
+  onToggle
 }) => {
-  const handleMethodToggle = (method: string) => {
-    if (readOnly || !onMethodsChange) return;
-    
-    const newMethods = methods.includes(method)
-      ? methods.filter(m => m !== method)
-      : [...methods, method];
-    
-    onMethodsChange(newMethods);
+  // Skip rendering if no methods
+  if (!methods.length) return null;
+
+  // Helper to render icons
+  const renderIcon = (method: string) => {
+    switch (method.toLowerCase()) {
+      case 'linkedin':
+        return <Linkedin className="h-3 w-3" />;
+      case 'twitter':
+        return <Twitter className="h-3 w-3" />;
+      case 'facebook':
+        return <Facebook className="h-3 w-3" />;
+      case 'instagram':
+        return <Instagram className="h-3 w-3" />;
+      case 'whatsapp':
+        return <MessageCircle className="h-3 w-3" />;
+      default:
+        // For custom platforms or other methods
+        return null;
+    }
+  };
+
+  // Helper to get display name
+  const getDisplayName = (method: string) => {
+    switch (method.toLowerCase()) {
+      case 'linkedin':
+        return 'LinkedIn';
+      case 'twitter':
+        return 'Twitter';
+      case 'facebook':
+        return 'Facebook';
+      case 'instagram':
+        return 'Instagram';
+      case 'whatsapp':
+        return 'WhatsApp';
+      case 'email':
+        return 'Email';
+      case 'phone':
+        return 'Phone';
+      default:
+        // Capitalize first letter for custom platforms
+        return method.charAt(0).toUpperCase() + method.slice(1);
+    }
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {Object.entries(icons).map(([method, Icon]) => {
-        const isActive = methods.includes(method);
-        
-        return (
-          <button
-            key={method}
-            onClick={() => handleMethodToggle(method)}
-            disabled={readOnly}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
-              isActive 
-                ? "bg-primary text-primary-foreground" 
-                : "bg-muted/20 text-muted-foreground hover:bg-muted/30",
-              readOnly && "cursor-default"
-            )}
-          >
-            <Icon className="h-4 w-4" />
-            <span className="capitalize">{method}</span>
-          </button>
-        );
-      })}
+    <div className="flex flex-wrap gap-1 mt-1">
+      <TooltipProvider>
+        {methods.map(method => (
+          <Tooltip key={method}>
+            <TooltipTrigger asChild>
+              <Badge 
+                variant={readOnly ? "outline" : "default"} 
+                className={`
+                  text-xs py-0 h-5 
+                  ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/90'}
+                `}
+                onClick={onToggle ? () => onToggle(method, !methods.includes(method)) : undefined}
+              >
+                {renderIcon(method)}
+                <span className="ml-1">{getDisplayName(method)}</span>
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Contact via {getDisplayName(method)}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </TooltipProvider>
     </div>
   );
 };

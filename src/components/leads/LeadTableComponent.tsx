@@ -40,6 +40,7 @@ export interface Lead {
   firstContactDate?: string;
   nextFollowUpDate?: string;
   assignedTo?: string;
+  assignedTeamMember?: string;
   linkedin?: string;
   twitter?: string;
   facebook?: string;
@@ -55,6 +56,8 @@ export interface Lead {
     [key: string]: string | undefined;
   };
   contactMethods?: string[];
+  contacted?: boolean;
+  contactPlatforms?: string[];
 }
 
 interface LeadTableComponentProps {
@@ -290,7 +293,7 @@ const LeadTableComponent: React.FC<LeadTableComponentProps> = ({
                 
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Select
-                    value={lead.status || lead.currentStage || ''}
+                    value={(lead.status || lead.currentStage || '').toString()}
                     onValueChange={(value) => handleStatusChange(lead, value)}
                   >
                     <SelectTrigger className="h-8 w-[130px] text-sm border-none bg-muted/10 hover:bg-muted/20 focus:ring-0">
@@ -308,14 +311,14 @@ const LeadTableComponent: React.FC<LeadTableComponentProps> = ({
                 
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Select
-                    value={lead.assignedTo || ''}
+                    value={(lead.assignedTo || lead.assignedTeamMember || '').toString()}
                     onValueChange={(value) => handleTeamAssignment(lead, value)}
                   >
                     <SelectTrigger className="h-8 w-[130px] text-sm border-none bg-muted/10 hover:bg-muted/20 focus:ring-0">
                       <SelectValue placeholder="Assign to" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
                       {teamMembers.filter(member => member !== 'All Team Members').map(member => (
                         <SelectItem key={member} value={member}>
                           {member}
@@ -337,7 +340,7 @@ const LeadTableComponent: React.FC<LeadTableComponentProps> = ({
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Lead
                       </DropdownMenuItem>
-                      {lead.campaign && (
+                      {lead.campaign && lead.campaignId && (
                         <DropdownMenuItem asChild>
                           <a href={`/campaigns/${lead.campaignId}`} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4 mr-2" />

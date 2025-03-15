@@ -2,9 +2,10 @@
 import React from 'react';
 import LeadTracking from '../LeadTracking';
 import { Lead } from '../leads/types';
+import { Campaign } from '../leads/types';
 
 interface LeadsTabProps {
-  campaign: any;
+  campaign: Campaign;
   leadsData: Lead[];
   view: 'table' | 'kanban';
   setView: (view: 'table' | 'kanban') => void;

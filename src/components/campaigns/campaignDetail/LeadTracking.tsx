@@ -8,6 +8,7 @@ import { useLeadFilters } from './leads/hooks/useLeadFilters';
 import { Lead, Campaign } from './leads/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { updateLead } from '@/lib/api/campaignApi';
 
 interface LeadTrackingProps {
   campaign: Campaign;
@@ -49,42 +50,64 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
   };
 
   // Handle updating a lead
-  const handleUpdateLead = (updatedLead: Lead) => {
-    // Update the lead in the local state
-    const updatedLeads = leads.map(lead => 
-      lead.id === updatedLead.id ? updatedLead : lead
-    );
-    setLeads(updatedLeads);
-    
-    // Close the detail drawer
-    setShowLeadDetail(false);
-    
-    // Show success toast
-    toast({
-      title: "Lead Updated",
-      description: `${updatedLead.name}'s information has been updated.`
-    });
-    
-    // In a real app, you would update the campaign data too
-    if (updateCampaign) {
-      // This is a simplified example - in a real app you would update the actual lead data
-      updateCampaign({
-        // Update any campaign stats that might change based on lead status
+  const handleUpdateLead = async (updatedLead: Lead) => {
+    try {
+      // Update lead through API
+      if (campaign.id && updatedLead.id) {
+        await updateLead(campaign.id, updatedLead.id, updatedLead);
+        
+        // Update the lead in the local state
+        const updatedLeads = leads.map(lead => 
+          lead.id === updatedLead.id ? updatedLead : lead
+        );
+        setLeads(updatedLeads);
+        
+        // Close the detail drawer
+        setShowLeadDetail(false);
+        
+        // Show success toast
+        toast({
+          title: "Lead Updated",
+          description: `${updatedLead.name}'s information has been updated.`
+        });
+        
+        // In a real app, you would update the campaign data too
+        if (updateCampaign) {
+          // This is a simplified example - in a real app you would update the actual lead data
+          updateCampaign({
+            // Update any campaign stats that might change based on lead status
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Update Failed",
+        description: `Error: ${(error as Error).message}`,
+        variant: "destructive"
       });
     }
+  };
+
+  // Handle lead status change
+  const handleLeadStatusChange = (leadId: string | number, status: string) => {
+    handleUpdateLead({
+      ...leads.find(lead => lead.id === leadId)!,
+      status,
+      currentStage: status
+    });
   };
 
   // Handle bulk actions for selected leads
   const handleBulkAction = (action: 'status' | 'team' | 'followUp', value: string) => {
     // Update leads based on the action
     const updatedLeads = leads.map(lead => {
-      if (selectedLeads.includes(lead.id)) {
+      if (selectedLeads.includes(lead.id as number | string)) {
         if (action === 'status') {
-          return { ...lead, currentStage: value };
+          return { ...lead, currentStage: value, status: value };
         } else if (action === 'team') {
           return { ...lead, assignedTo: value };
         } else if (action === 'followUp') {
-          return { ...lead, followUpDate: value };
+          return { ...lead, nextFollowUpDate: value };
         }
       }
       return lead;
@@ -99,15 +122,6 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
     toast({
       title: "Leads Updated",
       description: `${selectedLeads.length} leads have been updated.`
-    });
-  };
-
-  // Set all selected leads at once
-  const handleSelectLeads = (leadIds: number[]) => {
-    selectedLeads.forEach(id => {
-      if (!leadIds.includes(id)) {
-        handleSelectLead(id, false);
-      }
     });
   };
 
@@ -143,6 +157,7 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
             <LeadTable 
               leads={filteredLeads} 
               onLeadClick={handleLeadClick}
+              onStatusChange={handleLeadStatusChange}
               onSelectLead={handleSelectLead}
               selectedLeads={selectedLeads}
               campaign={campaign}
@@ -153,7 +168,7 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
           {/* Kanban view */}
           {view === 'kanban' && (
             <LeadKanban 
-              stages={campaign.stages} 
+              stages={campaign.stages || []} 
               leads={filteredLeads} 
               campaignLeads={campaign.leads}
               onLeadClick={handleLeadClick} 

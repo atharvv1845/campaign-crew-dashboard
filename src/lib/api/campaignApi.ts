@@ -1,5 +1,6 @@
 
 import { campaignData } from '@/components/campaigns/campaignData';
+import { LeadData } from '@/components/campaigns/types/campaignTypes';
 
 // Function to fetch all campaigns
 export const fetchAllCampaigns = async () => {
@@ -73,4 +74,61 @@ export const updateLead = async (campaignId: string | number, leadId: string | n
       }
     }, 300);
   });
+};
+
+// Function to fetch all leads from all campaigns
+export const fetchAllLeads = async () => {
+  try {
+    const campaigns = await fetchAllCampaigns() as any[];
+    
+    // Extract all leads from all campaigns
+    const allLeads: LeadData[] = [];
+    
+    campaigns.forEach(campaign => {
+      if (Array.isArray(campaign.leads)) {
+        // Add campaign information to each lead
+        const leadsWithCampaignInfo = campaign.leads.map((lead: any) => ({
+          ...lead,
+          campaignId: campaign.id,
+          campaign: campaign.name,
+          campaignStatus: campaign.status
+        }));
+        
+        allLeads.push(...leadsWithCampaignInfo);
+      }
+    });
+    
+    return allLeads;
+  } catch (error) {
+    throw new Error('Failed to fetch all leads: ' + (error as Error).message);
+  }
+};
+
+// Function to update a lead (without requiring campaign ID)
+export const updateLeadGlobal = async (leadId: string | number, data: Partial<LeadData>) => {
+  try {
+    // Find which campaign the lead belongs to
+    const campaigns = await fetchAllCampaigns() as any[];
+    let targetCampaignId: string | number | null = null;
+    
+    // Search for the lead in all campaigns
+    for (const campaign of campaigns) {
+      if (Array.isArray(campaign.leads)) {
+        const foundLead = campaign.leads.find((l: any) => l.id.toString() === leadId.toString());
+        if (foundLead) {
+          targetCampaignId = campaign.id;
+          break;
+        }
+      }
+    }
+    
+    if (!targetCampaignId) {
+      throw new Error(`Lead with ID ${leadId} not found in any campaign`);
+    }
+    
+    // Update the lead in its campaign
+    return await updateLead(targetCampaignId, leadId, data);
+  } catch (error) {
+    throw new Error('Failed to update lead: ' + (error as Error).message);
+  }
 };

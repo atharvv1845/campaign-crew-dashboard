@@ -45,6 +45,8 @@ export interface CampaignData {
   contacted?: number;
   contactPlatforms?: string[]; // Same as channels
   customPlatforms?: Array<{ id: string; name: string }>;
+  stages?: any[]; // Campaign stages
+  leadsData?: LeadData[]; // Processed leads data
 }
 
 // Lead data structure
@@ -58,6 +60,7 @@ export interface LeadData {
   phone?: string;
   status: string;
   assignedTo?: string;
+  assignedTeamMember?: string;
   notes?: string;
   socialProfiles?: {
     twitter?: string;
@@ -71,6 +74,7 @@ export interface LeadData {
   statusName?: string; // Added this optional property for temporary use during import
   contactPlatforms?: string[]; // Platforms this lead can be contacted on (same as channels)
   campaignId: string | number;
+  campaign?: string;
   lastContact?: string;
   firstContactDate?: string;
   nextFollowUpDate?: string;

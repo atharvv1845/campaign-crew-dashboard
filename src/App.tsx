@@ -28,9 +28,7 @@ if (!CLERK_PUBLISHABLE_KEY) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ClerkProvider 
-        publishableKey={CLERK_PUBLISHABLE_KEY}
-      >
+      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
         <Router>
           <Routes>
             {/* Public routes */}

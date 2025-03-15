@@ -1,12 +1,18 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import FlowBuilder from './outreachFlow/FlowBuilder';
-import SequenceEditor from './outreachFlow/SequenceEditor';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 import { MessageScript } from './MessageTemplates';
 import { fetchScriptTemplates } from '@/lib/api/messageApi';
+import FlowCanvas from '@/components/campaigns/wizardSteps/components/FlowCanvas';
+import FlowNodeEditor from '@/components/campaigns/wizardSteps/FlowNodeEditor';
+import { useMessageFlowState } from '@/components/campaigns/wizardSteps/hooks/useMessageFlowState';
+import FlowNodeActions from '@/components/campaigns/wizardSteps/components/FlowNodeActions';
+import FlowSaveValidation from '@/components/campaigns/wizardSteps/components/FlowSaveValidation';
+import { availableChannels } from '@/components/campaigns/constants/channels';
+import SequenceEditor from './outreachFlow/SequenceEditor';
 
 export interface FlowStep {
   id: number;
@@ -26,8 +32,77 @@ const OutreachFlow: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Initial form data for the flow
+  const formData = {
+    name: '',
+    description: '',
+    channels: availableChannels.map(c => c.id),
+    stages: [],
+    team: [],
+    leads: [],
+    flows: [],
+    messageFlow: { nodes: [], edges: [] }
+  };
+  
+  const [flowFormData, setFlowFormData] = useState(formData);
+  
+  // Using the campaign message flow state hook
+  const {
+    nodes,
+    edges,
+    selectedNode,
+    showNodeModal,
+    nodeType,
+    nodeData,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    handleNodeClick,
+    validateFlow,
+    validateMessageData,
+    addNode,
+    updateNode,
+    deleteNode,
+    setShowNodeModal,
+    setNodeType,
+    setNodeData,
+    setSelectedNode
+  } = useMessageFlowState(flowFormData, setFlowFormData, () => {
+    toast({
+      title: "Flow saved",
+      description: "Your message flow has been saved successfully."
+    });
+  });
+
+  const { handleAddNode, handleSaveNode, handleDeleteNode } = FlowNodeActions({
+    nodeType,
+    nodeData,
+    setNodeData,
+    selectedNode,
+    validateMessageData,
+    updateNode,
+    addNode,
+    setShowNodeModal,
+    deleteNode,
+    setNodeType,
+    setSelectedNode
+  });
+  
+  const { saveFlowToFormData } = FlowSaveValidation({
+    nodes,
+    edges,
+    validateFlow,
+    setFormData: setFlowFormData,
+    onNext: () => {
+      toast({
+        title: "Flow saved",
+        description: "Your message flow has been saved successfully."
+      });
+    }
+  });
+
   // Load message templates when component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     const loadTemplates = async () => {
       try {
         setIsLoading(true);
@@ -47,6 +122,10 @@ const OutreachFlow: React.FC = () => {
 
     loadTemplates();
   }, [toast]);
+
+  const handleAddNodeType = (type: 'message' | 'delay' | 'condition') => {
+    handleAddNode(type);
+  };
 
   const handleAddStep = (step: FlowStep) => {
     setFlowSteps([...flowSteps, { ...step, id: Date.now() }]);
@@ -95,19 +174,16 @@ const OutreachFlow: React.FC = () => {
     setFlowSteps(newSteps);
   };
 
-  const handleSaveFlow = () => {
-    // In a real app, this would save the flow to the API
-    toast({
-      title: "Flow saved",
-      description: `Saved outreach flow with ${flowSteps.length} steps.`
-    });
-  };
-
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Outreach Flow Builder</CardTitle>
+          <CardTitle className="flex justify-between items-center">
+            <span>Outreach Flow Builder</span>
+            <Button onClick={saveFlowToFormData}>
+              Save Flow
+            </Button>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="visual" value={activeTab} onValueChange={setActiveTab}>
@@ -117,15 +193,35 @@ const OutreachFlow: React.FC = () => {
             </TabsList>
             
             <TabsContent value="visual">
-              <FlowBuilder 
-                flowSteps={flowSteps}
-                onAddStep={handleAddStep}
-                onUpdateStep={handleUpdateStep}
-                onDeleteStep={handleDeleteStep}
-                onSaveFlow={handleSaveFlow}
-                templates={templates}
-                isLoading={isLoading}
-              />
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Design your outreach sequence by adding messages, delays, and conditions.
+                </p>
+                
+                <div className="h-[500px] flex flex-col">
+                  <FlowCanvas
+                    nodes={nodes}
+                    edges={edges}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onConnect={onConnect}
+                    onNodeClick={handleNodeClick}
+                    onAddNodeType={handleAddNodeType}
+                  />
+                </div>
+
+                {/* Node editor dialog */}
+                <FlowNodeEditor
+                  open={showNodeModal}
+                  onOpenChange={setShowNodeModal}
+                  nodeType={nodeType}
+                  nodeData={nodeData}
+                  setNodeData={setNodeData}
+                  selectedNode={selectedNode}
+                  onSave={handleSaveNode}
+                  onDelete={handleDeleteNode}
+                />
+              </div>
             </TabsContent>
             
             <TabsContent value="sequence">
@@ -135,7 +231,7 @@ const OutreachFlow: React.FC = () => {
                 onUpdateStep={handleUpdateStep}
                 onDeleteStep={handleDeleteStep}
                 onReorderStep={handleReorderStep}
-                onSaveFlow={handleSaveFlow}
+                onSaveFlow={() => saveFlowToFormData()}
                 templates={templates}
                 isLoading={isLoading}
               />

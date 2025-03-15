@@ -103,26 +103,35 @@ export interface MessageStep {
 
 // Message step specific data
 export interface MessageStepData {
+  id?: string;
+  type?: string;
   label?: string;
   message: string;
   assignedTo: string;
   templateId?: string;
   subject?: string;
   channel?: string;
+  platform?: string;
+  content?: string;
 }
 
 // Delay step data
 export interface DelayStepData {
+  id?: string;
+  type?: string;
   label?: string;
   days: number;
   hours?: number;
+  delay?: string;
 }
 
 // Condition step data
 export interface ConditionStepData {
+  id?: string;
+  type?: string;
   label?: string;
   condition: string;
-  action: string;
+  action?: string;
   targetStage?: string;
   waitDays?: number;
 }

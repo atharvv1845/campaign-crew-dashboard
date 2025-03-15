@@ -100,6 +100,7 @@ const Messaging: React.FC = () => {
           <Tabs defaultValue="templates" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="templates">Templates</TabsTrigger>
+              <TabsTrigger value="editor">Create/Edit</TabsTrigger>
               <TabsTrigger value="flow">Outreach Flow</TabsTrigger>
             </TabsList>
             

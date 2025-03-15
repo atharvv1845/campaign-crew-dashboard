@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
@@ -9,6 +8,7 @@ import { campaignData } from '../campaignData';
 import LeadTable from './leads/LeadTable';
 import StatusBadge from './components/StatusBadge';
 import { Lead } from './leads/types';
+import CreateCampaign from '../CreateCampaign';
 
 const CampaignDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +16,7 @@ const CampaignDetail: React.FC = () => {
   const { toast } = useToast();
   const [campaign, setCampaign] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (!id) return;
@@ -36,13 +37,13 @@ const CampaignDetail: React.FC = () => {
       else if (typeof foundCampaign.leads === 'number') {
         // Create minimal placeholder leads
         const dummyLeads: Lead[] = Array.from({ length: foundCampaign.leads }, (_, i) => ({
-          id: i + 1,
+          id: `${i + 1}`,
           name: `Lead ${i + 1}`,
           email: `lead${i + 1}@example.com`,
           company: `Company ${i + 1}`,
           status: ['Pending', 'Contacted', 'Interested', 'Not Interested', 'Converted'][Math.floor(Math.random() * 5)],
           lastContact: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          campaignId: parseInt(id)
+          campaignId: id
         }));
         
         foundCampaign.leadsData = dummyLeads;
@@ -54,11 +55,11 @@ const CampaignDetail: React.FC = () => {
       // Ensure campaign stages exist
       if (!foundCampaign.stages) {
         foundCampaign.stages = [
-          { id: 1, name: 'Pending', count: 0 },
-          { id: 2, name: 'Contacted', count: 0 },
-          { id: 3, name: 'Interested', count: 0 },
-          { id: 4, name: 'Not Interested', count: 0 },
-          { id: 5, name: 'Converted', count: 0 }
+          { id: "1", name: 'Pending', count: 0 },
+          { id: "2", name: 'Contacted', count: 0 },
+          { id: "3", name: 'Interested', count: 0 },
+          { id: "4", name: 'Not Interested', count: 0 },
+          { id: "5", name: 'Converted', count: 0 }
         ];
       }
       
@@ -72,6 +73,22 @@ const CampaignDetail: React.FC = () => {
     
     setLoading(false);
   }, [id]);
+
+  const handleEditCampaignClose = (updatedCampaign?: any) => {
+    setShowEditModal(false);
+    
+    if (updatedCampaign) {
+      // Refresh the campaign data by refetching from campaignData
+      const refreshedCampaign = campaignData.find(c => String(c.id) === id);
+      if (refreshedCampaign) {
+        setCampaign(refreshedCampaign);
+        toast({
+          title: "Campaign updated",
+          description: "Campaign has been successfully updated.",
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -162,7 +179,7 @@ const CampaignDetail: React.FC = () => {
           </div>
         </div>
         
-        <Button>Edit Campaign</Button>
+        <Button onClick={() => setShowEditModal(true)}>Edit Campaign</Button>
       </div>
       
       {/* Campaign Stats */}
@@ -217,6 +234,14 @@ const CampaignDetail: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Campaign Modal */}
+      {showEditModal && (
+        <CreateCampaign 
+          onClose={handleEditCampaignClose} 
+          existingCampaign={campaign}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Copy, Edit, Trash, Check, Clock, Mail, Search, MessageSquare, Linkedin, Facebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { fetchScriptTemplates, deleteScript } from '@/lib/api/messageApi';
 
 // Types for script templates
 export interface MessageScript {
@@ -29,65 +29,34 @@ interface MessageTemplatesProps {
 }
 
 const MessageTemplates: React.FC<MessageTemplatesProps> = ({ onEditScript }) => {
-  // Mock template data - in a real app, this would come from an API
-  const [templates, setTemplates] = useState<MessageScript[]>([
-    {
-      id: 1,
-      name: 'Initial Outreach',
-      platform: 'linkedin',
-      subject: 'Introducing our new solution for {company}',
-      content: 'Hi {firstName}, I hope this message finds you well. I noticed that {company} has been working on {industry} solutions, and I thought you might be interested in our approach that has helped similar companies achieve {benefit}.',
-      usageCount: 1432,
-      responseRate: 32,
-      lastUsed: '2 days ago',
-      campaignName: 'Tech Startup Outreach',
-      variables: ['{firstName}', '{company}', '{industry}', '{benefit}'],
-      createdAt: '2023-08-15',
-    },
-    {
-      id: 2,
-      name: 'Follow-up #1',
-      platform: 'email',
-      subject: 'Following up on my previous email',
-      content: 'Hi {firstName}, I just wanted to follow up on my previous message to see if you had a chance to consider our proposal for {company}. I'd be happy to provide more information or schedule a quick call.',
-      usageCount: 1056,
-      responseRate: 24,
-      lastUsed: '1 day ago',
-      campaignName: 'Tech Startup Outreach',
-      variables: ['{firstName}', '{company}'],
-      createdAt: '2023-08-20',
-    },
-    {
-      id: 3,
-      name: 'Demo Request',
-      platform: 'whatsapp',
-      content: "Hi {firstName}, I'd like to offer you a personalized demo of our solution that has helped {company} achieve {benefit}. Would you have 15 minutes this week for a quick demonstration?",
-      usageCount: 873,
-      responseRate: 41,
-      lastUsed: '3 days ago',
-      campaignName: 'Enterprise Outreach',
-      variables: ['{firstName}', '{company}', '{benefit}'],
-      createdAt: '2023-09-01',
-    },
-    {
-      id: 4,
-      name: 'Case Study Share',
-      platform: 'email',
-      subject: 'How {similarCompany} achieved {result}',
-      content: 'Hi {firstName}, I thought you might be interested in this case study of how we helped {similarCompany} in the {industry} industry improve their {metric} by {result}. Given {company}\'s recent focus on {focus}, I thought this might be relevant.',
-      usageCount: 632,
-      responseRate: 37,
-      lastUsed: '5 days ago',
-      campaignName: 'Enterprise Outreach',
-      variables: ['{firstName}', '{company}', '{similarCompany}', '{industry}', '{metric}', '{result}', '{focus}'],
-      createdAt: '2023-09-10',
-    },
-  ]);
-
+  const [templates, setTemplates] = useState<MessageScript[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [campaignFilter, setCampaignFilter] = useState('all');
   const [platformFilter, setPlatformFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  // Fetch templates on component mount
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchScriptTemplates();
+        setTemplates(data);
+      } catch (error) {
+        console.error("Failed to load templates:", error);
+        toast({
+          title: "Error loading templates",
+          description: "Failed to load message templates. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTemplates();
+  }, [toast]);
 
   // Filter templates based on search and filters
   const filteredTemplates = templates.filter(template => {
@@ -113,13 +82,23 @@ const MessageTemplates: React.FC<MessageTemplatesProps> = ({ onEditScript }) => 
   };
 
   // Handle delete script
-  const handleDeleteScript = (id: number) => {
-    setTemplates(templates.filter(t => t.id !== id));
-    
-    toast({
-      title: "Script deleted",
-      description: "The message script has been deleted",
-    });
+  const handleDeleteScript = async (id: number) => {
+    try {
+      await deleteScript(id);
+      setTemplates(templates.filter(t => t.id !== id));
+      
+      toast({
+        title: "Script deleted",
+        description: "The message script has been deleted",
+      });
+    } catch (error) {
+      console.error("Failed to delete script:", error);
+      toast({
+        title: "Error deleting script",
+        description: "Failed to delete message script. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Get platform icon
@@ -153,6 +132,14 @@ const MessageTemplates: React.FC<MessageTemplatesProps> = ({ onEditScript }) => 
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <p className="text-muted-foreground">Loading templates...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

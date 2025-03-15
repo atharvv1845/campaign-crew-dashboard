@@ -21,7 +21,7 @@ const scriptTemplates: MessageScript[] = [
     name: 'Follow-up #1',
     platform: 'email',
     subject: 'Following up on my previous email',
-    content: 'Hi {firstName}, I just wanted to follow up on my previous message to see if you had a chance to consider our proposal for {company}. I'd be happy to provide more information or schedule a quick call.',
+    content: 'Hi {firstName}, I just wanted to follow up on my previous message to see if you had a chance to consider our proposal for {company}. I\'d be happy to provide more information or schedule a quick call.',
     usageCount: 1056,
     responseRate: 24,
     lastUsed: '1 day ago',

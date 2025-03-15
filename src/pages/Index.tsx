@@ -5,10 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeroWithMockup } from '@/components/ui/hero-with-mockup';
 import { CheckCircle, BarChart2, RefreshCw, ArrowRight, ChevronRight, Mail, Rocket, Shield, Users, LayoutDashboard, ListChecks, UserPlus, PieChart, Globe, UsersRound, Plus, Clipboard, MessageSquare, BarChart, Eye, Phone } from 'lucide-react';
+
 const Index = () => {
   const {
     user
   } = useAuth();
+
   const features = [{
     icon: <LayoutDashboard className="h-12 w-12 text-primary" />,
     title: "Centralized Dashboard",
@@ -34,6 +36,7 @@ const Index = () => {
     title: "Team Collaboration",
     description: "Assign roles, leave comments, and track activity logs."
   }];
+
   const testimonials = [{
     quote: "This tool made our campaign tracking so much easier. No more messy spreadsheets!",
     author: "Marketing Manager",
@@ -47,6 +50,7 @@ const Index = () => {
     author: "Marketing Director",
     position: "Global Enterprises"
   }];
+
   const useCases = [{
     icon: <BarChart2 className="h-10 w-10 text-primary" />,
     title: "Marketing Teams",
@@ -64,6 +68,7 @@ const Index = () => {
     title: "Startups & SMBs",
     description: "Improve marketing efforts with data-driven decisions."
   }];
+
   const howItWorks = [{
     number: "1",
     title: "Create a Campaign",
@@ -81,6 +86,7 @@ const Index = () => {
     title: "Analyze Results & Improve Strategy",
     description: "Use reports to refine future campaigns."
   }];
+
   const advantages = [{
     icon: <Shield className="h-6 w-6 text-primary" />,
     title: "No Automation Overload",
@@ -98,11 +104,12 @@ const Index = () => {
     title: "Built for Teams",
     description: "Collaborate, comment, and share updates effortlessly."
   }];
+
   return <div className="flex flex-col min-h-screen bg-background">
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-md py-4 sticky top-0 z-10">
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img alt="Campaign Crew Logo" src="/lovable-uploads/ef555fda-6f23-4255-bcc5-d819165c5987.jpg" className="h-10 object-cover" />
+            <img alt="Campaign Crew Logo" src="/lovable-uploads/ef555fda-6f23-4255-bcc5-d819165c5987.jpg" className="h-16 object-cover" />
             
           </div>
           <div className="flex items-center space-x-4">
@@ -387,4 +394,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;

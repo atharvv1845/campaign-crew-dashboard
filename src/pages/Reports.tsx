@@ -199,6 +199,7 @@ const ReportsPage: React.FC = () => {
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
             selectedStages={selectedStages}
+            allStages={allStages}
           />
         </TabsContent>
         
@@ -209,6 +210,7 @@ const ReportsPage: React.FC = () => {
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
             selectedStages={selectedStages}
+            allStages={allStages}
           />
         </TabsContent>
         
@@ -219,6 +221,7 @@ const ReportsPage: React.FC = () => {
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
             selectedStages={selectedStages}
+            allStages={allStages}
           />
         </TabsContent>
         
@@ -229,6 +232,7 @@ const ReportsPage: React.FC = () => {
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
             selectedStages={selectedStages}
+            allStages={allStages}
           />
         </TabsContent>
       </Tabs>

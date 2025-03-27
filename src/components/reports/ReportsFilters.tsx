@@ -25,6 +25,9 @@ interface ReportsFiltersProps {
   setSelectedTeamMembers: React.Dispatch<React.SetStateAction<string[]>>;
   selectedPlatforms: string[];
   setSelectedPlatforms: React.Dispatch<React.SetStateAction<string[]>>;
+  allStages: string[];
+  selectedStages: string[];
+  onStageSelect: (stage: string) => void;
 }
 
 const ReportsFilters: React.FC<ReportsFiltersProps> = ({
@@ -35,7 +38,10 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
   selectedTeamMembers,
   setSelectedTeamMembers,
   selectedPlatforms,
-  setSelectedPlatforms
+  setSelectedPlatforms,
+  allStages,
+  selectedStages,
+  onStageSelect
 }) => {
   const { teamMembers } = useTeamStore();
   const platforms = ['Email', 'LinkedIn', 'Twitter', 'Phone', 'WhatsApp', 'SMS'];
@@ -67,7 +73,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div>
             <h3 className="font-medium mb-3">Date Range</h3>
             <Popover>
@@ -176,6 +182,30 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 </div>
               ))}
             </div>
+          </div>
+
+          <div>
+            <h3 className="font-medium mb-3">Lead Stages</h3>
+            {allStages.length > 0 ? (
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {allStages.map((stage) => (
+                  <div key={stage} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`stage-${stage}`} 
+                      checked={selectedStages.includes(stage)}
+                      onCheckedChange={() => onStageSelect(stage)}
+                    />
+                    <Label htmlFor={`stage-${stage}`} className="text-sm">
+                      {stage}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                No stages available
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

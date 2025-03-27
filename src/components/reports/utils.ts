@@ -1,35 +1,27 @@
 
-import { campaignData } from '@/components/campaigns/campaignData';
-import { TeamMember } from '@/components/team/types';
 import { 
   CampaignMetric, 
   LeadMetric, 
   MessageMetric, 
   PerformanceMetric 
 } from './types';
+import { CampaignData } from '@/components/campaigns/campaignData';
 
-// Generate campaign performance data
-export const getCampaignPerformanceData = (campaigns = campaignData): CampaignMetric[] => {
+// Generate campaign performance metrics from campaign data
+export const getCampaignPerformanceData = (campaigns: CampaignData[]): CampaignMetric[] => {
   return campaigns.map(campaign => {
-    // Calculate total leads
     const totalLeads = typeof campaign.leads === 'number' 
       ? campaign.leads 
-      : Array.isArray(campaign.leads) 
-        ? campaign.leads.length 
-        : 0;
+      : Array.isArray(campaign.leads) ? campaign.leads.length : 0;
     
-    // Calculate responses
-    const responses = campaign.responses || Math.floor(totalLeads * 0.4);
+    const responses = campaign.responses || 0;
+    const conversions = campaign.positive || 0;
     
-    // Calculate conversions (positive responses that led to next stage)
-    const conversions = campaign.positive || Math.floor(responses * 0.3);
-    
-    // Calculate rates
-    const responseRate = totalLeads > 0 ? Math.round((responses / totalLeads) * 100) : 0;
-    const conversionRate = responses > 0 ? Math.round((conversions / responses) * 100) : 0;
+    const responseRate = totalLeads > 0 ? (responses / totalLeads) * 100 : 0;
+    const conversionRate = responses > 0 ? (conversions / responses) * 100 : 0;
     
     return {
-      id: campaign.id,
+      id: typeof campaign.id === 'string' ? campaign.id : campaign.id.toString(),
       name: campaign.name,
       status: campaign.status,
       totalLeads,
@@ -41,118 +33,194 @@ export const getCampaignPerformanceData = (campaigns = campaignData): CampaignMe
   });
 };
 
-// Generate lead metrics data
+// Generate mock lead metrics data - in a real app, this would come from an API
 export const getLeadMetricsData = (): LeadMetric[] => {
-  return campaignData.map(campaign => {
-    // Calculate total leads
-    const totalLeads = typeof campaign.leads === 'number' 
-      ? campaign.leads 
-      : Array.isArray(campaign.leads) 
-        ? campaign.leads.length 
-        : 0;
-    
-    // Generate mock lead metrics
-    const newLeads = Math.floor(totalLeads * 0.2);
-    const contacted = Math.floor(totalLeads * 0.6);
-    const responded = Math.floor(contacted * 0.4);
-    const interested = Math.floor(responded * 0.6);
-    const converted = Math.floor(interested * 0.4);
-    
-    // Calculate response rate
-    const responseRate = contacted > 0 ? Math.round((responded / contacted) * 100) : 0;
-    
-    return {
-      campaignId: campaign.id,
-      campaignName: campaign.name,
-      newLeads,
-      contacted,
-      responded,
-      interested,
-      converted,
-      responseRate
-    };
-  });
+  return [
+    {
+      campaignId: 1,
+      campaignName: 'Email Outreach Q2',
+      newLeads: 150,
+      contacted: 120,
+      responded: 45,
+      interested: 30,
+      converted: 15,
+      responseRate: 37.5
+    },
+    {
+      campaignId: 2,
+      campaignName: 'LinkedIn Prospecting',
+      newLeads: 100,
+      contacted: 85,
+      responded: 42,
+      interested: 28,
+      converted: 12,
+      responseRate: 49.4
+    },
+    {
+      campaignId: 3,
+      campaignName: 'Conference Follow-ups',
+      newLeads: 75,
+      contacted: 70,
+      responded: 38,
+      interested: 25,
+      converted: 18,
+      responseRate: 54.3
+    },
+    {
+      campaignId: 4,
+      campaignName: 'Product Launch Outreach',
+      newLeads: 200,
+      contacted: 180,
+      responded: 65,
+      interested: 40,
+      converted: 25,
+      responseRate: 36.1
+    },
+    {
+      campaignId: 5,
+      campaignName: 'Webinar Registration',
+      newLeads: 300,
+      contacted: 250,
+      responded: 100,
+      interested: 80,
+      converted: 45,
+      responseRate: 40.0
+    }
+  ];
 };
 
-// Generate message metrics data
+// Generate mock message metrics data
 export const getMessageMetricsData = (): MessageMetric[] => {
-  const templates = [
-    'Introduction Email',
-    'Follow-up Message',
-    'LinkedIn Connection',
-    'Meeting Request',
-    'Value Proposition',
-    'Case Study Share',
-    'Testimonial Email'
+  return [
+    {
+      templateName: 'Initial Outreach',
+      platform: 'Email',
+      campaignId: 1,
+      campaignName: 'Email Outreach Q2',
+      sent: 120,
+      opened: 75,
+      responded: 30,
+      openRate: 62.5,
+      responseRate: 25.0
+    },
+    {
+      templateName: 'Follow-up Message',
+      platform: 'Email',
+      campaignId: 1,
+      campaignName: 'Email Outreach Q2',
+      sent: 90,
+      opened: 68,
+      responded: 22,
+      openRate: 75.6,
+      responseRate: 24.4
+    },
+    {
+      templateName: 'Connection Request',
+      platform: 'LinkedIn',
+      campaignId: 2,
+      campaignName: 'LinkedIn Prospecting',
+      sent: 85,
+      opened: 70,
+      responded: 42,
+      openRate: 82.4,
+      responseRate: 49.4
+    },
+    {
+      templateName: 'Conference Reminder',
+      platform: 'Email',
+      campaignId: 3,
+      campaignName: 'Conference Follow-ups',
+      sent: 70,
+      opened: 55,
+      responded: 38,
+      openRate: 78.6,
+      responseRate: 54.3
+    },
+    {
+      templateName: 'Product Announcement',
+      platform: 'Email',
+      campaignId: 4,
+      campaignName: 'Product Launch Outreach',
+      sent: 180,
+      opened: 110,
+      responded: 65,
+      openRate: 61.1,
+      responseRate: 36.1
+    },
+    {
+      templateName: 'Webinar Invitation',
+      platform: 'Email',
+      campaignId: 5,
+      campaignName: 'Webinar Registration',
+      sent: 250,
+      opened: 150,
+      responded: 100,
+      openRate: 60.0,
+      responseRate: 40.0
+    },
+    {
+      templateName: 'LinkedIn Message',
+      platform: 'LinkedIn',
+      campaignId: 2,
+      campaignName: 'LinkedIn Prospecting',
+      sent: 65,
+      opened: 50,
+      responded: 30,
+      openRate: 76.9,
+      responseRate: 46.2
+    },
+    {
+      templateName: 'SMS Reminder',
+      platform: 'SMS',
+      campaignId: 3,
+      campaignName: 'Conference Follow-ups',
+      sent: 50,
+      opened: 48,
+      responded: 30,
+      openRate: 96.0,
+      responseRate: 60.0
+    },
+    {
+      templateName: 'Phone Call Follow-up',
+      platform: 'Phone',
+      campaignId: 4,
+      campaignName: 'Product Launch Outreach',
+      sent: 100,
+      opened: 100,
+      responded: 55,
+      openRate: 100.0,
+      responseRate: 55.0
+    },
+    {
+      templateName: 'WhatsApp Message',
+      platform: 'WhatsApp',
+      campaignId: 5,
+      campaignName: 'Webinar Registration',
+      sent: 120,
+      opened: 110,
+      responded: 65,
+      openRate: 91.7,
+      responseRate: 54.2
+    }
   ];
-  
-  const platforms = [
-    'Email',
-    'LinkedIn',
-    'Twitter',
-    'Phone',
-    'WhatsApp'
-  ];
-  
-  // Generate 15 message metric entries
-  const messageMetrics: MessageMetric[] = [];
-  
-  for (let i = 0; i < 15; i++) {
-    const campaignIndex = i % campaignData.length;
-    const templateIndex = i % templates.length;
-    const platformIndex = i % platforms.length;
-    
-    const campaign = campaignData[campaignIndex];
-    const template = templates[templateIndex];
-    const platform = platforms[platformIndex];
-    
-    // Generate random metrics
-    const sent = Math.floor(Math.random() * 100) + 50;
-    const opened = Math.floor(sent * (Math.random() * 0.4 + 0.4)); // 40-80% open rate
-    const responded = Math.floor(opened * (Math.random() * 0.3 + 0.1)); // 10-40% response rate
-    
-    // Calculate rates
-    const openRate = Math.round((opened / sent) * 100);
-    const responseRate = Math.round((responded / opened) * 100);
-    
-    messageMetrics.push({
-      templateName: template,
-      platform,
-      campaignId: campaign.id,
-      campaignName: campaign.name,
-      sent,
-      opened,
-      responded,
-      openRate,
-      responseRate
-    });
-  }
-  
-  return messageMetrics;
 };
 
 // Generate team performance data
-export const getTeamPerformanceData = (teamMembers: TeamMember[]): PerformanceMetric[] => {
-  // If there are no team members, return an empty array
-  if (teamMembers.length === 0) {
-    return [];
-  }
-  
+export const getTeamPerformanceData = (teamMembers: any[]): PerformanceMetric[] => {
   return teamMembers.map(member => {
-    // Generate performance metrics
-    const leadsAssigned = Math.floor(Math.random() * 50) + 20;
-    const leadsContacted = Math.floor(leadsAssigned * (Math.random() * 0.3 + 0.6)); // 60-90% contact rate
-    const leadsResponded = Math.floor(leadsContacted * (Math.random() * 0.4 + 0.2)); // 20-60% response rate
-    const leadsConverted = Math.floor(leadsResponded * (Math.random() * 0.4 + 0.1)); // 10-50% conversion rate
+    // Generate random metrics for demonstration purposes
+    const leadsAssigned = Math.floor(Math.random() * 100) + 50; // 50-150
+    const leadsContacted = Math.floor(leadsAssigned * (Math.random() * 0.3 + 0.6)); // 60-90% of assigned
+    const leadsResponded = Math.floor(leadsContacted * (Math.random() * 0.3 + 0.3)); // 30-60% of contacted
+    const leadsConverted = Math.floor(leadsResponded * (Math.random() * 0.3 + 0.2)); // 20-50% of responded
     
-    // Calculate rates
-    const responseRate = Math.round((leadsResponded / leadsContacted) * 100);
-    const conversionRate = Math.round((leadsConverted / leadsResponded) * 100);
+    const responseRate = leadsContacted > 0 ? (leadsResponded / leadsContacted) * 100 : 0;
+    const conversionRate = leadsResponded > 0 ? (leadsConverted / leadsResponded) * 100 : 0;
     
     return {
       id: member.id,
       name: member.name,
-      role: member.role,
+      role: member.role || 'Sales Representative',
       leadsAssigned,
       leadsContacted,
       leadsResponded,

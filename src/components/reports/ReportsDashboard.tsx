@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { 
@@ -28,13 +28,19 @@ interface ReportsDashboardProps {
   selectedCampaigns: string[];
   selectedTeamMembers: string[];
   selectedPlatforms: string[];
+  selectedStages: string[];
+  allStages: string[];
+  isLoading: boolean;
 }
 
 const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
   dateRange,
   selectedCampaigns,
   selectedTeamMembers,
-  selectedPlatforms
+  selectedPlatforms,
+  selectedStages,
+  allStages,
+  isLoading
 }) => {
   const { teamMembers } = useTeamStore();
   
@@ -68,6 +74,20 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
       }, 0) / campaignData.length
     : 0;
   
+  // Filter data based on selected stages
+  const filteredCampaignData = useMemo(() => {
+    if (selectedStages.length === 0) return campaignData;
+    
+    return campaignData.filter(campaign => {
+      if (campaign.stages) {
+        return campaign.stages.some(stage => 
+          selectedStages.includes(stage.name)
+        );
+      }
+      return true;
+    });
+  }, [campaignData, selectedStages]);
+  
   // Data for platform distribution chart
   const platformData = [
     { name: 'Email', value: 45 },
@@ -75,16 +95,62 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
     { name: 'Phone', value: 15 },
     { name: 'Twitter', value: 5 },
     { name: 'Other', value: 5 },
-  ];
+  ].filter(platform => 
+    selectedPlatforms.length === 0 || 
+    selectedPlatforms.includes(platform.name)
+  );
   
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
   
-  // Data for campaign status chart
-  const statusData = [
-    { name: 'Active', value: activeCampaigns },
-    { name: 'Completed', value: completedCampaigns },
-    { name: 'Draft', value: totalCampaigns - activeCampaigns - completedCampaigns },
-  ];
+  // Data for campaign status chart - filter by selected campaigns
+  const statusData = useMemo(() => {
+    const filtered = selectedCampaigns.length === 0 
+      ? campaignData 
+      : campaignData.filter(c => selectedCampaigns.includes(c.id.toString()));
+    
+    const active = filtered.filter(c => c.status === 'Active').length;
+    const completed = filtered.filter(c => c.status === 'Completed').length;
+    const draft = filtered.length - active - completed;
+    
+    return [
+      { name: 'Active', value: active },
+      { name: 'Completed', value: completed },
+      { name: 'Draft', value: draft },
+    ];
+  }, [campaignData, selectedCampaigns]);
+  
+  // Lead stage distribution chart
+  const stageDistributionData = useMemo(() => {
+    // If no custom stages available, use default stage categories
+    if (allStages.length === 0) {
+      return [
+        { name: 'New', value: 35 },
+        { name: 'Contacted', value: 25 },
+        { name: 'Interested', value: 20 },
+        { name: 'Meeting', value: 10 },
+        { name: 'Converted', value: 5 },
+        { name: 'Lost', value: 5 },
+      ];
+    }
+    
+    // Create data from available stages
+    const stageData = allStages.map(stage => {
+      // Count leads in this stage across all campaigns
+      let count = 0;
+      campaignData.forEach(campaign => {
+        if (campaign.stages) {
+          const stageInfo = campaign.stages.find(s => s.name === stage);
+          if (stageInfo) {
+            count += stageInfo.count || 0;
+          }
+        }
+      });
+      
+      return { name: stage, value: count || 5 }; // Use minimum value of 5 for visualization
+    });
+    
+    return stageData;
+  }, [allStages, campaignData]);
   
   // Data for lead activity timeline
   const activityData = [
@@ -98,7 +164,12 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
   const performanceData: PerformanceMetric[] = getTeamPerformanceData(teamMembers);
   
   // Sort team members by performance (leads converted)
-  const sortedPerformanceData = [...performanceData].sort((a, b) => b.leadsConverted - a.leadsConverted);
+  const sortedPerformanceData = [...performanceData]
+    .filter(member => 
+      selectedTeamMembers.length === 0 || 
+      selectedTeamMembers.includes(member.id)
+    )
+    .sort((a, b) => b.leadsConverted - a.leadsConverted);
   
   return (
     <div className="space-y-6">
@@ -179,17 +250,17 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
           </CardContent>
         </Card>
         
-        {/* Platform Distribution Chart */}
+        {/* Lead Stage Distribution Chart - Using custom stages */}
         <Card>
           <CardHeader>
-            <CardTitle>Outreach by Platform</CardTitle>
+            <CardTitle>Lead Stage Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={{}} className="aspect-square md:aspect-video">
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={platformData}
+                    data={stageDistributionData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -198,7 +269,7 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {platformData.map((entry, index) => (
+                    {stageDistributionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { 
@@ -24,19 +24,24 @@ import { PerformanceMetric } from '@/components/reports/types';
 import { getTeamPerformanceData } from '@/components/reports/utils';
 import { useTeamStore } from '@/hooks/useTeamStore';
 import { UserPlus } from 'lucide-react';
+import { campaignData } from '@/components/campaigns/campaignData';
 
 interface TeamReportsProps {
   dateRange: { from: Date | undefined; to: Date | undefined };
   selectedCampaigns: string[];
   selectedTeamMembers: string[];
   selectedPlatforms: string[];
+  selectedStages: string[];
+  allStages: string[];
 }
 
 const TeamReports: React.FC<TeamReportsProps> = ({
   dateRange,
   selectedCampaigns,
   selectedTeamMembers,
-  selectedPlatforms
+  selectedPlatforms,
+  selectedStages,
+  allStages
 }) => {
   const { teamMembers } = useTeamStore();
   
@@ -47,6 +52,26 @@ const TeamReports: React.FC<TeamReportsProps> = ({
     }
     return true;
   });
+  
+  // Filter campaigns based on selections
+  const filteredCampaigns = useMemo(() => {
+    return campaignData.filter(campaign => {
+      // Filter by selected campaigns
+      if (selectedCampaigns.length > 0 && !selectedCampaigns.includes(campaign.id.toString())) {
+        return false;
+      }
+      
+      // Filter by selected stages
+      if (selectedStages.length > 0 && campaign.stages) {
+        const hasStage = campaign.stages.some(stage => 
+          selectedStages.includes(stage.name)
+        );
+        if (!hasStage) return false;
+      }
+      
+      return true;
+    });
+  }, [campaignData, selectedCampaigns, selectedStages]);
   
   // Generate team performance metrics
   const performanceMetrics: PerformanceMetric[] = getTeamPerformanceData(filteredTeamMembers);
@@ -102,6 +127,27 @@ const TeamReports: React.FC<TeamReportsProps> = ({
     { name: 'Week 4', leads: 220, responses: 90, conversions: 30 },
   ];
   
+  // Team member stage performance
+  const stagePerformanceData = useMemo(() => {
+    if (allStages.length === 0 || filteredTeamMembers.length === 0) return [];
+    
+    return filteredTeamMembers.map(member => {
+      const memberData: any = {
+        name: member.name,
+      };
+      
+      // Add random values for each stage
+      allStages.forEach(stage => {
+        if (selectedStages.length === 0 || selectedStages.includes(stage)) {
+          // Generate random value between 5-30 for visualization
+          memberData[stage] = Math.floor(Math.random() * 25) + 5;
+        }
+      });
+      
+      return memberData;
+    });
+  }, [allStages, filteredTeamMembers, selectedStages]);
+  
   // Team member skill assessment
   const skillsData = filteredTeamMembers.map(member => {
     return {
@@ -152,6 +198,55 @@ const TeamReports: React.FC<TeamReportsProps> = ({
           </ChartContainer>
         </CardContent>
       </Card>
+      
+      {/* Team Stage Performance - Using custom stages */}
+      {stagePerformanceData.length > 0 && allStages.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Team Performance by Stage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={{}} className="aspect-square md:aspect-video">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={stagePerformanceData}
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 20,
+                    bottom: 70,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="name" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={70}
+                  />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  {allStages
+                    .filter(stage => selectedStages.length === 0 || selectedStages.includes(stage))
+                    .map((stage, index) => {
+                      const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#8dd1e1', '#a4de6c'];
+                      return (
+                        <Bar 
+                          key={stage}
+                          dataKey={stage} 
+                          name={stage} 
+                          fill={colors[index % colors.length]} 
+                        />
+                      );
+                    })
+                  }
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
       
       {/* Team Activity Timeline */}
       <Card>

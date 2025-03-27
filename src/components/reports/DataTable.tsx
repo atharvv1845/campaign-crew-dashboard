@@ -8,160 +8,149 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { 
-  CampaignMetric, 
-  LeadMetric, 
-  MessageMetric, 
-  PerformanceMetric 
-} from '@/components/reports/types';
-import { Badge } from '@/components/ui/badge';
+import { CampaignMetric, LeadMetric, MessageMetric, PerformanceMetric } from './types';
 
 interface DataTableProps {
-  data: CampaignMetric[] | LeadMetric[] | MessageMetric[] | PerformanceMetric[];
+  data: any[];
   type: 'campaign' | 'lead' | 'message' | 'performance';
 }
 
 export const DataTable: React.FC<DataTableProps> = ({ data, type }) => {
   if (data.length === 0) {
-    return <p className="text-muted-foreground text-center py-4">No data available</p>;
+    return (
+      <div className="py-8 text-center text-muted-foreground">
+        No data available with the current filters
+      </div>
+    );
   }
 
-  // Render different table structures based on data type
   if (type === 'campaign') {
-    const campaignData = data as CampaignMetric[];
-    return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Campaign Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Total Leads</TableHead>
-            <TableHead>Responses</TableHead>
-            <TableHead>Conversions</TableHead>
-            <TableHead>Response Rate</TableHead>
-            <TableHead>Conversion Rate</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {campaignData.map((campaign) => (
-            <TableRow key={campaign.id}>
-              <TableCell className="font-medium">{campaign.name}</TableCell>
-              <TableCell>
-                <Badge variant="outline" className={
-                  campaign.status === 'Active' 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
-                    : campaign.status === 'Completed'
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                }>
-                  {campaign.status}
-                </Badge>
-              </TableCell>
-              <TableCell>{campaign.totalLeads}</TableCell>
-              <TableCell>{campaign.responses}</TableCell>
-              <TableCell>{campaign.conversions}</TableCell>
-              <TableCell>{campaign.responseRate}%</TableCell>
-              <TableCell>{campaign.conversionRate}%</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
-  } else if (type === 'lead') {
-    const leadData = data as LeadMetric[];
     return (
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Campaign</TableHead>
-            <TableHead>New Leads</TableHead>
-            <TableHead>Contacted</TableHead>
-            <TableHead>Responded</TableHead>
-            <TableHead>Interested</TableHead>
-            <TableHead>Converted</TableHead>
-            <TableHead>Response Rate</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Total Leads</TableHead>
+            <TableHead className="text-right">Responses</TableHead>
+            <TableHead className="text-right">Conversions</TableHead>
+            <TableHead className="text-right">Response Rate</TableHead>
+            <TableHead className="text-right">Conversion Rate</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {leadData.map((lead) => (
-            <TableRow key={lead.campaignId}>
-              <TableCell className="font-medium">{lead.campaignName}</TableCell>
-              <TableCell>{lead.newLeads}</TableCell>
-              <TableCell>{lead.contacted}</TableCell>
-              <TableCell>{lead.responded}</TableCell>
-              <TableCell>{lead.interested}</TableCell>
-              <TableCell>{lead.converted}</TableCell>
-              <TableCell>{lead.responseRate}%</TableCell>
+          {(data as CampaignMetric[]).map((campaign) => (
+            <TableRow key={campaign.id.toString()}>
+              <TableCell className="font-medium">{campaign.name}</TableCell>
+              <TableCell>{campaign.status}</TableCell>
+              <TableCell className="text-right">{campaign.totalLeads}</TableCell>
+              <TableCell className="text-right">{campaign.responses}</TableCell>
+              <TableCell className="text-right">{campaign.conversions}</TableCell>
+              <TableCell className="text-right">{campaign.responseRate.toFixed(1)}%</TableCell>
+              <TableCell className="text-right">{campaign.conversionRate.toFixed(1)}%</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     );
-  } else if (type === 'message') {
-    const messageData = data as MessageMetric[];
+  }
+
+  if (type === 'lead') {
     return (
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Template Name</TableHead>
+            <TableHead>Campaign</TableHead>
+            <TableHead className="text-right">New Leads</TableHead>
+            <TableHead className="text-right">Contacted</TableHead>
+            <TableHead className="text-right">Responded</TableHead>
+            <TableHead className="text-right">Interested</TableHead>
+            <TableHead className="text-right">Converted</TableHead>
+            <TableHead className="text-right">Response Rate</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {(data as LeadMetric[]).map((metric) => (
+            <TableRow key={metric.campaignId.toString()}>
+              <TableCell className="font-medium">{metric.campaignName}</TableCell>
+              <TableCell className="text-right">{metric.newLeads}</TableCell>
+              <TableCell className="text-right">{metric.contacted}</TableCell>
+              <TableCell className="text-right">{metric.responded}</TableCell>
+              <TableCell className="text-right">{metric.interested}</TableCell>
+              <TableCell className="text-right">{metric.converted}</TableCell>
+              <TableCell className="text-right">{metric.responseRate.toFixed(1)}%</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+
+  if (type === 'message') {
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Template</TableHead>
             <TableHead>Platform</TableHead>
             <TableHead>Campaign</TableHead>
-            <TableHead>Sent</TableHead>
-            <TableHead>Opened</TableHead>
-            <TableHead>Responded</TableHead>
-            <TableHead>Open Rate</TableHead>
-            <TableHead>Response Rate</TableHead>
+            <TableHead className="text-right">Sent</TableHead>
+            <TableHead className="text-right">Opened</TableHead>
+            <TableHead className="text-right">Responded</TableHead>
+            <TableHead className="text-right">Open Rate</TableHead>
+            <TableHead className="text-right">Response Rate</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {messageData.map((message, index) => (
+          {(data as MessageMetric[]).map((metric, index) => (
             <TableRow key={index}>
-              <TableCell className="font-medium">{message.templateName}</TableCell>
-              <TableCell>{message.platform}</TableCell>
-              <TableCell>{message.campaignName}</TableCell>
-              <TableCell>{message.sent}</TableCell>
-              <TableCell>{message.opened}</TableCell>
-              <TableCell>{message.responded}</TableCell>
-              <TableCell>{message.openRate}%</TableCell>
-              <TableCell>{message.responseRate}%</TableCell>
+              <TableCell className="font-medium">{metric.templateName}</TableCell>
+              <TableCell>{metric.platform}</TableCell>
+              <TableCell>{metric.campaignName}</TableCell>
+              <TableCell className="text-right">{metric.sent}</TableCell>
+              <TableCell className="text-right">{metric.opened}</TableCell>
+              <TableCell className="text-right">{metric.responded}</TableCell>
+              <TableCell className="text-right">{metric.openRate.toFixed(1)}%</TableCell>
+              <TableCell className="text-right">{metric.responseRate.toFixed(1)}%</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     );
-  } else if (type === 'performance') {
-    const performanceData = data as PerformanceMetric[];
+  }
+
+  if (type === 'performance') {
     return (
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Team Member</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Leads Assigned</TableHead>
-            <TableHead>Leads Contacted</TableHead>
-            <TableHead>Leads Responded</TableHead>
-            <TableHead>Leads Converted</TableHead>
-            <TableHead>Response Rate</TableHead>
-            <TableHead>Conversion Rate</TableHead>
+            <TableHead className="text-right">Leads Assigned</TableHead>
+            <TableHead className="text-right">Leads Contacted</TableHead>
+            <TableHead className="text-right">Leads Responded</TableHead>
+            <TableHead className="text-right">Leads Converted</TableHead>
+            <TableHead className="text-right">Response Rate</TableHead>
+            <TableHead className="text-right">Conversion Rate</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {performanceData.map((member) => (
-            <TableRow key={member.id}>
-              <TableCell className="font-medium">{member.name}</TableCell>
-              <TableCell>{member.role}</TableCell>
-              <TableCell>{member.leadsAssigned}</TableCell>
-              <TableCell>{member.leadsContacted}</TableCell>
-              <TableCell>{member.leadsResponded}</TableCell>
-              <TableCell>{member.leadsConverted}</TableCell>
-              <TableCell>{member.responseRate}%</TableCell>
-              <TableCell>{member.conversionRate}%</TableCell>
+          {(data as PerformanceMetric[]).map((metric) => (
+            <TableRow key={metric.id}>
+              <TableCell className="font-medium">{metric.name}</TableCell>
+              <TableCell>{metric.role}</TableCell>
+              <TableCell className="text-right">{metric.leadsAssigned}</TableCell>
+              <TableCell className="text-right">{metric.leadsContacted}</TableCell>
+              <TableCell className="text-right">{metric.leadsResponded}</TableCell>
+              <TableCell className="text-right">{metric.leadsConverted}</TableCell>
+              <TableCell className="text-right">{metric.responseRate.toFixed(1)}%</TableCell>
+              <TableCell className="text-right">{metric.conversionRate.toFixed(1)}%</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     );
   }
-  
+
   return null;
 };

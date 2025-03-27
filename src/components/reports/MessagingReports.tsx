@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { 
@@ -20,20 +20,45 @@ import {
 import { DataTable } from '@/components/reports/DataTable';
 import { MessageMetric } from '@/components/reports/types';
 import { getMessageMetricsData } from '@/components/reports/utils';
+import { campaignData } from '@/components/campaigns/campaignData';
 
 interface MessagingReportsProps {
   dateRange: { from: Date | undefined; to: Date | undefined };
   selectedCampaigns: string[];
   selectedTeamMembers: string[];
   selectedPlatforms: string[];
+  selectedStages: string[];
+  allStages: string[];
 }
 
 const MessagingReports: React.FC<MessagingReportsProps> = ({
   dateRange,
   selectedCampaigns,
   selectedTeamMembers,
-  selectedPlatforms
+  selectedPlatforms,
+  selectedStages,
+  allStages
 }) => {
+  // Filter campaigns based on selections
+  const filteredCampaigns = useMemo(() => {
+    return campaignData.filter(campaign => {
+      // Filter by selected campaigns
+      if (selectedCampaigns.length > 0 && !selectedCampaigns.includes(campaign.id.toString())) {
+        return false;
+      }
+      
+      // Filter by selected stages
+      if (selectedStages.length > 0 && campaign.stages) {
+        const hasStage = campaign.stages.some(stage => 
+          selectedStages.includes(stage.name)
+        );
+        if (!hasStage) return false;
+      }
+      
+      return true;
+    });
+  }, [campaignData, selectedCampaigns, selectedStages]);
+
   // Mock message metrics data
   const messageMetrics: MessageMetric[] = getMessageMetricsData();
   
@@ -70,6 +95,22 @@ const MessagingReports: React.FC<MessagingReportsProps> = ({
     { time: '6-8 PM', rate: 20 },
     { time: 'After 8 PM', rate: 10 },
   ];
+  
+  // Message response rates by stage
+  const stageResponseData = useMemo(() => {
+    if (allStages.length === 0) return [];
+    
+    return allStages
+      .filter(stage => selectedStages.length === 0 || selectedStages.includes(stage))
+      .map(stage => {
+        return {
+          name: stage,
+          sent: Math.floor(Math.random() * 50) + 50, // Random value between 50-100
+          opened: Math.floor(Math.random() * 40) + 30, // Random value between 30-70
+          responded: Math.floor(Math.random() * 20) + 5, // Random value between 5-25
+        };
+      });
+  }, [allStages, selectedStages]);
   
   // Message template effectiveness data
   const templateData = [
@@ -141,6 +182,39 @@ const MessagingReports: React.FC<MessagingReportsProps> = ({
           </CardContent>
         </Card>
       </div>
+      
+      {/* Message Effectiveness by Stage */}
+      {stageResponseData.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Message Effectiveness by Lead Stage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={{}} className="aspect-square md:aspect-video">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={stageResponseData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="sent" name="Messages Sent" fill="#8884d8" />
+                  <Bar dataKey="opened" name="Messages Opened" fill="#82ca9d" />
+                  <Bar dataKey="responded" name="Messages Responded" fill="#ffc658" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
       
       {/* Message Template Effectiveness */}
       <Card>

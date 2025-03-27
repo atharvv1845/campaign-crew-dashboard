@@ -1,149 +1,69 @@
 
-import { LeadData } from '../../../types/campaignTypes';
+import { Lead } from '../../../campaignDetail/leads/types';
+import { parseCsvContent } from './csvFileOperations';
 
 export const processLeadData = (
-  content: string,
+  csvContent: string,
   mapping: Record<string, string>,
   initialStageId: string,
-  generateId: () => string
-): LeadData[] => {
-  console.log('Processing CSV content with mapping:', mapping);
-  console.log('Initial stage ID:', initialStageId);
-  
-  const lines = content.split('\n');
-  const headers = lines[0].split(',').map(header => header.trim());
-  console.log('Found headers:', headers);
-  
-  const newLeads: LeadData[] = [];
-  
-  for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
+  generateId: () => string,
+  customStages?: { id: string; name: string }[]
+): Lead[] => {
+  try {
+    const { data, headers } = parseCsvContent(csvContent);
+    const leads: Lead[] = [];
     
-    const values = lines[i].split(',').map(val => val.trim());
-    console.log(`Processing row ${i} with values:`, values);
+    // Extract mapped field names for easier access
+    const nameField = Object.keys(mapping).find(key => mapping[key] === 'name');
+    const emailField = Object.keys(mapping).find(key => mapping[key] === 'email');
+    const phoneField = Object.keys(mapping).find(key => mapping[key] === 'phone');
+    const companyField = Object.keys(mapping).find(key => mapping[key] === 'company');
+    const titleField = Object.keys(mapping).find(key => mapping[key] === 'title');
     
-    const leadData: any = {
-      id: generateId(),
-      firstName: '',
-      lastName: '',
-      name: '',
-      email: '',
-      company: '',
-      title: '',
-      status: initialStageId,
-      currentStage: initialStageId,
-      source: 'csv',
-      lastContact: '',
-      firstContactDate: '',
-      nextFollowUpDate: '',
-      notes: '',
-      campaignId: '',
-      assignedTo: '',
-      socialProfiles: {}
-    };
-    
-    headers.forEach((header, index) => {
-      const mappingKey = mapping[header];
-      const value = values[index] || '';
-      
-      console.log(`Mapping: ${header} -> ${mappingKey} = ${value}`);
-      
-      if (mappingKey === 'name' || mappingKey === 'fullName') {
-        leadData.name = value;
-        
-        // Try to split name into first and last name if it contains a space
-        if (value.includes(' ')) {
-          const nameParts = value.split(' ');
-          leadData.firstName = nameParts[0] || '';
-          leadData.lastName = nameParts.slice(1).join(' ') || '';
-        } else {
-          leadData.firstName = value;
-        }
-      } else if (mappingKey === 'firstName') {
-        leadData.firstName = value;
-        if (leadData.lastName) {
-          leadData.name = `${value} ${leadData.lastName}`;
-        } else {
-          leadData.name = value;
-        }
-      } else if (mappingKey === 'lastName') {
-        leadData.lastName = value;
-        if (leadData.firstName) {
-          leadData.name = `${leadData.firstName} ${value}`;
-        } else {
-          leadData.name = value;
-        }
-      } else if (mappingKey === 'email') {
-        leadData.email = value;
-      } else if (mappingKey === 'company') {
-        leadData.company = value;
-      } else if (mappingKey === 'title') {
-        leadData.title = value;
-      } else if (mappingKey === 'phone') {
-        leadData.phone = value;
-      } else if (mappingKey === 'status' || mappingKey === 'currentStage') {
-        leadData.statusName = value;
-        leadData.currentStage = value;
-        leadData.status = initialStageId; // Will be updated later if stage matches
-      } else if (mappingKey === 'assignedTo') {
-        leadData.assignedTo = value;
-      } else if (mappingKey === 'notes') {
-        leadData.notes = value;
-      } else if (mappingKey === 'lastContact') {
-        leadData.lastContact = value;
-      } else if (mappingKey === 'firstContactDate') {
-        leadData.firstContactDate = value;
-      } else if (mappingKey === 'nextFollowUpDate') {
-        leadData.nextFollowUpDate = value;
-      } else if (mappingKey === 'source') {
-        leadData.source = value;
-      } else if (mappingKey === 'linkedin') {
-        if (!leadData.socialProfiles) leadData.socialProfiles = {};
-        leadData.socialProfiles.linkedin = value;
-      } else if (mappingKey === 'twitter') {
-        if (!leadData.socialProfiles) leadData.socialProfiles = {};
-        leadData.socialProfiles.twitter = value;
-      } else if (mappingKey === 'facebook') {
-        if (!leadData.socialProfiles) leadData.socialProfiles = {};
-        leadData.socialProfiles.facebook = value;
-      } else if (mappingKey === 'instagram') {
-        if (!leadData.socialProfiles) leadData.socialProfiles = {};
-        leadData.socialProfiles.instagram = value;
-      } else if (mappingKey === 'whatsapp') {
-        if (!leadData.socialProfiles) leadData.socialProfiles = {};
-        leadData.socialProfiles.whatsapp = value;
-      } else if (mappingKey && mappingKey.startsWith('platform_')) {
-        // Handle custom platforms (keys starting with 'platform_')
-        if (!leadData.socialProfiles) leadData.socialProfiles = {};
-        const platformId = mappingKey.replace('platform_', '');
-        if (platformId && value) {
-          leadData.socialProfiles[platformId] = value;
-        }
+    // Process each row in the CSV data
+    data.forEach((row: any) => {
+      // Skip empty rows
+      if (!row || Object.values(row).every(val => !val)) {
+        return;
       }
+      
+      // Create a new lead object
+      const lead: Lead = {
+        id: generateId(),
+        name: nameField ? row[nameField] : '',
+        email: emailField ? row[emailField] : '',
+        phone: phoneField ? row[phoneField] : '',
+        company: companyField ? row[companyField] : '',
+        title: titleField ? row[titleField] : '',
+        status: 'New',
+        currentStage: customStages && customStages.length > 0 
+          ? customStages[0].name 
+          : 'New Lead',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastContact: null,
+        nextFollowUpDate: null,
+        assignedTo: '',
+        notes: '',
+        tags: [],
+        stageId: initialStageId,
+      };
+      
+      // Add extra fields from CSV if they exist
+      Object.keys(row).forEach(key => {
+        if (!mapping[key]) {
+          // If this field wasn't mapped to a standard field, add it as a custom field
+          (lead as any)[key] = row[key];
+        }
+      });
+      
+      leads.push(lead);
     });
-
-    // Ensure name is set
-    if (!leadData.name) {
-      if (leadData.firstName && leadData.lastName) {
-        leadData.name = `${leadData.firstName} ${leadData.lastName}`;
-      } else if (leadData.firstName) {
-        leadData.name = leadData.firstName;
-      } else if (leadData.lastName) {
-        leadData.name = leadData.lastName;
-      } else {
-        leadData.name = leadData.email || `Lead #${leadData.id}`;
-      }
-    }
     
-    // Ensure id is always a string for consistency
-    if (typeof leadData.id === 'number') {
-      leadData.id = String(leadData.id);
-    }
-    
-    console.log('Processed lead data:', leadData);
-    newLeads.push(leadData);
+    console.log(`Processed ${leads.length} leads from CSV`);
+    return leads;
+  } catch (error) {
+    console.error('Error processing lead data:', error);
+    throw error;
   }
-  
-  console.log(`Total leads processed: ${newLeads.length}`);
-  return newLeads;
 };

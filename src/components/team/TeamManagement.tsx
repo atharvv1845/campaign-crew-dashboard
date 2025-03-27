@@ -335,7 +335,8 @@ const TeamManagement = () => {
       <AddTeamMemberDialog 
         open={isAddDialogOpen} 
         onOpenChange={setIsAddDialogOpen} 
-        onSubmit={handleAddMember}
+        onAdd={handleAddMember}
+        withAccess={true}
       />
       
       {selectedMember && (
@@ -343,22 +344,22 @@ const TeamManagement = () => {
           <EditTeamMemberDialog 
             open={isEditDialogOpen} 
             onOpenChange={setIsEditDialogOpen} 
-            member={selectedMember}
-            onSubmit={handleEditMember}
+            teamMember={selectedMember}
+            onUpdate={handleEditMember}
           />
           
           <DeleteTeamMemberDialog
             open={isDeleteDialogOpen}
             onOpenChange={setIsDeleteDialogOpen}
-            member={selectedMember}
-            onDelete={handleDeleteMember}
+            teamMember={selectedMember}
+            onConfirm={handleDeleteMember}
           />
           
           <CreateTeamAccessDialog
             open={isCreateAccessDialogOpen}
             onOpenChange={setIsCreateAccessDialogOpen}
-            member={selectedMember}
-            onSubmit={handleCreateAccess}
+            teamMember={selectedMember}
+            onConfirm={handleCreateAccess}
           />
         </>
       )}

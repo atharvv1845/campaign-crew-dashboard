@@ -9,6 +9,7 @@ interface TeamState {
   addTeamMember: (member: TeamMember) => void;
   removeTeamMember: (id: string) => void;
   updateTeamMember: (member: TeamMember) => void;
+  setTeamMembers: (members: TeamMember[]) => void;
 }
 
 export const useTeamStore = create<TeamState>()(
@@ -33,6 +34,7 @@ export const useTeamStore = create<TeamState>()(
           member.id === updatedMember.id ? updatedMember : member
         )
       })),
+      setTeamMembers: (members) => set({ teamMembers: members }),
     }),
     {
       name: 'team-storage',

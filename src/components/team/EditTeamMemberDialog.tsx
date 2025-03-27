@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { TeamMember } from './types';
+import { Loader2 } from 'lucide-react';
 
 interface EditTeamMemberDialogProps {
   open: boolean;
@@ -50,47 +51,41 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
   open, 
   onOpenChange,
   teamMember,
-  onUpdate 
+  onUpdate
 }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: teamMember.name,
-      email: teamMember.email,
-      phone: teamMember.phone || "",
-      role: teamMember.role,
-      bio: teamMember.bio || "",
-      status: teamMember.status,
+      name: teamMember?.name || "",
+      email: teamMember?.email || "",
+      phone: teamMember?.phone || "",
+      role: teamMember?.role || "Sales Rep",
+      bio: teamMember?.bio || "",
+      status: teamMember?.status || "Pending",
     },
   });
 
-  // Update form values when teamMember changes
-  useEffect(() => {
-    form.reset({
-      name: teamMember.name,
-      email: teamMember.email,
-      phone: teamMember.phone || "",
-      role: teamMember.role,
-      bio: teamMember.bio || "",
-      status: teamMember.status,
-    });
-  }, [teamMember, form]);
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const updatedTeamMember: TeamMember = {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
+    
+    const updatedMember: TeamMember = {
       ...teamMember,
       name: values.name,
       email: values.email,
       phone: values.phone || "",
       role: values.role,
       bio: values.bio || "",
-      status: values.status as "Active" | "Pending" | "Inactive",
+      status: values.status,
     };
-    onUpdate(updatedTeamMember);
+    
+    onUpdate(updatedMember);
+    setIsSubmitting(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(open) => !isSubmitting && onOpenChange(open)}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Edit Team Member</DialogTitle>
@@ -105,7 +100,7 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="John Smith" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,7 +113,7 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="john@example.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -134,7 +129,7 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                   <FormItem>
                     <FormLabel>Phone (Optional)</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="+1 (555) 123-4567" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,11 +144,10 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                     <Select 
                       onValueChange={field.onChange} 
                       defaultValue={field.value}
-                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -179,11 +173,10 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
-                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -205,6 +198,7 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                   <FormLabel>Bio (Optional)</FormLabel>
                   <FormControl>
                     <Textarea 
+                      placeholder="Tell us a bit about this team member..."
                       className="min-h-[80px]"
                       {...field} 
                     />
@@ -219,10 +213,23 @@ const EditTeamMemberDialog: React.FC<EditTeamMemberDialogProps> = ({
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit">Update Team Member</Button>
+              <Button 
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

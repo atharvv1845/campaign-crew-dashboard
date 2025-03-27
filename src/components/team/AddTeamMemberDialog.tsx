@@ -34,6 +34,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Checkbox } from '@/components/ui/checkbox';
 import { signUp } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface AddTeamMemberDialogProps {
   open: boolean;

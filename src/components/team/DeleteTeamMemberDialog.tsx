@@ -16,7 +16,7 @@ interface DeleteTeamMemberDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   teamMember: TeamMember | null;
-  onConfirm: (id: string) => void;
+  onConfirm: () => void;
 }
 
 const DeleteTeamMemberDialog: React.FC<DeleteTeamMemberDialogProps> = ({
@@ -25,30 +25,23 @@ const DeleteTeamMemberDialog: React.FC<DeleteTeamMemberDialogProps> = ({
   teamMember,
   onConfirm,
 }) => {
-  if (!teamMember) return null;
-  
-  const handleConfirm = () => {
-    onConfirm(teamMember.id);
-    onOpenChange(false);
-  };
-
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to remove <span className="font-medium">{teamMember.name}</span> from the team?
+            This will permanently delete {teamMember?.name}'s account and remove them from the team. 
             This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={handleConfirm}
+          <AlertDialogAction
+            onClick={onConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Remove
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

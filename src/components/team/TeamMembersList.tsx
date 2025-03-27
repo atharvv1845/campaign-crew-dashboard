@@ -197,7 +197,10 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({
         open={!!deletingMember}
         onOpenChange={() => setDeletingMember(null)}
         teamMember={deletingMember}
-        onConfirm={onRemove}
+        onConfirm={() => {
+          deletingMember && onRemove(deletingMember.id);
+          setDeletingMember(null);
+        }}
       />
 
       {creatingAccessForMember && (

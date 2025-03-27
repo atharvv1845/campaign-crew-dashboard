@@ -39,7 +39,12 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
     setCsvFile(file);
     
     try {
+      console.log('Parsing CSV file:', file.name);
       const { headers, preview, initialMapping } = await parseCsvFile(file);
+      
+      console.log('Parsed CSV headers:', headers);
+      console.log('CSV preview:', preview);
+      console.log('Initial mapping:', initialMapping);
       
       setCsvHeaders(headers);
       setCsvMapping(initialMapping);
@@ -62,11 +67,19 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
   };
   
   const importCsvLeads = async () => {
-    if (!csvFile) return;
+    if (!csvFile) {
+      console.error('No CSV file selected');
+      return;
+    }
     
     try {
+      console.log('Starting import with formData:', formData);
       const initialStageId = formData.stages[0]?.id || '';
+      console.log('Initial stage ID:', initialStageId);
+      console.log('CSV mapping to use:', csvMapping);
+      
       const newLeads = await processLeadsFromCsv(csvFile, csvMapping, initialStageId, generateId);
+      console.log('Processed new leads:', newLeads);
       
       // Add contact platforms to each lead based on campaign settings
       const leadsWithPlatforms = newLeads.map(lead => {
@@ -74,7 +87,7 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         let leadPlatforms: string[] = [];
         
         // Add platforms based on the presence of data
-        if (formData.contactPlatforms) {
+        if (formData.contactPlatforms && formData.contactPlatforms.length > 0) {
           formData.contactPlatforms.forEach(platform => {
             // Check if lead has data for this platform
             if (
@@ -96,6 +109,8 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
           contactPlatforms: leadPlatforms
         };
       });
+      
+      console.log('Leads with platforms:', leadsWithPlatforms);
       
       // No validation - Accept all leads
       const validLeads = leadsWithPlatforms;
@@ -122,10 +137,16 @@ const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
         return lead;
       });
       
-      setFormData(prev => ({
-        ...prev,
-        leads: [...prev.leads, ...leadsWithStages]
-      }));
+      console.log('Final leads to add to formData:', leadsWithStages);
+      
+      setFormData(prev => {
+        const updatedFormData = {
+          ...prev,
+          leads: [...prev.leads, ...leadsWithStages]
+        };
+        console.log('Updated formData:', updatedFormData);
+        return updatedFormData;
+      });
       
       setImportedLeads(leadsWithStages);
       

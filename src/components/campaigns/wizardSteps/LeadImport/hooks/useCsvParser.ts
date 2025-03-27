@@ -18,8 +18,13 @@ export const useCsvParser = () => {
         try {
           const text = event.target?.result as string;
           const result = parseCsvContent(text);
+          
+          // Log the parsed result for debugging
+          console.log('CSV parsing result:', result);
+          
           resolve(result);
         } catch (error) {
+          console.error('Error parsing CSV file:', error);
           reject(error);
         }
       };
@@ -44,9 +49,14 @@ export const useCsvParser = () => {
       reader.onload = (event) => {
         try {
           const text = event.target?.result as string;
+          console.log('Processing CSV with mapping:', mapping);
+          
           const leads = processLeadData(text, mapping, initialStageId, generateId);
+          console.log('Processed leads from CSV:', leads);
+          
           resolve(leads);
         } catch (error) {
+          console.error('Error processing leads from CSV:', error);
           reject(error);
         }
       };

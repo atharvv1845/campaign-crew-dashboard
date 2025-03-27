@@ -34,14 +34,19 @@ export const generateCsvTemplate = (contactPlatforms?: string[]) => {
 
 export const parseInitialMapping = (headers: string[]): Record<string, string> => {
   const initialMapping: Record<string, string> = {};
+  
+  console.log('Creating initial mapping for headers:', headers);
+  
   headers.forEach(header => {
     const lowerHeader = header.toLowerCase();
+    
+    // Match headers to field names
     if (lowerHeader.includes('first') && lowerHeader.includes('name')) {
       initialMapping[header] = 'firstName';
     } else if (lowerHeader.includes('last') && lowerHeader.includes('name')) {
       initialMapping[header] = 'lastName';
-    } else if (lowerHeader === 'name') {
-      initialMapping[header] = 'fullName';
+    } else if (lowerHeader === 'name' || lowerHeader === 'full name' || lowerHeader === 'fullname') {
+      initialMapping[header] = 'name';
     } else if (lowerHeader.includes('email')) {
       initialMapping[header] = 'email';
     } else if (lowerHeader.includes('company')) {
@@ -58,35 +63,70 @@ export const parseInitialMapping = (headers: string[]): Record<string, string> =
       initialMapping[header] = 'instagram';
     } else if (lowerHeader.includes('whatsapp')) {
       initialMapping[header] = 'whatsapp';
-    } else if (lowerHeader.includes('status')) {
-      initialMapping[header] = 'status';
+    } else if (lowerHeader.includes('status') || lowerHeader.includes('stage')) {
+      initialMapping[header] = 'currentStage';
     } else if (lowerHeader.includes('assign') || lowerHeader.includes('rep')) {
       initialMapping[header] = 'assignedTo';
     } else if (lowerHeader.includes('note')) {
       initialMapping[header] = 'notes';
+    } else if (lowerHeader.includes('title') || lowerHeader.includes('position') || lowerHeader.includes('job')) {
+      initialMapping[header] = 'title';
     }
   });
+  
+  console.log('Generated initial mapping:', initialMapping);
   return initialMapping;
 };
 
 export const parseCsvContent = (content: string): CsvParseResult => {
-  const lines = content.split('\n');
+  console.log('Parsing CSV content...');
+  
+  // Split by newlines, but handle different line endings (CRLF, LF)
+  const lines = content.replace(/\r\n/g, '\n').split('\n');
+  console.log(`Found ${lines.length} lines in CSV`);
+  
+  if (lines.length === 0 || !lines[0].trim()) {
+    console.error('CSV file is empty or has no headers');
+    throw new Error('CSV file is empty or has no headers');
+  }
+  
+  // Parse headers from first line
   const headers = lines[0].split(',').map(header => header.trim());
+  console.log('CSV headers:', headers);
+  
+  if (headers.length === 0) {
+    console.error('No valid headers found in CSV');
+    throw new Error('No valid headers found in CSV');
+  }
+  
   const initialMapping = parseInitialMapping(headers);
   
+  // Generate preview data (up to 5 rows)
   const preview = [];
   for (let i = 1; i < Math.min(6, lines.length); i++) {
     if (lines[i].trim()) {
-      const values = lines[i].split(',').map(val => val.trim());
-      const row: Record<string, string> = {};
-      
-      headers.forEach((header, index) => {
-        row[header] = values[index] || '';
-      });
-      
-      preview.push(row);
+      try {
+        const values = lines[i].split(',').map(val => val.trim());
+        
+        // Only process rows with the right number of values
+        if (values.length >= headers.length) {
+          const row: Record<string, string> = {};
+          
+          headers.forEach((header, index) => {
+            row[header] = values[index] || '';
+          });
+          
+          preview.push(row);
+        } else {
+          console.warn(`Row ${i} has fewer values than headers. Skipping.`);
+        }
+      } catch (error) {
+        console.error(`Error parsing row ${i}:`, error);
+      }
     }
   }
+  
+  console.log(`Generated preview with ${preview.length} rows`);
   
   return {
     headers,

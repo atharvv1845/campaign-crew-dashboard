@@ -22,14 +22,25 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
   const { savedLeadLists, loadLeadList } = useLeadImport();
   const { toast } = useToast();
   
+  useEffect(() => {
+    // Log current leads count on component mount and when formData.leads changes
+    console.log(`LeadImport: Current leads count: ${formData.leads.length}`);
+  }, [formData.leads]);
+  
   // Handle loading a saved lead list
   const handleLoadLeadList = (listId: string) => {
     const leads = loadLeadList(listId);
     if (leads) {
-      setFormData(prev => ({
-        ...prev,
-        leads: [...leads]
-      }));
+      console.log(`Loading saved lead list: ${listId} with ${leads.length} leads`);
+      
+      setFormData(prev => {
+        const updatedFormData = {
+          ...prev,
+          leads: [...leads]
+        };
+        console.log(`Updated form data with ${updatedFormData.leads.length} leads`);
+        return updatedFormData;
+      });
       
       toast({
         title: "Lead List Loaded",

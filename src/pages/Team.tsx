@@ -51,7 +51,7 @@ const TeamPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              As an admin, you can add, edit, or remove team members, and create login access for them to use the platform.
+              As an admin, you can add, edit, or remove team members, and create login access for them to use the Leveraged Growth platform.
             </p>
           </CardContent>
         </Card>

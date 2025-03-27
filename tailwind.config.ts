@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,7 +25,7 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#FFC107', // Golden Yellow from logo
+					DEFAULT: '#1EAEDB', // Bright blue color from Leveraged Growth logo
 					foreground: '#000000' // Black
 				},
 				secondary: {
@@ -43,7 +42,7 @@ export default {
 				},
 				accent: {
 					DEFAULT: '#333333', // Dark gray accent
-					foreground: '#FFC107' // Golden Yellow
+					foreground: '#1EAEDB' // Bright blue
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -56,12 +55,12 @@ export default {
 				sidebar: {
 					DEFAULT: '#000000', // Black
 					foreground: '#FFFFFF', // White
-					primary: '#FFC107', // Golden Yellow
+					primary: '#1EAEDB', // Bright blue
 					'primary-foreground': '#000000', // Black
 					accent: '#333333', // Dark gray
 					'accent-foreground': '#FFFFFF', // White
 					border: '#333333', // Dark gray
-					ring: '#FFC107' // Golden Yellow
+					ring: '#1EAEDB' // Bright blue
 				}
 			},
 			borderRadius: {

@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, onToggle }) => {
         )}>
           {expanded ? (
             <>
-              <div className="font-semibold text-primary">Campaign Crew</div>
+              <div className="font-semibold text-primary">Leveraged Growth</div>
               <button 
                 onClick={onToggle}
                 className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-accent transition-colors"

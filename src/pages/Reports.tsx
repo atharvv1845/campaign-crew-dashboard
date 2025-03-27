@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Tabs, 
   TabsContent, 
@@ -22,6 +22,8 @@ import LeadReports from '@/components/reports/LeadReports';
 import TeamReports from '@/components/reports/TeamReports';
 import MessagingReports from '@/components/reports/MessagingReports';
 import ReportsFilters from '@/components/reports/ReportsFilters';
+import { fetchAllCampaigns } from '@/lib/api/campaignApi';
+import { useToast } from '@/hooks/use-toast';
 
 const ReportsPage: React.FC = () => {
   const [dateRange, setDateRange] = useState<{from: Date | undefined, to: Date | undefined}>({
@@ -32,10 +34,64 @@ const ReportsPage: React.FC = () => {
   const [selectedTeamMembers, setSelectedTeamMembers] = useState<string[]>([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [allStages, setAllStages] = useState<string[]>([]);
+  const [selectedStages, setSelectedStages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  // Fetch all campaigns to extract custom stages
+  useEffect(() => {
+    const fetchCampaignsData = async () => {
+      try {
+        setIsLoading(true);
+        const campaigns = await fetchAllCampaigns() as any[];
+        
+        // Extract all unique stages from all campaigns
+        const uniqueStages = new Set<string>();
+        
+        campaigns.forEach(campaign => {
+          if (campaign.stages && Array.isArray(campaign.stages)) {
+            campaign.stages.forEach((stage: any) => {
+              if (stage.name) {
+                uniqueStages.add(stage.name);
+              }
+            });
+          }
+        });
+        
+        const stagesArray = Array.from(uniqueStages);
+        setAllStages(stagesArray);
+        console.log('Extracted unique stages from campaigns:', stagesArray);
+        
+      } catch (error) {
+        console.error('Failed to fetch campaigns data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch campaign data for reports',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCampaignsData();
+  }, [toast]);
 
   const handleExport = (format: 'csv' | 'pdf' | 'excel') => {
     console.log(`Exporting in ${format} format`);
     // In a real app, this would trigger an API call to generate the export
+  };
+
+  // Handle stage selection
+  const handleStageSelect = (stage: string) => {
+    setSelectedStages(prev => {
+      if (prev.includes(stage)) {
+        return prev.filter(s => s !== stage);
+      } else {
+        return [...prev, stage];
+      }
+    });
   };
 
   return (
@@ -94,6 +150,9 @@ const ReportsPage: React.FC = () => {
           setSelectedTeamMembers={setSelectedTeamMembers}
           selectedPlatforms={selectedPlatforms}
           setSelectedPlatforms={setSelectedPlatforms}
+          allStages={allStages}
+          selectedStages={selectedStages}
+          onStageSelect={handleStageSelect}
         />
       )}
       
@@ -127,6 +186,9 @@ const ReportsPage: React.FC = () => {
             selectedCampaigns={selectedCampaigns}
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
+            selectedStages={selectedStages}
+            allStages={allStages}
+            isLoading={isLoading}
           />
         </TabsContent>
         
@@ -136,6 +198,7 @@ const ReportsPage: React.FC = () => {
             selectedCampaigns={selectedCampaigns}
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
+            selectedStages={selectedStages}
           />
         </TabsContent>
         
@@ -145,6 +208,7 @@ const ReportsPage: React.FC = () => {
             selectedCampaigns={selectedCampaigns}
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
+            selectedStages={selectedStages}
           />
         </TabsContent>
         
@@ -154,6 +218,7 @@ const ReportsPage: React.FC = () => {
             selectedCampaigns={selectedCampaigns}
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
+            selectedStages={selectedStages}
           />
         </TabsContent>
         
@@ -163,6 +228,7 @@ const ReportsPage: React.FC = () => {
             selectedCampaigns={selectedCampaigns}
             selectedTeamMembers={selectedTeamMembers}
             selectedPlatforms={selectedPlatforms}
+            selectedStages={selectedStages}
           />
         </TabsContent>
       </Tabs>

@@ -25,7 +25,13 @@ const LeadImport: React.FC<LeadImportProps> = ({ formData, setFormData, onNext, 
   useEffect(() => {
     // Log current leads count on component mount and when formData.leads changes
     console.log(`LeadImport: Current leads count: ${formData.leads.length}`);
-  }, [formData.leads]);
+    
+    // Log stages if they're already defined
+    if (formData.stages && formData.stages.length > 0) {
+      console.log(`LeadImport: Campaign has ${formData.stages.length} custom stages:`, 
+        formData.stages.map(stage => stage.name));
+    }
+  }, [formData.leads, formData.stages]);
   
   // Handle loading a saved lead list
   const handleLoadLeadList = (listId: string) => {

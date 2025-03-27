@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -8,6 +8,43 @@ interface CampaignReportsProps {
 }
 
 const CampaignReports: React.FC<CampaignReportsProps> = ({ campaign }) => {
+  // Generate colors for stages based on their defined colors
+  const STAGE_COLORS = useMemo(() => {
+    // First try to use the colors defined in the stages
+    if (campaign.stages && campaign.stages.length > 0) {
+      const stageColors = campaign.stages
+        .filter((stage: any) => stage.color)
+        .map((stage: any) => {
+          if (stage.color.startsWith('bg-')) {
+            // Extract color from Tailwind class
+            const colorName = stage.color.replace('bg-', '');
+            // Map to hex values (simplified)
+            const colorMap: Record<string, string> = {
+              'blue-500': '#3b82f6',
+              'purple-500': '#8b5cf6',
+              'green-500': '#10b981',
+              'yellow-500': '#f59e0b',
+              'orange-500': '#f97316',
+              'green-700': '#047857',
+              'red-500': '#ef4444',
+              'indigo-500': '#6366f1',
+              'pink-500': '#ec4899',
+              'gray-500': '#6b7280',
+            };
+            return colorMap[colorName] || '#6b7280'; // Default to gray
+          }
+          return stage.color;
+        });
+        
+      if (stageColors.length > 0) {
+        return stageColors;
+      }
+    }
+    
+    // Default colors if no stage colors available
+    return ['#10b981', '#ef4444', '#94a3b8'];
+  }, [campaign.stages]);
+
   // Sample data for reports
   const responseData = [
     { name: 'Mon', responses: 4 },
@@ -19,11 +56,22 @@ const CampaignReports: React.FC<CampaignReportsProps> = ({ campaign }) => {
     { name: 'Sun', responses: 2 },
   ];
 
-  const outcomeData = [
-    { name: 'Positive', value: campaign.positive },
-    { name: 'Negative', value: campaign.negative },
-    { name: 'No Response', value: campaign.leads - campaign.responses },
-  ];
+  // Create stage distribution data from campaign stages
+  const stageDistributionData = useMemo(() => {
+    if (!campaign.stages || campaign.stages.length === 0) {
+      return [
+        { name: 'Positive', value: campaign.positive },
+        { name: 'Negative', value: campaign.negative },
+        { name: 'No Response', value: campaign.leads - campaign.responses },
+      ];
+    }
+    
+    // If we have stage data with counts, use that
+    return campaign.stages.map((stage: any) => ({
+      name: stage.name,
+      value: stage.count || 0
+    })).filter((item: any) => item.value > 0);
+  }, [campaign]);
 
   const channelEffectivenessData = [
     {
@@ -59,8 +107,6 @@ const CampaignReports: React.FC<CampaignReportsProps> = ({ campaign }) => {
     { name: 'Mia', positive: 7, negative: 3, noResponse: 10 },
   ];
 
-  const COLORS = ['#10b981', '#ef4444', '#94a3b8'];
-
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Campaign Reports</h2>
@@ -95,17 +141,17 @@ const CampaignReports: React.FC<CampaignReportsProps> = ({ campaign }) => {
           </CardContent>
         </Card>
 
-        {/* Response Outcome Chart */}
+        {/* Stage Distribution Chart - Using custom stages */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Response Outcomes</CardTitle>
+            <CardTitle className="text-base font-medium">Lead Stage Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-80 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={outcomeData}
+                    data={stageDistributionData}
                     cx="50%"
                     cy="50%"
                     labelLine={true}
@@ -114,8 +160,8 @@ const CampaignReports: React.FC<CampaignReportsProps> = ({ campaign }) => {
                     dataKey="value"
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   >
-                    {outcomeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {stageDistributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={STAGE_COLORS[index % STAGE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />

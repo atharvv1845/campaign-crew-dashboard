@@ -41,7 +41,8 @@ export const useCsvParser = () => {
     file: File, 
     mapping: Record<string, string>, 
     initialStageId: string,
-    generateId: () => string
+    generateId: () => string,
+    customStages?: { id: string; name: string }[]
   ): Promise<LeadData[]> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -50,8 +51,9 @@ export const useCsvParser = () => {
         try {
           const text = event.target?.result as string;
           console.log('Processing CSV with mapping:', mapping);
+          console.log('Using custom stages:', customStages);
           
-          const leads = processLeadData(text, mapping, initialStageId, generateId);
+          const leads = processLeadData(text, mapping, initialStageId, generateId, customStages);
           console.log('Processed leads from CSV:', leads);
           
           resolve(leads);

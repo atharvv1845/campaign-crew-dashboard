@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,11 +31,15 @@ import {
 } from '@/components/ui/select';
 import { TeamMember } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { Checkbox } from '@/components/ui/checkbox';
+import { signUp } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 interface AddTeamMemberDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (member: TeamMember) => void;
+  withAccess?: boolean;
 }
 
 const formSchema = z.object({
@@ -43,13 +48,22 @@ const formSchema = z.object({
   phone: z.string().optional(),
   role: z.string({ required_error: "Please select a role" }),
   bio: z.string().optional(),
+  createAccess: z.boolean().optional(),
+  password: z.string().optional()
+    .refine(val => !val || val.length >= 8, {
+      message: "Password must be at least 8 characters",
+    }),
 });
 
 const AddTeamMemberDialog: React.FC<AddTeamMemberDialogProps> = ({ 
   open, 
   onOpenChange,
-  onAdd 
+  onAdd,
+  withAccess = false
 }) => {
+  const { toast } = useToast();
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,10 +72,41 @@ const AddTeamMemberDialog: React.FC<AddTeamMemberDialogProps> = ({
       phone: "",
       role: "Sales Rep",
       bio: "",
+      createAccess: false,
+      password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const createAccessValue = form.watch('createAccess');
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    let hasAccess = false;
+    
+    if (values.createAccess && values.password) {
+      setIsCreatingUser(true);
+      
+      try {
+        // Create a user account in Supabase
+        await signUp(values.email, values.password);
+        hasAccess = true;
+        
+        toast({
+          title: "Account created",
+          description: `Login access created for ${values.name}`
+        });
+      } catch (error: any) {
+        console.error('Error creating user:', error);
+        toast({
+          title: "Error creating user account",
+          description: error.message || "There was an error creating the user account",
+          variant: "destructive"
+        });
+        // Continue with team member creation even if user creation fails
+      } finally {
+        setIsCreatingUser(false);
+      }
+    }
+    
     const newTeamMember: TeamMember = {
       id: uuidv4(),
       name: values.name,
@@ -72,7 +117,9 @@ const AddTeamMemberDialog: React.FC<AddTeamMemberDialogProps> = ({
       avatar: "",
       status: "Pending",
       createdAt: new Date().toISOString(),
+      hasAccess: hasAccess,
     };
+    
     onAdd(newTeamMember);
     form.reset();
   };
@@ -157,6 +204,54 @@ const AddTeamMemberDialog: React.FC<AddTeamMemberDialogProps> = ({
               />
             </div>
             
+            {withAccess && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="createAccess"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Create Login Access</FormLabel>
+                        <FormDescription>
+                          Allow this team member to login to the platform
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {createAccessValue && (
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Initial Password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password" 
+                            placeholder="Minimum 8 characters" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          The team member will be able to change this after first login
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </>
+            )}
+            
             <FormField
               control={form.control}
               name="bio"
@@ -180,10 +275,16 @@ const AddTeamMemberDialog: React.FC<AddTeamMemberDialogProps> = ({
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
+                disabled={isCreatingUser}
               >
                 Cancel
               </Button>
-              <Button type="submit">Add Team Member</Button>
+              <Button 
+                type="submit"
+                disabled={isCreatingUser}
+              >
+                {isCreatingUser ? 'Creating User...' : 'Add Team Member'}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

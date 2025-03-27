@@ -9,4 +9,5 @@ export interface TeamMember {
   bio?: string;
   status: 'Active' | 'Pending' | 'Inactive';
   createdAt: string;
+  hasAccess?: boolean;
 }

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { TeamMember } from './types';
-import { MoreHorizontal, Pencil, Trash2, Mail, UserPlus } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Mail, UserPlus, Key } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,16 +15,24 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import EditTeamMemberDialog from './EditTeamMemberDialog';
 import DeleteTeamMemberDialog from './DeleteTeamMemberDialog';
+import CreateTeamAccessDialog from './CreateTeamAccessDialog';
 
 interface TeamMembersListProps {
   teamMembers: TeamMember[];
   onUpdate: (member: TeamMember) => void;
   onRemove: (id: string) => void;
+  isAdmin?: boolean;
 }
 
-const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate, onRemove }) => {
+const TeamMembersList: React.FC<TeamMembersListProps> = ({ 
+  teamMembers, 
+  onUpdate, 
+  onRemove,
+  isAdmin = false
+}) => {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
+  const [creatingAccessForMember, setCreatingAccessForMember] = useState<TeamMember | null>(null);
 
   const handleEdit = (member: TeamMember) => {
     setEditingMember(member);
@@ -32,6 +40,10 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
 
   const handleDelete = (member: TeamMember) => {
     setDeletingMember(member);
+  };
+
+  const handleCreateAccess = (member: TeamMember) => {
+    setCreatingAccessForMember(member);
   };
 
   const handleUpdate = (member: TeamMember) => {
@@ -87,6 +99,7 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
             <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Email</th>
             <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Role</th>
             <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Status</th>
+            <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Access</th>
             <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Actions</th>
           </tr>
         </thead>
@@ -118,6 +131,11 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
                   {member.status}
                 </Badge>
               </td>
+              <td className="py-3 px-4">
+                <Badge variant="outline" className={member.hasAccess ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"}>
+                  {member.hasAccess ? "Has Access" : "No Access"}
+                </Badge>
+              </td>
               <td className="py-3 px-4 text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -128,22 +146,36 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => handleEdit(member)}>
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => handleEdit(member)}>
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem>
                       <Mail className="h-4 w-4 mr-2" />
-                      Send Invite
+                      Send Message
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      className="text-destructive focus:text-destructive" 
-                      onClick={() => handleDelete(member)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Remove
-                    </DropdownMenuItem>
+                    
+                    {isAdmin && !member.hasAccess && (
+                      <DropdownMenuItem onClick={() => handleCreateAccess(member)}>
+                        <Key className="h-4 w-4 mr-2" />
+                        Create Access
+                      </DropdownMenuItem>
+                    )}
+                    
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className="text-destructive focus:text-destructive" 
+                          onClick={() => handleDelete(member)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Remove
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </td>
@@ -167,6 +199,18 @@ const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamMembers, onUpdate
         teamMember={deletingMember}
         onConfirm={onRemove}
       />
+
+      {creatingAccessForMember && (
+        <CreateTeamAccessDialog
+          open={!!creatingAccessForMember}
+          onOpenChange={() => setCreatingAccessForMember(null)}
+          teamMember={creatingAccessForMember}
+          onConfirm={(updatedMember) => {
+            onUpdate(updatedMember);
+            setCreatingAccessForMember(null);
+          }}
+        />
+      )}
     </div>
   );
 };

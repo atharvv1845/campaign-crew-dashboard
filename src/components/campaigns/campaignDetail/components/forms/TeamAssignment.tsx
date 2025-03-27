@@ -30,10 +30,12 @@ const TeamAssignment: React.FC<TeamAssignmentProps> = ({
   const storeTeamMembers = useTeamStore(state => state.teamMembers);
   
   // If options are explicitly provided, use those; otherwise, use team members from store
-  const options = providedOptions || storeTeamMembers.map(member => ({
-    value: member.id,
-    label: member.name
-  }));
+  const options = providedOptions || storeTeamMembers
+    .filter(member => member.status === 'Active') // Only show active members
+    .map(member => ({
+      value: member.id,
+      label: member.name
+    }));
 
   return (
     <div className="space-y-2">

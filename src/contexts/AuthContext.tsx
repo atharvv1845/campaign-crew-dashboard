@@ -4,14 +4,19 @@ import { supabase } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
 
+// Define available user roles
+export type UserRole = 'admin' | 'editor' | 'viewer';
+
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
   isInternalTeam: boolean;
+  userRole: UserRole | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  getUserRoleLabel: (role: UserRole) => string;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,8 +25,10 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAdmin: false,
   isInternalTeam: false,
+  userRole: null,
   signIn: async () => {},
   signOut: async () => {},
+  getUserRoleLabel: () => '',
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -32,7 +39,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isInternalTeam, setIsInternalTeam] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const { toast } = useToast();
+
+  // Helper function to get role label
+  const getUserRoleLabel = (role: UserRole): string => {
+    switch (role) {
+      case 'admin':
+        return 'Administrator';
+      case 'editor':
+        return 'Editor';
+      case 'viewer':
+        return 'Viewer';
+      default:
+        return 'Unknown Role';
+    }
+  };
+
+  // Function to fetch and set user role from database
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        setUserRole('viewer'); // Default to lowest access level
+        return;
+      }
+
+      if (data) {
+        setUserRole(data.role as UserRole);
+        setIsAdmin(data.role === 'admin');
+      } else {
+        setUserRole('viewer'); // Default role if not found
+      }
+    } catch (error) {
+      console.error('Error in fetchUserRole:', error);
+      setUserRole('viewer'); // Default to viewer role on error
+    }
+  };
 
   useEffect(() => {
     // Get initial session
@@ -43,11 +92,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (data.session?.user) {
           setUser(data.session.user);
-          checkUserRole(data.session.user);
+          checkUserEmail(data.session.user);
+          await fetchUserRole(data.session.user.id);
         } else {
           setUser(null);
           setIsAdmin(false);
           setIsInternalTeam(false);
+          setUserRole(null);
         }
       } catch (error) {
         console.error('Error getting initial session:', error);
@@ -66,11 +117,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (currentSession?.user) {
           setUser(currentSession.user);
-          checkUserRole(currentSession.user);
+          checkUserEmail(currentSession.user);
+          await fetchUserRole(currentSession.user.id);
         } else {
           setUser(null);
           setIsAdmin(false);
           setIsInternalTeam(false);
+          setUserRole(null);
         }
         
         setLoading(false);
@@ -82,8 +135,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Check user role from email
-  const checkUserRole = (user: User) => {
+  // Check user email for internal team status
+  const checkUserEmail = (user: User) => {
     if (!user) return;
     
     // Check if user is from internal team
@@ -92,10 +145,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
        user.email.endsWith('@leveragedgrowth.com'));
     
     setIsInternalTeam(isLeveragedGrowthEmail || false);
-    
-    // For now, consider all internal team members as admins
-    // In the future, this can be refined with specific role assignments
-    setIsAdmin(isLeveragedGrowthEmail || false);
   };
 
   const signIn = async (email: string, password: string) => {
@@ -108,7 +157,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       
       if (data.user) {
-        checkUserRole(data.user);
+        checkUserEmail(data.user);
+        await fetchUserRole(data.user.id);
         
         // Check if user is internal team
         const isLeveragedGrowthEmail = data.user.email && 
@@ -153,8 +203,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     isAdmin,
     isInternalTeam,
+    userRole,
     signIn,
     signOut,
+    getUserRoleLabel,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

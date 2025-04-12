@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, Search, LogOut, User } from 'lucide-react';
+import { Bell, Search, LogOut, User, Settings, UserCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from '@/components/ui/badge';
 
 interface TopBarProps {
   sidebarExpanded: boolean;
@@ -20,7 +21,7 @@ interface TopBarProps {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ sidebarExpanded, title }) => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, userRole, getUserRoleLabel } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,6 +35,20 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarExpanded, title }) => {
         description: error.message || "An error occurred while signing out.",
         variant: "destructive",
       });
+    }
+  };
+
+  // Get correct color for role badge
+  const getRoleBadgeColor = () => {
+    switch (userRole) {
+      case 'admin':
+        return 'bg-primary text-primary-foreground';
+      case 'editor':
+        return 'bg-blue-500 text-white';
+      case 'viewer':
+        return 'bg-gray-500 text-white';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -66,19 +81,37 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarExpanded, title }) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="rounded-full w-9 h-9 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors">
-              <User className="h-5 w-5" />
+              <UserCircle className="h-5 w-5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              {user?.email || 'My Account'}
-              {isAdmin && <span className="ml-2 text-xs text-primary">(Admin)</span>}
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user?.email}</p>
+                <div className="flex items-center mt-1">
+                  <Badge variant="outline" className={cn("h-5 text-xs font-normal", getRoleBadgeColor())}>
+                    {userRole && getUserRoleLabel(userRole)}
+                  </Badge>
+                </div>
+              </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-muted-foreground">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="text-muted-foreground">Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            {isAdmin && (
+              <DropdownMenuItem onClick={() => navigate('/team')} className="cursor-pointer">
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>Team Management</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

@@ -27,19 +27,59 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/*" element={
+            <Route path="/dashboard" element={
               <ProtectedRoute>
                 <MainLayout>
-                  <Routes>
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="campaigns" element={<Campaigns />} />
-                    <Route path="campaigns/:id" element={<CampaignDetail />} />
-                    <Route path="leads" element={<Leads />} />
-                    <Route path="messaging" element={<Messaging />} />
-                    <Route path="reports" element={<Reports />} />
-                    <Route path="team" element={<Team />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <Dashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/campaigns" element={
+              <ProtectedRoute requiredRole="editor">
+                <MainLayout>
+                  <Campaigns />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/campaigns/:id" element={
+              <ProtectedRoute requiredRole="editor">
+                <MainLayout>
+                  <CampaignDetail />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/leads" element={
+              <ProtectedRoute requiredRole="editor">
+                <MainLayout>
+                  <Leads />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/messaging" element={
+              <ProtectedRoute requiredRole="editor">
+                <MainLayout>
+                  <Messaging />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute requiredRole="viewer">
+                <MainLayout>
+                  <Reports />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/team" element={
+              <ProtectedRoute requiredRole="admin">
+                <MainLayout>
+                  <Team />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <NotFound />
                 </MainLayout>
               </ProtectedRoute>
             } />

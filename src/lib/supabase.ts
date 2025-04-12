@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
+import { UserRole } from '@/contexts/AuthContext';
 
 // Create Supabase client
 const supabaseUrl = 'https://iouuqypqvpicswzzcwpd.supabase.co';
@@ -30,6 +31,56 @@ export const signOut = async () => {
   if (error) throw error;
 };
 
+// User role management
+export const getUserRole = async (userId: string): Promise<UserRole | null> => {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single();
+  
+  if (error) {
+    console.error('Error fetching user role:', error);
+    return null;
+  }
+  
+  return data?.role as UserRole || null;
+};
+
+export const setUserRole = async (userId: string, role: UserRole): Promise<boolean> => {
+  // Check if user role already exists
+  const { data: existingRole } = await supabase
+    .from('user_roles')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+  
+  if (existingRole) {
+    // Update existing role
+    const { error } = await supabase
+      .from('user_roles')
+      .update({ role })
+      .eq('user_id', userId);
+    
+    if (error) {
+      console.error('Error updating user role:', error);
+      return false;
+    }
+  } else {
+    // Create new role
+    const { error } = await supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role });
+    
+    if (error) {
+      console.error('Error creating user role:', error);
+      return false;
+    }
+  }
+  
+  return true;
+};
+
 // Data functions
 export const fetchData = async (table: string) => {
   const { data, error } = await supabase.from(table).select('*');
@@ -57,4 +108,57 @@ export const deleteData = async (table: string, id: string) => {
   const { error } = await supabase.from(table).delete().eq('id', id);
   if (error) throw error;
   return true;
+};
+
+// Team management functions
+export interface UserData {
+  id: string;
+  email: string;
+  role: UserRole;
+  name?: string;
+  avatar_url?: string;
+  created_at: string;
+}
+
+export const getAllTeamMembers = async (): Promise<UserData[]> => {
+  // Get all users from auth.users through RLS policies (requires admin role)
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select(`
+      user_id,
+      role,
+      users:user_id (
+        email,
+        created_at
+      )
+    `);
+  
+  if (error) {
+    console.error('Error fetching team members:', error);
+    return [];
+  }
+  
+  return data.map((item: any) => ({
+    id: item.user_id,
+    email: item.users.email,
+    role: item.role,
+    created_at: item.users.created_at,
+  }));
+};
+
+export const inviteTeamMember = async (email: string, role: UserRole = 'viewer'): Promise<boolean> => {
+  try {
+    // This is just a placeholder - in a real implementation, you'd use Supabase's invite functionality
+    // or send a custom invitation email with a signup link
+    const { data, error } = await supabase.functions.invoke('invite-team-member', {
+      body: { email, role }
+    });
+    
+    if (error) throw error;
+    
+    return true;
+  } catch (error) {
+    console.error('Error inviting team member:', error);
+    return false;
+  }
 };

@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, Mail, Key, Lock } from 'lucide-react';
+import { LogIn, Mail, Key, Lock, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const loginSchema = z.object({
@@ -128,10 +128,16 @@ const Login = () => {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <div className="flex items-center justify-center space-x-2 text-sm">
-            <Lock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Internal team access only</span>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="flex flex-col items-center justify-center space-y-2 text-sm">
+            <div className="flex items-center space-x-2">
+              <Lock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Internal team access only</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Multiple user roles supported</span>
+            </div>
           </div>
         </CardFooter>
       </Card>

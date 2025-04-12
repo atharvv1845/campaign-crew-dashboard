@@ -11,8 +11,28 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
+  },
+  global: {
+    fetch: (url, options) => {
+      const customOptions = {
+        ...options,
+        timeout: 30000,
+      };
+      return fetch(url, customOptions);
+    }
   }
 });
+
+// Helper for common network error detection
+const isNetworkError = (error: any): boolean => {
+  return (
+    error?.message === 'Failed to fetch' ||
+    error?.message?.includes('NetworkError') ||
+    error?.message?.includes('network') ||
+    error?.name === 'AbortError' ||
+    error?.code === 'NETWORK_ERROR'
+  );
+};
 
 // Auth functions
 export const signIn = async (email: string, password: string) => {
@@ -30,6 +50,12 @@ export const signIn = async (email: string, password: string) => {
     return data;
   } catch (error) {
     console.error('Sign in exception:', error);
+    
+    if (isNetworkError(error)) {
+      console.log('Network appears to be offline or unreachable');
+      throw new Error('Failed to connect to authentication service. Please check your internet connection and try again.');
+    }
+    
     throw error;
   }
 };
@@ -50,22 +76,31 @@ export const signOut = async () => {
 
 // User role management
 export const getUserRole = async (userId: string): Promise<UserRole | null> => {
-  const { data, error } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', userId)
-    .single();
-  
-  if (error) {
-    console.error('Error fetching user role:', error);
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+    
+    return data?.role as UserRole || null;
+  } catch (error) {
+    console.error('Exception in getUserRole:', error);
+    
+    if (isNetworkError(error)) {
+      throw error;
+    }
+    
     return null;
   }
-  
-  return data?.role as UserRole || null;
 };
 
 export const setUserRole = async (userId: string, role: UserRole): Promise<boolean> => {
-  // Check if user role already exists
   const { data: existingRole } = await supabase
     .from('user_roles')
     .select('*')
@@ -73,7 +108,6 @@ export const setUserRole = async (userId: string, role: UserRole): Promise<boole
     .single();
   
   if (existingRole) {
-    // Update existing role
     const { error } = await supabase
       .from('user_roles')
       .update({ role })
@@ -84,7 +118,6 @@ export const setUserRole = async (userId: string, role: UserRole): Promise<boole
       return false;
     }
   } else {
-    // Create new role
     const { error } = await supabase
       .from('user_roles')
       .insert({ user_id: userId, role });
@@ -164,7 +197,6 @@ export const getAllTeamMembers = async (): Promise<UserData[]> => {
 
 export const createAdminUser = async (email: string, password: string): Promise<boolean> => {
   try {
-    // Create user in Supabase Auth
     const { data: userData, error: userError } = await supabase.auth.admin.createUser({
       email: email,
       password: password,
@@ -176,7 +208,6 @@ export const createAdminUser = async (email: string, password: string): Promise<
       return false;
     }
     
-    // Set admin role if user was created successfully
     if (userData.user) {
       const success = await setUserRole(userData.user.id, 'admin');
       if (!success) {
@@ -197,20 +228,17 @@ export const createAdminUser = async (email: string, password: string): Promise<
 
 export const inviteTeamMember = async (email: string, role: UserRole = 'viewer'): Promise<boolean> => {
   try {
-    // Ensure specific emails get admin role
     const adminEmails = [
       'atharv@leveragedgrowth.co', 
       'sikander@leveragedgrowth.co'
     ];
     
-    // Check if email should be an admin
     if (adminEmails.includes(email.toLowerCase()) || email.toLowerCase().includes('sikander')) {
       role = 'admin';
       console.log(`Setting admin role for ${email}`);
     }
     
-    // Create user with password in Supabase
-    const password = 'TemporaryPassword123!'; // In a real app, this would be randomly generated
+    const password = 'TemporaryPassword123!';
     const { data: userData, error: userError } = await supabase.auth.admin.createUser({
       email: email,
       password: password,
@@ -219,14 +247,9 @@ export const inviteTeamMember = async (email: string, role: UserRole = 'viewer')
     
     if (userError) throw userError;
     
-    // Set the user role if user was created successfully
     if (userData.user) {
       await setUserRole(userData.user.id, role);
       
-      // This would be where you'd send an email with the invite in a real app
-      // For now, we'll just return success
-      
-      // Create a simulated invite function call
       const { data, error } = await supabase.functions.invoke('invite-team-member', {
         body: { email, role, temporaryPassword: password }
       });
@@ -243,7 +266,7 @@ export const inviteTeamMember = async (email: string, role: UserRole = 'viewer')
   }
 };
 
-// Modified initializeAdminUsers to make it more robust with error handling
+// Modified initializeAdminUsers to make it more robust with error handling and retries
 export const initializeAdminUsers = async () => {
   console.log('Initializing admin users...');
   
@@ -252,11 +275,12 @@ export const initializeAdminUsers = async () => {
     { email: 'sikander@leveragedgrowth.co', password: 'leveragedgrowth123' }
   ];
   
+  let hasNetworkError = false;
+  
   for (const user of adminUsers) {
     try {
       console.log(`Setting up admin user: ${user.email}`);
       
-      // First try to sign in to see if user exists
       try {
         const { data } = await supabase.auth.signInWithPassword({
           email: user.email,
@@ -264,25 +288,39 @@ export const initializeAdminUsers = async () => {
         });
         
         if (data.user) {
-          // User exists, ensure they have admin role
           console.log(`User ${user.email} exists, ensuring admin role`);
           await setUserRole(data.user.id, 'admin');
           console.log(`Ensured admin role for: ${user.email}`);
         }
-      } catch (signInError) {
+      } catch (signInError: any) {
+        if (isNetworkError(signInError)) {
+          console.error(`Network error while checking ${user.email}:`, signInError);
+          hasNetworkError = true;
+          continue;
+        }
+        
         console.log(`User ${user.email} doesn't exist or credentials are wrong, creating...`);
         
-        // Create the admin user
         try {
           await createAdminUser(user.email, user.password);
           console.log(`Created admin user: ${user.email}`);
-        } catch (createError) {
+        } catch (createError: any) {
+          if (isNetworkError(createError)) {
+            hasNetworkError = true;
+          }
           console.error(`Failed to create admin user ${user.email}:`, createError);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (isNetworkError(error)) {
+        hasNetworkError = true;
+      }
       console.error(`Error setting up admin user ${user.email}:`, error);
     }
+  }
+  
+  if (hasNetworkError) {
+    throw new Error('Failed to fetch');
   }
   
   console.log('Admin user initialization completed');

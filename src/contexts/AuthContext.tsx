@@ -14,6 +14,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isInternalTeam: boolean;
   userRole: UserRole | null;
+  isOffline: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   getUserRoleLabel: (role: UserRole) => string;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   isInternalTeam: false,
   userRole: null,
+  isOffline: false,
   signIn: async () => {},
   signOut: async () => {},
   getUserRoleLabel: () => '',
@@ -40,6 +42,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [isInternalTeam, setIsInternalTeam] = useState(false);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const { toast } = useToast();
 
   // Helper function to get role label
@@ -72,9 +76,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error('Error in fetchUserRole:', error);
+      
+      // Check if it's a network error
+      if (error instanceof Error && 
+          (error.message === 'Failed to fetch' || 
+           error.message.includes('NetworkError') || 
+           error.message.includes('network'))) {
+        setIsOffline(true);
+      }
+      
       setUserRole('viewer'); // Default to viewer role on error
     }
   };
+
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('Connection restored');
+      setIsOffline(false);
+      
+      // If user exists, refresh their role
+      if (user) {
+        fetchUserRole(user.id);
+      }
+      
+      toast({
+        title: "Connection Restored",
+        description: "You're back online.",
+      });
+    };
+    
+    const handleOffline = () => {
+      console.log('Connection lost');
+      setIsOffline(true);
+      
+      toast({
+        title: "Connection Lost",
+        description: "You're currently offline. Some features may not work.",
+        variant: "destructive"
+      });
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    // Set initial offline status
+    setIsOffline(!navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [toast, user]);
 
   useEffect(() => {
     console.log('Auth provider initialized');
@@ -98,8 +151,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsInternalTeam(false);
           setUserRole(null);
         }
+        
+        // Reset retry count on success
+        setRetryCount(0);
+        setIsOffline(false);
       } catch (error) {
         console.error('Error getting initial session:', error);
+        
+        // Check if it's a network error
+        if (error instanceof Error && 
+            (error.message === 'Failed to fetch' || 
+             error.message.includes('NetworkError') || 
+             error.message.includes('network'))) {
+          
+          setIsOffline(true);
+          
+          // Retry with increasing delay if we're offline
+          if (retryCount < 5) {
+            const delayMs = Math.min(1000 * Math.pow(2, retryCount), 30000); // Exponential backoff with 30s max
+            console.log(`Retrying session in ${delayMs}ms (attempt ${retryCount + 1})`);
+            
+            setTimeout(() => {
+              setRetryCount(prev => prev + 1);
+              getInitialSession();
+            }, delayMs);
+          }
+        }
       } finally {
         setLoading(false);
       }
@@ -134,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Cleaning up auth listener');
       authListener?.subscription?.unsubscribe();
     };
-  }, []);
+  }, [retryCount]);
 
   // Check user email for internal team status
   const checkUserEmail = (user: User) => {
@@ -152,6 +229,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Auth context: Signing in user:', email);
+      
+      // Validate offline status first
+      if (isOffline) {
+        throw new Error('You are currently offline. Please check your internet connection and try again.');
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -159,6 +242,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Auth context: Sign in error:', error);
+        
+        // Detect network errors
+        if (error.message === 'Failed to fetch') {
+          setIsOffline(true);
+          throw new Error('Network connection error. Please check your internet connection and try again.');
+        }
+        
         throw error;
       }
       
@@ -186,6 +276,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error: any) {
       console.error('Auth context: Sign in error:', error);
+      
+      // Set offline state based on error message
+      if (error.message === 'Failed to fetch' || 
+          error.message.includes('Network connection error')) {
+        setIsOffline(true);
+      }
+      
       throw error;
     }
   };
@@ -193,6 +290,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       console.log('Auth context: Signing out user');
+      
+      // If we're offline, just clear the local session
+      if (isOffline) {
+        setUser(null);
+        setSession(null);
+        setIsAdmin(false);
+        setIsInternalTeam(false);
+        setUserRole(null);
+        
+        toast({
+          title: "Signed out (offline mode)",
+          description: "You have been signed out locally. Some data may re-appear when your connection is restored.",
+        });
+        
+        return;
+      }
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -202,7 +316,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } catch (error: any) {
       console.error('Auth context: Sign out error:', error);
-      throw error;
+      
+      // Handle network errors during sign out
+      if (error.message === 'Failed to fetch') {
+        setIsOffline(true);
+        toast({
+          title: "Offline Sign Out",
+          description: "Signed out locally. Full sign out will occur when connection is restored.",
+          variant: "destructive"
+        });
+      } else {
+        throw error;
+      }
     }
   };
 
@@ -213,6 +338,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin,
     isInternalTeam,
     userRole,
+    isOffline,
     signIn,
     signOut,
     getUserRoleLabel,

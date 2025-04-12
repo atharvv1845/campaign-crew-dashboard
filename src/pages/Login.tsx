@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, Mail, Key, Lock, Users, AlertCircle } from 'lucide-react';
+import { LogIn, Mail, Key, Lock, Users, AlertCircle, WifiOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const loginSchema = z.object({
   email: z.string().email({
@@ -26,9 +27,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [networkError, setNetworkError] = useState(false);
+  const [retryAttempts, setRetryAttempts] = useState(0);
+  const [lastError, setLastError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signIn } = useAuth();
+  const { signIn, isOffline } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -38,20 +41,56 @@ const Login = () => {
     }
   });
 
+  // Check network state on mount and when isOffline changes
+  useEffect(() => {
+    setNetworkError(isOffline || !navigator.onLine);
+  }, [isOffline]);
+
+  // Listen for online status changes
+  useEffect(() => {
+    const handleOnline = () => setNetworkError(false);
+    const handleOffline = () => setNetworkError(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    setNetworkError(false);
+    
+    // Check offline status before attempting login
+    if (networkError) {
+      toast({
+        title: "Network error",
+        description: "Unable to connect to the authentication service. Please check your internet connection.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
     
     try {
       console.log('Attempting to sign in with:', data.email);
       await signIn(data.email, data.password);
+      setLastError(null);
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
+      setLastError(error.message || "Unknown error occurred");
       
       // Check if it's a network error
-      if (error.message === 'Failed to fetch') {
+      if (error.message === 'Failed to fetch' || 
+          error.message.includes('Network') || 
+          error.message.includes('network')) {
+        
         setNetworkError(true);
+        setRetryAttempts(prev => prev + 1);
+        
         toast({
           title: "Network error",
           description: "Unable to connect to the authentication service. Please check your internet connection.",
@@ -80,13 +119,27 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           {networkError && (
-            <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded flex items-start space-x-2">
-              <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium">Connection error</p>
-                <p className="text-sm">Unable to connect to the authentication service. This could be due to network issues.</p>
-              </div>
-            </div>
+            <Alert variant="destructive" className="mb-4">
+              <WifiOff className="h-5 w-5 mr-2" />
+              <AlertTitle>Connection error</AlertTitle>
+              <AlertDescription className="mt-1">
+                <p>Unable to connect to the authentication service. This could be due to:</p>
+                <ul className="list-disc list-inside mt-2">
+                  <li>Network connectivity issues</li>
+                  <li>Temporary server downtime</li>
+                  <li>Firewall or VPN restrictions</li>
+                </ul>
+                <p className="mt-2">Please check your internet connection and try again.</p>
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {lastError && !networkError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-5 w-5 mr-2" />
+              <AlertTitle>Authentication Error</AlertTitle>
+              <AlertDescription>{lastError}</AlertDescription>
+            </Alert>
           )}
           
           <Form {...form}>
@@ -134,7 +187,11 @@ const Login = () => {
                   </FormItem>
                 )} 
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading || networkError}
+              >
                 {isLoading ? (
                   <span className="flex items-center justify-center">
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -142,6 +199,11 @@ const Login = () => {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Signing in...
+                  </span>
+                ) : networkError ? (
+                  <span className="flex items-center justify-center">
+                    <WifiOff className="mr-2 h-4 w-4" />
+                    Offline
                   </span>
                 ) : (
                   <span className="flex items-center justify-center">

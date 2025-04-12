@@ -3,7 +3,6 @@ import React from 'react';
 import { Bell, Search, LogOut, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { signOut } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,17 +20,13 @@ interface TopBarProps {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ sidebarExpanded, title }) => {
-  const { user } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been signed out successfully.",
-      });
       navigate('/login');
     } catch (error: any) {
       toast({
@@ -77,6 +72,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarExpanded, title }) => {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
               {user?.email || 'My Account'}
+              {isAdmin && <span className="ml-2 text-xs text-primary">(Admin)</span>}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-muted-foreground">Profile</DropdownMenuItem>

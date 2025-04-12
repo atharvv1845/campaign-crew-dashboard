@@ -1,3 +1,4 @@
+
 // Global TypeScript definitions to fix build errors
 
 // Add missing type definitions or property compatibilities
@@ -15,6 +16,27 @@ declare module '@/components/campaigns/campaignDetail/leads/types' {
 
     // Add missing properties that are being referenced
     tags?: string[];
+    
+    // Add social profiles and contact methods
+    socialProfiles?: {
+      linkedin?: string;
+      twitter?: string;
+      facebook?: string;
+      instagram?: string;
+    };
+    contactMethods?: {
+      email?: string;
+      phone?: string;
+      whatsapp?: string;
+    };
+    contactPlatforms?: string[];
+    company?: string;
+    title?: string;
+    name?: string;
+    contacted?: boolean;
+    notes?: string;
+    assignedTo?: string;
+    assignedTeamMember?: string;
   }
 }
 
@@ -27,7 +49,7 @@ declare module '@/components/campaigns/types/campaignTypes' {
     contactPlatforms?: string[];
   }
 
-  // Fix LeadData to make properties optional
+  // Fix LeadData to make properties optional and add missing properties
   interface LeadData {
     id?: string | number;
     firstName?: string;
@@ -36,7 +58,29 @@ declare module '@/components/campaigns/types/campaignTypes' {
     email?: string;
     status?: string;
     campaignId?: string | number;
-    // Other optional fields
+    campaign?: string;
+    currentStage?: string;
+    phone?: string;
+    company?: string;
+    title?: string;
+    lastContact?: Date | string;
+    lastContacted?: Date | string;
+    nextFollowUpDate?: Date | string;
+    followUpDate?: Date | string;
+    firstContactDate?: Date | string;
+    assignedTo?: string;
+    assignedTeamMember?: string;
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    whatsapp?: string;
+    notes?: string;
+    socialProfiles?: Record<string, string>;
+    contactMethods?: Record<string, string>;
+    contacted?: boolean;
+    contactPlatforms?: string[];
+    tags?: string[];
   }
 }
 
@@ -50,7 +94,29 @@ declare module '@/components/campaigns/wizardSteps/LeadImport/hooks/types' {
     email?: string;
     status?: string;
     campaignId?: string | number;
-    // Add other optional fields
+    campaign?: string;
+    currentStage?: string;
+    phone?: string;
+    company?: string;
+    title?: string;
+    lastContact?: Date | string;
+    lastContacted?: Date | string;
+    nextFollowUpDate?: Date | string;
+    followUpDate?: Date | string;
+    firstContactDate?: Date | string;
+    assignedTo?: string;
+    assignedTeamMember?: string;
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    whatsapp?: string;
+    notes?: string;
+    socialProfiles?: Record<string, string>;
+    contactMethods?: Record<string, string>;
+    contacted?: boolean;
+    contactPlatforms?: string[];
+    tags?: string[];
   }
   
   interface CsvParseResult {
@@ -60,3 +126,4 @@ declare module '@/components/campaigns/wizardSteps/LeadImport/hooks/types' {
     initialMapping: Record<string, string>;
   }
 }
+

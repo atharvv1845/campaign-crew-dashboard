@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, Mail, Key, Lock, Users, AlertCircle } from 'lucide-react';
+import { LogIn, Mail, Key, Lock, Users, AlertCircle, WifiOff, RefreshCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { NetworkStatus } from '@/components/ui/network-status';
@@ -45,7 +45,48 @@ const Login = () => {
 
   // Check network state on mount and when isOffline changes
   useEffect(() => {
-    setNetworkError(isOffline || !navigator.onLine);
+    // Check network status during component mount
+    const isCurrentlyOffline = !navigator.onLine;
+    console.log('Current network status:', isCurrentlyOffline ? 'offline' : 'online');
+    setNetworkError(isOffline || isCurrentlyOffline);
+    
+    // Event listeners for online/offline status
+    const handleOnline = () => {
+      console.log('Connection restored');
+      setNetworkError(false);
+      setLastError(null);
+    };
+    
+    const handleOffline = () => {
+      console.log('Connection lost');
+      setNetworkError(true);
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    // Check again via fetch
+    const checkNetworkConnection = async () => {
+      try {
+        await fetch('https://www.google.com/favicon.ico', { 
+          mode: 'no-cors',
+          cache: 'no-cache',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        // If we get here, we're online
+        setNetworkError(false);
+      } catch (error) {
+        console.log('Network check failed:', error);
+        setNetworkError(true);
+      }
+    };
+    
+    checkNetworkConnection();
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, [isOffline]);
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -69,12 +110,12 @@ const Login = () => {
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
-      setLastError(error.message || "Unknown error occurred");
       
       // Check if it's a network error
       if (isNetworkError(error)) {
         setNetworkError(true);
         setRetryAttempts(prev => prev + 1);
+        setLastError("Network connection error. Please check your internet connection and try again.");
         
         toast({
           title: "Network error",
@@ -82,6 +123,8 @@ const Login = () => {
           variant: "destructive"
         });
       } else {
+        setLastError(error.message || "Unknown error occurred");
+        
         toast({
           title: "Login failed",
           description: error.message || "Please check your credentials and try again.",
@@ -93,9 +136,41 @@ const Login = () => {
     }
   };
 
-  const handleConnectionRetry = () => {
-    setNetworkError(false);
-    setLastError(null);
+  const handleConnectionRetry = async () => {
+    try {
+      setIsLoading(true);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      await fetch('https://www.google.com/favicon.ico', { 
+        mode: 'no-cors',
+        signal: controller.signal,
+        cache: 'no-cache',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+      
+      clearTimeout(timeoutId);
+      
+      // If we get here, the fetch succeeded
+      setNetworkError(false);
+      setLastError(null);
+      
+      toast({
+        title: "Connection check",
+        description: "Internet connection appears to be working. You can try signing in now.",
+      });
+    } catch (error) {
+      console.error('Connection retry failed:', error);
+      
+      toast({
+        title: "Still offline",
+        description: "Internet connection isn't available. Please check your network settings.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -110,10 +185,38 @@ const Login = () => {
         <CardContent>
           {networkError && (
             <div className="mb-4">
-              <NetworkStatus 
-                onRetry={handleConnectionRetry} 
-                isAuthentication={true}
-              />
+              <Alert variant="destructive">
+                <WifiOff className="h-4 w-4 mr-2" />
+                <AlertTitle>Connection Issue</AlertTitle>
+                <AlertDescription className="mt-1">
+                  <p>Unable to connect to the authentication service. This could be due to:</p>
+                  <ul className="list-disc list-inside mt-2">
+                    <li>Network connectivity issues</li>
+                    <li>Temporary server downtime</li>
+                    <li>Firewall or VPN restrictions</li>
+                  </ul>
+                  <div className="mt-3 flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleConnectionRetry}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <RefreshCcw className="h-4 w-4 mr-2 animate-spin" />
+                          Checking...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCcw className="h-4 w-4 mr-2" />
+                          Check Connection
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
             </div>
           )}
           

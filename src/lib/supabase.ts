@@ -1,7 +1,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { UserRole } from '@/contexts/AuthContext';
-import { isNetworkError } from '@/lib/network-utils';
+import { isNetworkError, getBackoffDelay } from '@/lib/network-utils';
 
 // Create Supabase client with correct configuration
 const supabaseUrl = 'https://iouuqypqvpicswzzcwpd.supabase.co';
@@ -29,14 +29,25 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 export const signIn = async (email: string, password: string) => {
   try {
     console.log(`Attempting to sign in with email: ${email}`);
+    
+    // First check if we're online before attempting to sign in
+    if (!navigator.onLine) {
+      throw new Error('Network connection error. Please check your internet connection and try again.');
+    }
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
     if (error) {
       console.error('Sign in error:', error);
+      if (isNetworkError(error)) {
+        throw new Error('Network connection error. Please check your internet connection and try again.');
+      }
       throw error;
     }
+    
     console.log('Sign in successful:', data);
     return data;
   } catch (error) {
@@ -44,7 +55,7 @@ export const signIn = async (email: string, password: string) => {
     
     if (isNetworkError(error)) {
       console.log('Network appears to be offline or unreachable');
-      throw new Error('Failed to connect to authentication service. Please check your internet connection and try again.');
+      throw new Error('Network connection error. Please check your internet connection and try again.');
     }
     
     throw error;
@@ -260,6 +271,11 @@ export const inviteTeamMember = async (email: string, role: UserRole = 'viewer')
 // Modified initializeAdminUsers to make it more robust with error handling and retries
 export const initializeAdminUsers = async () => {
   console.log('Initializing admin users...');
+  
+  // Check if we're online before attempting initialization
+  if (!navigator.onLine) {
+    throw new Error('Failed to fetch');
+  }
   
   const adminUsers = [
     { email: 'atharv@leveragedgrowth.co', password: 'leveragedgrowth123' },

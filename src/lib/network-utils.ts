@@ -9,12 +9,16 @@
  * @returns True if the error appears to be network related
  */
 export const isNetworkError = (error: any): boolean => {
+  if (!error) return false;
+  
   return (
     error?.message === 'Failed to fetch' ||
     error?.message?.includes('NetworkError') ||
     error?.message?.includes('network') ||
+    error?.message?.includes('Network') ||
     error?.name === 'AbortError' ||
-    error?.code === 'NETWORK_ERROR'
+    error?.code === 'NETWORK_ERROR' ||
+    error instanceof TypeError && error.message === 'Failed to fetch'
   );
 };
 
@@ -39,4 +43,29 @@ export const getBackoffDelay = (
   maxDelayMs = 30000
 ): number => {
   return Math.min(baseDelayMs * Math.pow(2, retryCount), maxDelayMs);
+};
+
+/**
+ * Checks connectivity by making a fetch request to a reliable endpoint
+ * @param timeoutMs Timeout in milliseconds
+ * @returns Promise that resolves to a boolean indicating if connection is available
+ */
+export const checkConnectivity = async (timeoutMs = 5000): Promise<boolean> => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
+    await fetch('https://www.google.com/favicon.ico', { 
+      mode: 'no-cors',
+      signal: controller.signal,
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+    
+    clearTimeout(timeoutId);
+    return true;
+  } catch (error) {
+    console.error('Connectivity check failed:', error);
+    return false;
+  }
 };

@@ -1,19 +1,37 @@
 import { createClient } from '@supabase/supabase-js';
 import { UserRole } from '@/contexts/AuthContext';
 
-// Create Supabase client
+// Create Supabase client with correct configuration
 const supabaseUrl = 'https://iouuqypqvpicswzzcwpd.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvdXVxeXBxdnBpY3N3enpjd3BkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwNjAzNTksImV4cCI6MjA1NzYzNjM1OX0.2LN6JCsaD4gMb8AuYezBD7wF4Pif_LZZ0PbFnttSvdw';
-export const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Create client with proper options
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
 // Auth functions
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  if (error) throw error;
-  return data;
+  try {
+    console.log(`Attempting to sign in with email: ${email}`);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      console.error('Sign in error:', error);
+      throw error;
+    }
+    console.log('Sign in successful:', data);
+    return data;
+  } catch (error) {
+    console.error('Sign in exception:', error);
+    throw error;
+  }
 };
 
 export const signUp = async (email: string, password: string) => {
@@ -225,7 +243,10 @@ export const inviteTeamMember = async (email: string, role: UserRole = 'viewer')
   }
 };
 
+// Modified initializeAdminUsers to make it more robust with error handling
 export const initializeAdminUsers = async () => {
+  console.log('Initializing admin users...');
+  
   const adminUsers = [
     { email: 'atharv@leveragedgrowth.co', password: 'leveragedgrowth123' },
     { email: 'sikander@leveragedgrowth.co', password: 'leveragedgrowth123' }
@@ -233,25 +254,36 @@ export const initializeAdminUsers = async () => {
   
   for (const user of adminUsers) {
     try {
-      // Check if user already exists
-      const { data } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: user.password,
-      });
+      console.log(`Setting up admin user: ${user.email}`);
       
-      if (!data.user) {
-        // User doesn't exist, create them
-        await createAdminUser(user.email, user.password);
-        console.log(`Created admin user: ${user.email}`);
-      } else {
-        // Ensure they have admin role
-        await setUserRole(data.user.id, 'admin');
-        console.log(`Ensured admin role for existing user: ${user.email}`);
+      // First try to sign in to see if user exists
+      try {
+        const { data } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: user.password,
+        });
+        
+        if (data.user) {
+          // User exists, ensure they have admin role
+          console.log(`User ${user.email} exists, ensuring admin role`);
+          await setUserRole(data.user.id, 'admin');
+          console.log(`Ensured admin role for: ${user.email}`);
+        }
+      } catch (signInError) {
+        console.log(`User ${user.email} doesn't exist or credentials are wrong, creating...`);
+        
+        // Create the admin user
+        try {
+          await createAdminUser(user.email, user.password);
+          console.log(`Created admin user: ${user.email}`);
+        } catch (createError) {
+          console.error(`Failed to create admin user ${user.email}:`, createError);
+        }
       }
     } catch (error) {
-      // User doesn't exist or other error
-      await createAdminUser(user.email, user.password);
-      console.log(`Created admin user after error check: ${user.email}`);
+      console.error(`Error setting up admin user ${user.email}:`, error);
     }
   }
+  
+  console.log('Admin user initialization completed');
 };

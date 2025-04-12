@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, Mail, Key, Lock, Users } from 'lucide-react';
+import { LogIn, Mail, Key, Lock, Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const loginSchema = z.object({
@@ -25,6 +25,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signIn } = useAuth();
@@ -39,16 +40,30 @@ const Login = () => {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
+    setNetworkError(false);
+    
     try {
+      console.log('Attempting to sign in with:', data.email);
       await signIn(data.email, data.password);
       navigate('/dashboard');
     } catch (error: any) {
-      console.error(error);
-      toast({
-        title: "Login failed",
-        description: error.message || "Please check your credentials and try again.",
-        variant: "destructive"
-      });
+      console.error('Login error:', error);
+      
+      // Check if it's a network error
+      if (error.message === 'Failed to fetch') {
+        setNetworkError(true);
+        toast({
+          title: "Network error",
+          description: "Unable to connect to the authentication service. Please check your internet connection.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Login failed",
+          description: error.message || "Please check your credentials and try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +79,16 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {networkError && (
+            <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded flex items-start space-x-2">
+              <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">Connection error</p>
+                <p className="text-sm">Unable to connect to the authentication service. This could be due to network issues.</p>
+              </div>
+            </div>
+          )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField 
@@ -125,6 +150,22 @@ const Login = () => {
                   </span>
                 )}
               </Button>
+              
+              {networkError && (
+                <div className="pt-2">
+                  <p className="text-sm text-center text-muted-foreground">
+                    Test credentials (when service is available):
+                  </p>
+                  <div className="mt-1 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                    <div className="p-2 bg-muted rounded">
+                      <span className="font-medium">Email:</span> atharv@leveragedgrowth.co
+                    </div>
+                    <div className="p-2 bg-muted rounded">
+                      <span className="font-medium">Password:</span> leveragedgrowth123
+                    </div>
+                  </div>
+                </div>
+              )}
             </form>
           </Form>
         </CardContent>

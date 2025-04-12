@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, getUserRole } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
 
@@ -59,22 +59,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Function to fetch and set user role from database
   const fetchUserRole = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user role:', error);
-        setUserRole('viewer'); // Default to lowest access level
-        return;
-      }
-
-      if (data) {
-        setUserRole(data.role as UserRole);
-        setIsAdmin(data.role === 'admin');
+      console.log('Fetching user role for:', userId);
+      const role = await getUserRole(userId);
+      
+      if (role) {
+        console.log('User role found:', role);
+        setUserRole(role);
+        setIsAdmin(role === 'admin');
       } else {
+        console.log('No role found, defaulting to viewer');
         setUserRole('viewer'); // Default role if not found
       }
     } catch (error) {
@@ -84,17 +77,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    console.log('Auth provider initialized');
+    
     // Get initial session
     const getInitialSession = async () => {
       try {
+        console.log('Getting initial session');
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
         
         if (data.session?.user) {
+          console.log('User found in session:', data.session.user.email);
           setUser(data.session.user);
           checkUserEmail(data.session.user);
           await fetchUserRole(data.session.user.id);
         } else {
+          console.log('No user in session');
           setUser(null);
           setIsAdmin(false);
           setIsInternalTeam(false);
@@ -116,10 +114,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(currentSession);
         
         if (currentSession?.user) {
+          console.log('User in auth change:', currentSession.user.email);
           setUser(currentSession.user);
           checkUserEmail(currentSession.user);
           await fetchUserRole(currentSession.user.id);
         } else {
+          console.log('No user in auth change');
           setUser(null);
           setIsAdmin(false);
           setIsInternalTeam(false);
@@ -131,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     return () => {
+      console.log('Cleaning up auth listener');
       authListener?.subscription?.unsubscribe();
     };
   }, []);
@@ -144,19 +145,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (user.email.endsWith('@leveragedgrowth.co') || 
        user.email.endsWith('@leveragedgrowth.com'));
     
+    console.log('Internal team check:', isLeveragedGrowthEmail);
     setIsInternalTeam(isLeveragedGrowthEmail || false);
   };
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Auth context: Signing in user:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Auth context: Sign in error:', error);
+        throw error;
+      }
       
       if (data.user) {
+        console.log('Auth context: Sign in successful:', data.user.email);
         checkUserEmail(data.user);
         await fetchUserRole(data.user.id);
         
@@ -167,6 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (!isLeveragedGrowthEmail) {
           // Sign out if not from internal team
+          console.log('Auth context: Not internal team, signing out');
           await supabase.auth.signOut();
           throw new Error('Access restricted to Leveraged Growth team members only');
         }
@@ -177,13 +185,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     } catch (error: any) {
-      console.error('Sign in error:', error);
+      console.error('Auth context: Sign in error:', error);
       throw error;
     }
   };
 
   const signOut = async () => {
     try {
+      console.log('Auth context: Signing out user');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -192,7 +201,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "You have been signed out successfully.",
       });
     } catch (error: any) {
-      console.error('Sign out error:', error);
+      console.error('Auth context: Sign out error:', error);
       throw error;
     }
   };

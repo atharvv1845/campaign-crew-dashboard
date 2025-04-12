@@ -4,6 +4,7 @@ import { initializeAdminUsers } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { isNetworkError } from '@/lib/network-utils';
 
 export const AdminInitializer = () => {
   const [initialized, setInitialized] = useState(false);
@@ -35,12 +36,7 @@ export const AdminInitializer = () => {
         console.error('AdminInitializer: Error initializing admin users:', error);
         
         // Check if it's a network error
-        if (error instanceof Error && 
-            (error.message === 'Failed to fetch' || 
-             error.message.includes('NetworkError') || 
-             error.message.includes('network') || 
-             error.name === 'AbortError')) {
-          
+        if (isNetworkError(error)) {
           setNetworkError(true);
           toast({
             title: 'Network Connection Issue',

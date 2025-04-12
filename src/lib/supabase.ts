@@ -1,5 +1,7 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { UserRole } from '@/contexts/AuthContext';
+import { isNetworkError } from '@/lib/network-utils';
 
 // Create Supabase client with correct configuration
 const supabaseUrl = 'https://iouuqypqvpicswzzcwpd.supabase.co';
@@ -22,17 +24,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     }
   }
 });
-
-// Helper for common network error detection
-const isNetworkError = (error: any): boolean => {
-  return (
-    error?.message === 'Failed to fetch' ||
-    error?.message?.includes('NetworkError') ||
-    error?.message?.includes('network') ||
-    error?.name === 'AbortError' ||
-    error?.code === 'NETWORK_ERROR'
-  );
-};
 
 // Auth functions
 export const signIn = async (email: string, password: string) => {

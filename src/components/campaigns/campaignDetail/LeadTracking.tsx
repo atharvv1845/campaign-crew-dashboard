@@ -26,6 +26,7 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
   updateCampaign
 }) => {
   const { toast } = useToast();
+  // Make sure the filter hook accepts the correct property names
   const {
     filteredLeads,
     statusFilter,
@@ -101,13 +102,18 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
   const handleBulkAction = (action: 'status' | 'team' | 'followUp', value: string) => {
     // Update leads based on the action
     const updatedLeads = leads.map(lead => {
-      if (selectedLeads.includes(lead.id as number | string)) {
+      if (selectedLeads.includes(lead.id)) {
         if (action === 'status') {
           return { ...lead, currentStage: value, status: value };
         } else if (action === 'team') {
           return { ...lead, assignedTo: value };
         } else if (action === 'followUp') {
-          return { ...lead, nextFollowUpDate: value };
+          // Add both property names for compatibility
+          return { 
+            ...lead, 
+            nextFollowUpDate: value,
+            followUpDate: value 
+          };
         }
       }
       return lead;
@@ -170,7 +176,7 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
             <LeadKanban 
               stages={campaign.stages || []} 
               leads={filteredLeads} 
-              campaignLeads={campaign.leads}
+              campaignLeads={typeof campaign.leads === 'number' ? campaign.leads : filteredLeads.length}
               onLeadClick={handleLeadClick} 
             />
           )}

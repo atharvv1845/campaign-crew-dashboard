@@ -30,6 +30,7 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedLead, setEditedLead] = useState<Lead>(lead);
+  // Fix the interactions hook to accept both string and number for ID
   const { interactions, logInteraction } = useInteractions(lead.id);
   const { notifyContactLogged } = useToastNotifications();
 
@@ -63,8 +64,10 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
     
     if (onUpdateLead) {
       const today = new Date().toISOString().split('T')[0];
+      // Use both properties for maximum compatibility
       onUpdateLead({
         ...lead,
+        lastContact: today,
         lastContacted: today
       });
     }

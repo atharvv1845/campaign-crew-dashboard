@@ -12,6 +12,9 @@ declare module '@/components/campaigns/campaignDetail/leads/types' {
     
     nextFollowUpDate?: Date | string;
     followUpDate?: Date | string;
+
+    // Add missing properties that are being referenced
+    tags?: string[];
   }
 }
 
@@ -23,6 +26,18 @@ declare module '@/components/campaigns/types/campaignTypes' {
   interface CampaignData {
     contactPlatforms?: string[];
   }
+
+  // Fix LeadData to make properties optional
+  interface LeadData {
+    id?: string | number;
+    firstName?: string;
+    lastName?: string;
+    name?: string;
+    email?: string;
+    status?: string;
+    campaignId?: string | number;
+    // Other optional fields
+  }
 }
 
 // Fix LeadData compatibility issues
@@ -31,11 +46,17 @@ declare module '@/components/campaigns/wizardSteps/LeadImport/hooks/types' {
     id?: string | number;
     firstName?: string;
     lastName?: string;
+    name?: string;
+    email?: string;
+    status?: string;
+    campaignId?: string | number;
     // Add other optional fields
   }
   
   interface CsvParseResult {
     data?: any[];
-    // Other properties
+    headers: string[];
+    preview: Record<string, string>[];
+    initialMapping: Record<string, string>;
   }
 }

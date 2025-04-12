@@ -4,13 +4,15 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { WifiOff, Wifi, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { isNetworkError, isBrowserOffline } from '@/lib/network-utils';
 
 interface NetworkStatusProps {
   onRetry?: () => void;
   className?: string;
+  isAuthentication?: boolean;
 }
 
-export const NetworkStatus = ({ onRetry, className = "" }: NetworkStatusProps) => {
+export const NetworkStatus = ({ onRetry, className = "", isAuthentication = false }: NetworkStatusProps) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [checking, setChecking] = useState(false);
   const { toast } = useToast();
@@ -62,7 +64,9 @@ export const NetworkStatus = ({ onRetry, className = "" }: NetworkStatusProps) =
         setIsOnline(true);
         toast({
           title: "Connection Available",
-          description: "Internet connection appears to be working, but the authentication service may still be unavailable.",
+          description: isAuthentication 
+            ? "Internet connection appears to be working, but the authentication service may still be unavailable."
+            : "Internet connection appears to be working now.",
         });
       }
     } catch (error) {
@@ -91,7 +95,7 @@ export const NetworkStatus = ({ onRetry, className = "" }: NetworkStatusProps) =
         <WifiOff className="h-4 w-4 mr-2" />
         <AlertTitle>Connection Issue</AlertTitle>
         <AlertDescription className="mt-1">
-          <p>Unable to connect to the authentication service. This could be due to:</p>
+          <p>Unable to connect to the {isAuthentication ? "authentication service" : "server"}. This could be due to:</p>
           <ul className="list-disc list-inside mt-2">
             <li>Network connectivity issues</li>
             <li>Temporary server downtime</li>

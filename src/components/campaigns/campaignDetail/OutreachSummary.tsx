@@ -7,6 +7,7 @@ import {
   TeamPerformanceCard,
 } from './outreachSummary';
 import { Lead } from './leads/types';
+import { TeamMemberPerformance } from './types';
 
 interface OutreachSummaryProps {
   campaign: any;
@@ -50,7 +51,7 @@ const OutreachSummary: React.FC<OutreachSummaryProps> = ({
     : 0;
 
   // Generate team performance data based on actual team members
-  const teamPerformance = teamMembers.map(member => {
+  const teamPerformance: TeamMemberPerformance[] = teamMembers.map(member => {
     // Count leads assigned to this team member
     const assignedLeads = leadsData.filter(lead => lead.assignedTo === member).length;
     
@@ -63,6 +64,7 @@ const OutreachSummary: React.FC<OutreachSummaryProps> = ({
     ).length;
     
     return {
+      memberId: member, // Use member as the ID to fix the missing property
       member,
       responses: assignedLeads > 0 ? Math.floor(assignedLeads * 0.7) : 0,
       positive: positiveLeads > 0 ? positiveLeads : Math.floor((assignedLeads || 1) * 0.4)

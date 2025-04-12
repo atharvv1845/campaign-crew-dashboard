@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { Lead, CampaignStage } from './types';
@@ -40,7 +41,7 @@ const LeadKanban: React.FC<LeadKanbanProps> = ({ stages, leads, campaignLeads, o
                     <span className="text-muted-foreground">{lead.assignedTo}</span>
                     <div className="flex items-center">
                       <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
-                      <span className="text-muted-foreground">{lead.lastContacted}</span>
+                      <span className="text-muted-foreground">{lead.lastContact || lead.lastContacted}</span>
                     </div>
                   </div>
                 </div>

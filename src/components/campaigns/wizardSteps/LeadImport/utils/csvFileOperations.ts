@@ -1,3 +1,4 @@
+
 import FileSaver from 'file-saver';
 import { CsvParseResult } from '../hooks/types';
 import Papa from 'papaparse';
@@ -56,8 +57,16 @@ const createInitialMapping = (headers: string[]): Record<string, string> => {
   return mapping;
 };
 
-export const generateCsvTemplate = () => {
-  const headers = ['name', 'email', 'phone', 'company', 'title', 'notes'];
+export const generateCsvTemplate = (contactPlatforms?: string[]) => {
+  let headers = ['name', 'email', 'phone', 'company', 'title', 'notes'];
+  
+  // Add social platforms if specified
+  if (contactPlatforms && contactPlatforms.length > 0) {
+    const socialPlatforms = contactPlatforms.filter(p => 
+      ['linkedin', 'twitter', 'facebook', 'instagram', 'whatsapp'].includes(p));
+    headers = [...headers, ...socialPlatforms];
+  }
+  
   const data = [
     'John Doe,john@example.com,+1234567890,Acme Inc,CEO,Interested in our product',
     'Jane Smith,jane@example.com,+0987654321,Tech Corp,CTO,Follow up in two weeks'

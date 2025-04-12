@@ -10,7 +10,10 @@ export interface Lead extends OriginalLead {
   id: string | number;
   
   // Adding property aliases for compatibility
+  // Support both naming conventions used in the codebase
+  lastContact?: Date | string;
   lastContacted?: Date | string;
+  nextFollowUpDate?: Date | string;
   followUpDate?: Date | string;
   
   // Optional social media properties

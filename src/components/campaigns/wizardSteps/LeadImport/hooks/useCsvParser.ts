@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
-import { LeadData } from '../../../types/campaignTypes';
-import { CsvParseResult } from './types';
+import { LeadData, CsvParseResult } from './types';
 import { parseCsvContent, generateCsvTemplate } from '../utils/csvFileOperations';
 import { processLeadData } from '../utils/leadDataProcessor';
 

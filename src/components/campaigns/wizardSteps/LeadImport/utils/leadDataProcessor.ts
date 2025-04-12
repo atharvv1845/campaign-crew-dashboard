@@ -1,5 +1,5 @@
 
-import { Lead } from '../../../campaignDetail/leads/types';
+import { LeadData } from '../hooks/types';
 import { parseCsvContent } from './csvFileOperations';
 
 export const processLeadData = (
@@ -8,10 +8,10 @@ export const processLeadData = (
   initialStageId: string,
   generateId: () => string,
   customStages?: { id: string; name: string }[]
-): Lead[] => {
+): LeadData[] => {
   try {
     const { data, headers } = parseCsvContent(csvContent);
-    const leads: Lead[] = [];
+    const leads: LeadData[] = [];
     
     // Extract mapped field names for easier access
     const nameField = Object.keys(mapping).find(key => mapping[key] === 'name');
@@ -28,7 +28,7 @@ export const processLeadData = (
       }
       
       // Create a new lead object
-      const lead: Lead = {
+      const lead: LeadData = {
         id: generateId(),
         name: nameField ? row[nameField] : '',
         email: emailField ? row[emailField] : '',

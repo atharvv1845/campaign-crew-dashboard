@@ -9,11 +9,11 @@ export enum InteractionType {
 }
 
 export interface Interaction {
-  id: number;
+  id: number | string;
   type: InteractionType;
   content: string;
   timestamp: string;
-  leadId: number;
+  leadId: number | string;
   user?: string;
   // Added for compatibility with existing code
   date?: string;

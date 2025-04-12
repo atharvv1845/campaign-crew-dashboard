@@ -26,6 +26,7 @@ export interface LeadData {
   phone?: string;
   company?: string;
   title?: string;
+  // Unified date field names to support both property patterns
   lastContact?: Date | string;
   lastContacted?: Date | string;
   nextFollowUpDate?: Date | string;
@@ -33,14 +34,22 @@ export interface LeadData {
   firstContactDate?: Date | string;
   assignedTo?: string;
   assignedTeamMember?: string;
+  // Social media and contact methods
   linkedin?: string;
   twitter?: string;
   facebook?: string;
   instagram?: string;
   whatsapp?: string;
   notes?: string;
-  socialProfiles?: Record<string, string>;
-  contactMethods?: Record<string, string>;
+  // Make contactMethods and socialProfiles more flexible to support both formats
+  socialProfiles?: Record<string, string> | { 
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+    whatsapp?: string;
+  };
+  contactMethods?: Record<string, string> | string[];
   contacted?: boolean;
   contactPlatforms?: string[];
   tags?: string[];

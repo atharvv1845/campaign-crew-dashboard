@@ -1,61 +1,60 @@
-
 import FileSaver from 'file-saver';
 import { CsvParseResult } from '../hooks/types';
+import Papa from 'papaparse';
 
-export const parseCsvContent = (content: string): CsvParseResult => {
-  // Split the CSV content by lines
-  const lines = content.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
-  
-  if (lines.length === 0) {
-    throw new Error('The CSV file is empty');
-  }
-  
-  // Extract headers from the first line
-  const headers = lines[0].split(',').map(header => header.trim());
-  
-  // Process data rows
-  const data = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
-    
-    if (values.length !== headers.length) {
-      console.warn(`Line ${i+1} has ${values.length} fields, but there are ${headers.length} headers. Skipping.`);
-      continue;
-    }
-    
-    const row: Record<string, string> = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index].trim();
+export const parseCsvContent = (csvContent: string): CsvParseResult => {
+  try {
+    const results = Papa.parse(csvContent, {
+      header: true,
+      skipEmptyLines: true,
     });
-    
-    data.push(row);
+
+    const headers = results.meta.fields || [];
+    const data = results.data;
+
+    // Create a preview with a subset of the data
+    const preview = data.slice(0, 5).map(row => {
+      const typedRow: Record<string, string> = {};
+      headers.forEach(header => {
+        typedRow[header] = (row as any)[header] || '';
+      });
+      return typedRow;
+    });
+
+    // Create initial mapping suggestion
+    const initialMapping = createInitialMapping(headers);
+
+    return {
+      headers,
+      data,
+      preview,
+      initialMapping
+    };
+  } catch (error) {
+    console.error('Error parsing CSV:', error);
+    throw error;
   }
-  
-  return { headers, data };
 };
 
-// Helper function to correctly parse CSV lines accounting for quoted fields
-function parseCSVLine(line: string): string[] {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
+// Helper function to create initial mapping suggestion
+const createInitialMapping = (headers: string[]): Record<string, string> => {
+  const mapping: Record<string, string> = {};
+  headers.forEach(header => {
+    const lowerHeader = header.toLowerCase();
+    if (lowerHeader.includes('name')) {
+      mapping[header] = 'name';
+    } else if (lowerHeader.includes('email')) {
+      mapping[header] = 'email';
+    } else if (lowerHeader.includes('phone')) {
+      mapping[header] = 'phone';
+    } else if (lowerHeader.includes('company')) {
+      mapping[header] = 'company';
+    } else if (lowerHeader.includes('title')) {
+      mapping[header] = 'title';
     }
-  }
-  
-  result.push(current); // Add the last field
-  return result;
-}
+  });
+  return mapping;
+};
 
 export const generateCsvTemplate = () => {
   const headers = ['name', 'email', 'phone', 'company', 'title', 'notes'];

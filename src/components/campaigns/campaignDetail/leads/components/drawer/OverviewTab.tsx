@@ -37,14 +37,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
           <h3 className="text-sm font-medium text-muted-foreground">Last Contacted</h3>
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>{lead.lastContacted}</span>
+            <span>{lead.lastContact || lead.lastContacted || 'Not contacted'}</span>
           </div>
         </div>
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground">Follow-up Date</h3>
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span>{lead.followUpDate || 'Not set'}</span>
+            <span>{lead.nextFollowUpDate || lead.followUpDate || 'Not set'}</span>
           </div>
         </div>
         <div className="space-y-2">

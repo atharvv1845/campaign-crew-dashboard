@@ -20,6 +20,7 @@ export interface CampaignData {
     nodes: any[];
     edges: any[];
   };
+  contactPlatforms?: string[]; // Add contactPlatforms property
   stages?: Array<{
     id: string;
     name: string;

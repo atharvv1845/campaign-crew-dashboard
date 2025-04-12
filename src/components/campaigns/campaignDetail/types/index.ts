@@ -6,7 +6,7 @@ import { Lead as OriginalLead } from "@/components/campaigns/campaignDetail/lead
 
 // Extended Lead interface that maps properties with different names
 export interface Lead extends OriginalLead {
-  // Make id accept both string and number to fix type errors
+  // Make id accept both string and number
   id: string | number;
   
   // Adding property aliases for compatibility
@@ -21,7 +21,7 @@ export interface Lead extends OriginalLead {
   whatsapp?: string;
   
   // Optional additional properties
-  contactMethods?: string[];
+  contactMethods?: Record<string, string> | string[];
   contacted?: boolean;
   tags?: string[];
   title?: string;

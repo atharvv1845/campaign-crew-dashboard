@@ -19,7 +19,7 @@ const InteractionsTab: React.FC<InteractionsTabProps> = ({
   onLogInteraction: propLogInteraction 
 }) => {
   // Use the hook to get interactions data and functions if not provided as props
-  const { interactions: hookInteractions, logInteraction: hookLogInteraction } = useInteractions(lead.id);
+  const { interactions: hookInteractions, logInteraction: hookLogInteraction } = useInteractions(String(lead.id));
   
   const interactions = propInteractions || hookInteractions;
   const onLogInteraction = propLogInteraction || hookLogInteraction;

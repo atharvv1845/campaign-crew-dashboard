@@ -45,8 +45,9 @@ export const processLeadData = (
         nextFollowUpDate: null,
         assignedTo: '',
         notes: '',
-        tags: [],
-        stageId: initialStageId,
+        campaignId: initialStageId,
+        tags: [], // Add tags as an empty array
+        contactPlatforms: [], // Initialize contact platforms
       };
       
       // Add extra fields from CSV if they exist

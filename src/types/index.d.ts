@@ -23,12 +23,9 @@ declare module '@/components/campaigns/campaignDetail/leads/types' {
       twitter?: string;
       facebook?: string;
       instagram?: string;
-    };
-    contactMethods?: {
-      email?: string;
-      phone?: string;
       whatsapp?: string;
     };
+    contactMethods?: Record<string, string> | string[];
     contactPlatforms?: string[];
     company?: string;
     title?: string;
@@ -77,7 +74,7 @@ declare module '@/components/campaigns/types/campaignTypes' {
     whatsapp?: string;
     notes?: string;
     socialProfiles?: Record<string, string>;
-    contactMethods?: Record<string, string>;
+    contactMethods?: Record<string, string> | string[];
     contacted?: boolean;
     contactPlatforms?: string[];
     tags?: string[];
@@ -113,7 +110,7 @@ declare module '@/components/campaigns/wizardSteps/LeadImport/hooks/types' {
     whatsapp?: string;
     notes?: string;
     socialProfiles?: Record<string, string>;
-    contactMethods?: Record<string, string>;
+    contactMethods?: Record<string, string> | string[];
     contacted?: boolean;
     contactPlatforms?: string[];
     tags?: string[];
@@ -126,4 +123,3 @@ declare module '@/components/campaigns/wizardSteps/LeadImport/hooks/types' {
     initialMapping: Record<string, string>;
   }
 }
-

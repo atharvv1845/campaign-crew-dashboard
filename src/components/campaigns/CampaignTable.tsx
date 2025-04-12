@@ -7,7 +7,7 @@ import { CampaignData } from './campaignData';
 interface CampaignTableProps {
   campaigns: CampaignData[];
   refreshList?: () => void;
-  onCampaignClick?: (campaignId: number) => void;
+  onCampaignClick?: (campaignId: string | number) => void;
 }
 
 const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList, onCampaignClick }) => {
@@ -18,7 +18,7 @@ const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, refreshList, o
     if (refreshList) refreshList();
   };
 
-  const handleRowClick = (campaignId: number) => {
+  const handleRowClick = (campaignId: string | number) => {
     if (onCampaignClick) {
       onCampaignClick(campaignId);
     }

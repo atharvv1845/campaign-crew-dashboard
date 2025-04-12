@@ -1,4 +1,3 @@
-
 export interface Lead {
   id: number | string;
   name: string;                 // Required full name
@@ -15,8 +14,10 @@ export interface Lead {
   assignedTeamMember?: string; // For team assignment
   assignedTo?: string;         // Alias for team assignment
   lastContact?: string;        // For tracking contacts
+  lastContacted?: string;      // Alias for lastContact
   firstContactDate?: string;   // First contact tracking
   nextFollowUpDate?: string;   // Next follow-up
+  followUpDate?: string;       // Alias for nextFollowUpDate
   notes?: string;
   campaignId: number | string;
   // Social profiles
@@ -35,10 +36,13 @@ export interface Lead {
   };
   // Contact platforms
   contactPlatforms?: string[];  // Array of enabled contact platforms for this lead
+  contactMethods?: Record<string, string> | string[];  // More flexible type to support both usages
   // Metadata
   source?: string;
   createdAt?: string;
   updatedAt?: string;
+  tags?: string[];  // Add tags support
+  contacted?: boolean;  // Flag to indicate if lead has been contacted
 }
 
 export interface CampaignStage {

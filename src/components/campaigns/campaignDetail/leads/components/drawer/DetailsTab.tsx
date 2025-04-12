@@ -65,7 +65,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ lead, campaign, onEdit }) => {
             <span className="font-medium">Assigned To:</span> {lead.assignedTo}
           </p>
           <p className="text-sm">
-            <span className="font-medium">Last Contacted:</span> {lead.lastContacted}
+            <span className="font-medium">Last Contacted:</span> {lead.lastContact || lead.lastContacted || 'Not contacted yet'}
           </p>
         </div>
       </div>

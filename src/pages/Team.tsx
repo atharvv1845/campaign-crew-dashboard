@@ -6,40 +6,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchData } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const TeamPage: React.FC = () => {
-  const { user, isAdmin } = useAuth();
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isAdmin, userRole } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
+  // We can now directly use userRole from the AuthContext
+  // which is already being fetched when the user logs in
+
+  // Show admin notification on first load
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (user) {
-        try {
-          const userData = await fetchData('users');
-          const currentUser = userData.find((u: any) => u.auth_id === user.id);
-          setUserRole(currentUser?.role || 'Team Member');
-        } catch (error) {
-          console.error('Error fetching user role:', error);
-          setUserRole('Team Member');
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchUserRole();
-  }, [user]);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-6 h-full flex items-center justify-center">
-        <div className="animate-pulse">Loading team information...</div>
-      </div>
-    );
-  }
+    if (isAdmin) {
+      toast({
+        title: "Admin access detected",
+        description: "You have full administrative privileges for team management",
+      });
+    }
+  }, [isAdmin, toast]);
 
   return (
     <div className="container mx-auto py-6 h-full space-y-6">

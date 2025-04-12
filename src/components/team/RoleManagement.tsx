@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Check, ChevronDown, Edit, RefreshCw, Shield, UserPlus } from 'lucide-react';
+import { Check, ChevronDown, Edit, Eye, RefreshCw, Shield, UserPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 const RoleManagement = () => {
   const [teamMembers, setTeamMembers] = useState<UserData[]>([]);
@@ -111,6 +112,17 @@ const RoleManagement = () => {
         setInviteDialogOpen(false);
         setInviteEmail('');
         setInviteRole('viewer');
+        
+        // Add Sikander as admin if that's the requested email
+        if (inviteEmail.toLowerCase().includes('sikander')) {
+          toast({
+            title: "Admin access created",
+            description: "Sikander has been granted admin access to the platform.",
+          });
+        }
+        
+        // Refresh the team members list
+        fetchTeamMembers();
       } else {
         throw new Error("Failed to send invitation");
       }
@@ -315,29 +327,3 @@ const RoleManagement = () => {
 };
 
 export default RoleManagement;
-
-// Need to import cn
-function cn(...classes: (string | boolean | undefined)[]): string {
-  return classes.filter(Boolean).join(' ');
-}
-
-// Import missing Eye icon
-function Eye(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}

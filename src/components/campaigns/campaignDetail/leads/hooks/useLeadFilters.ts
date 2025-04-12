@@ -1,59 +1,69 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Lead } from '../types';
 
-export function useLeadFilters(leadsData: Lead[]) {
-  const [filteredLeads, setFilteredLeads] = useState<Lead[]>(leadsData);
+export const useLeadFilters = (leads: Lead[]) => {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [teamFilter, setTeamFilter] = useState<string | null>(null);
-  const [dateSort, setDateSort] = useState<'lastContact' | 'nextFollowUpDate' | null>(null);
-  const [selectedLeads, setSelectedLeads] = useState<(number | string)[]>([]);
-
-  // Update filtered leads when data or filters change
-  useEffect(() => {
-    applyFilters();
-  }, [leadsData, statusFilter, teamFilter, dateSort]);
-
-  // Filter leads based on selected filters
-  const applyFilters = () => {
-    let filtered = [...leadsData];
+  const [dateSort, setDateSort] = useState<"lastContact" | "nextFollowUpDate">("lastContact");
+  const [selectedLeads, setSelectedLeads] = useState<(string | number)[]>([]);
+  
+  // Filter and sort the leads
+  const filteredLeads = useMemo(() => {
+    let filtered = [...leads];
     
+    // Apply status filter
     if (statusFilter) {
       filtered = filtered.filter(lead => lead.currentStage === statusFilter || lead.status === statusFilter);
     }
     
+    // Apply team filter
     if (teamFilter) {
-      filtered = filtered.filter(lead => lead.assignedTo === teamFilter || lead.assignedTeamMember === teamFilter);
+      filtered = filtered.filter(lead => lead.assignedTo === teamFilter);
     }
     
-    if (dateSort) {
-      filtered.sort((a, b) => {
-        const dateA = new Date(dateSort === 'lastContact' ? (a.lastContact || '') : (a.nextFollowUpDate || ''));
-        const dateB = new Date(dateSort === 'lastContact' ? (b.lastContact || '') : (b.nextFollowUpDate || ''));
-        return dateB.getTime() - dateA.getTime(); // Sort descending (newest first)
-      });
-    }
-    
-    setFilteredLeads(filtered);
-  };
-
+    // Sort by date
+    return filtered.sort((a, b) => {
+      const dateA = dateSort === "lastContact" 
+        ? new Date(a.lastContact || a.lastContacted || 0) 
+        : new Date(a.nextFollowUpDate || a.followUpDate || 0);
+      
+      const dateB = dateSort === "lastContact" 
+        ? new Date(b.lastContact || b.lastContacted || 0) 
+        : new Date(b.nextFollowUpDate || b.followUpDate || 0);
+      
+      return dateB.getTime() - dateA.getTime(); // newest first
+    });
+  }, [leads, statusFilter, teamFilter, dateSort]);
+  
   // Reset all filters
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setStatusFilter(null);
     setTeamFilter(null);
-    setDateSort(null);
-    setFilteredLeads(leadsData);
-  };
-
-  // Handle lead selection for bulk actions
-  const handleSelectLead = (leadId: number | string, selected: boolean) => {
+    setDateSort("lastContact");
+    setSelectedLeads([]);
+  }, []);
+  
+  // Handle lead selection
+  const handleSelectLead = useCallback((leadId: string | number, selected: boolean) => {
+    setSelectedLeads(prev => {
+      if (selected) {
+        return [...prev, leadId];
+      } else {
+        return prev.filter(id => id !== leadId);
+      }
+    });
+  }, []);
+  
+  // Handle select all
+  const handleSelectAll = useCallback((selected: boolean) => {
     if (selected) {
-      setSelectedLeads(prev => [...prev, leadId]);
+      setSelectedLeads(filteredLeads.map(lead => lead.id));
     } else {
-      setSelectedLeads(prev => prev.filter(id => id !== leadId));
+      setSelectedLeads([]);
     }
-  };
-
+  }, [filteredLeads]);
+  
   return {
     filteredLeads,
     statusFilter,
@@ -63,8 +73,8 @@ export function useLeadFilters(leadsData: Lead[]) {
     dateSort,
     setDateSort,
     selectedLeads,
-    setSelectedLeads,
-    resetFilters,
-    handleSelectLead
+    handleSelectLead,
+    handleSelectAll,
+    resetFilters
   };
-}
+};

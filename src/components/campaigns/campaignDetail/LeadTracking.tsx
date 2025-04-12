@@ -151,10 +151,10 @@ const LeadTracking: React.FC<LeadTrackingProps> = ({
             setStatusFilter={setStatusFilter}
             teamFilter={teamFilter}
             setTeamFilter={setTeamFilter}
-            dateSort={dateSort}
-            setDateSort={setDateSort}
+            dateSort={dateSort as "lastContacted" | "followUpDate"}
+            setDateSort={setDateSort as (sort: "lastContacted" | "followUpDate") => void}
             resetFilters={resetFilters}
-            selectedLeads={selectedLeads}
+            selectedLeads={selectedLeads as number[]}
             handleBulkAction={handleBulkAction}
           />
           

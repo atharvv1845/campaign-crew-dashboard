@@ -22,7 +22,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData, updateCa
     name: lead.name || 
           (lead.firstName && lead.lastName ? `${lead.firstName} ${lead.lastName}` : 
           lead.firstName || lead.lastName || `Lead #${lead.id}`),
-    lastContacted: lead.lastContacted || lead.lastContact || '',
+    lastContact: lead.lastContact || lead.lastContacted || '',
   }));
 
   return (
@@ -91,8 +91,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ campaign, leadsData, updateCa
         </CardContent>
       </Card>
 
-      <StatCards campaign={campaign} leadsData={processedLeads} />
-      <ChannelsAndStages campaign={campaign} leadsData={processedLeads} />
+      <StatCards campaign={campaign} leadsData={processedLeads as any} />
+      <ChannelsAndStages campaign={campaign} leadsData={processedLeads as any} />
       <OutreachSummary campaign={campaign} leadsData={processedLeads} teamMembers={campaign.teamMembers} />
     </div>
   );

@@ -14,7 +14,7 @@ export interface ImportStatus {
 }
 
 export interface LeadData {
-  id?: string | number;
+  id: string | number; // Make required instead of optional
   firstName?: string;
   lastName?: string;
   name?: string;
@@ -27,11 +27,11 @@ export interface LeadData {
   company?: string;
   title?: string;
   // Unified date field names to support both property patterns
-  lastContact?: Date | string;
-  lastContacted?: Date | string;
-  nextFollowUpDate?: Date | string;
-  followUpDate?: Date | string;
-  firstContactDate?: Date | string;
+  lastContact?: string | Date;
+  lastContacted?: string | Date;
+  nextFollowUpDate?: string | Date;
+  followUpDate?: string | Date;
+  firstContactDate?: string | Date;
   assignedTo?: string;
   assignedTeamMember?: string;
   // Social media and contact methods
@@ -53,4 +53,7 @@ export interface LeadData {
   contacted?: boolean;
   contactPlatforms?: string[];
   tags?: string[];
+  createdAt?: string; // Add createdAt
+  updatedAt?: string; // Add updatedAt
+  statusName?: string; // Add statusName for compatibility with existing code
 }

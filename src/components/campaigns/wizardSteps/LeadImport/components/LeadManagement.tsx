@@ -7,7 +7,7 @@ import { Pencil, Check, X } from 'lucide-react';
 
 interface LeadManagementProps {
   leads: LeadData[];
-  onLeadUpdate: (id: string, updates: Partial<LeadData>) => void;
+  onLeadUpdate: (id: string | number, updates: Partial<LeadData>) => void;
   stages: { id: string; name: string }[];
   teamMembers: string[];
 }
@@ -27,7 +27,7 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
 
   // Start editing a lead
   const startEdit = (lead: LeadData) => {
-    setEditingLeadId(lead.id);
+    setEditingLeadId(String(lead.id));
     setEditValues({
       status: lead.status,
       assignedTo: lead.assignedTo || ''
@@ -41,7 +41,7 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
   };
 
   // Save changes to a lead
-  const saveChanges = (leadId: string) => {
+  const saveChanges = (leadId: string | number) => {
     onLeadUpdate(leadId, editValues);
     setEditingLeadId(null);
     setEditValues({});
@@ -78,14 +78,14 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
           </thead>
           <tbody className="divide-y divide-border">
             {leads.map((lead) => (
-              <tr key={lead.id} className="hover:bg-muted/5">
+              <tr key={String(lead.id)} className="hover:bg-muted/5">
                 <td className="px-4 py-2">
                   {lead.firstName} {lead.lastName}
                 </td>
                 <td className="px-4 py-2">{lead.email}</td>
                 <td className="px-4 py-2">{lead.company || '-'}</td>
                 <td className="px-4 py-2">
-                  {editingLeadId === lead.id ? (
+                  {editingLeadId === String(lead.id) ? (
                     <select
                       value={editValues.status}
                       onChange={(e) => setEditValues(prev => ({...prev, status: e.target.value}))}
@@ -102,7 +102,7 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  {editingLeadId === lead.id ? (
+                  {editingLeadId === String(lead.id) ? (
                     <select
                       value={editValues.assignedTo}
                       onChange={(e) => setEditValues(prev => ({...prev, assignedTo: e.target.value}))}
@@ -122,7 +122,7 @@ const LeadManagement: React.FC<LeadManagementProps> = ({
                   )}
                 </td>
                 <td className="px-4 py-2 text-right">
-                  {editingLeadId === lead.id ? (
+                  {editingLeadId === String(lead.id) ? (
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => saveChanges(lead.id)}

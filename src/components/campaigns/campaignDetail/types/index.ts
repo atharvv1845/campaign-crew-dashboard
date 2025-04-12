@@ -28,6 +28,7 @@ export interface Lead extends OriginalLead {
   contacted?: boolean;
   tags?: string[];
   title?: string;
+  statusName?: string;
 }
 
 // Team performance type

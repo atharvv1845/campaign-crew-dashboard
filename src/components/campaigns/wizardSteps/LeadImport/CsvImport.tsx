@@ -1,221 +1,197 @@
 
-import React, { useState } from 'react';
-import { CampaignFormData } from '../../types/campaignTypes';
-import { useToast } from "@/hooks/use-toast";
-import { useLeadImport } from './hooks/useLeadImport';
+import React, { useCallback, useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { useCsvParser } from './hooks/useCsvParser';
-import CsvMapping from './CsvMapping';
-import CsvPreview from './CsvPreview';
-import FileUpload from './components/FileUpload';
-import ImportedLeadsTable from './components/ImportedLeadsTable';
+import { FileUploader } from './components/FileUploader';
+import CsvColumnMapper from './components/CsvColumnMapper';
+import MappingTable from './components/MappingTable';
+import { CsvParseResult, LeadData } from './hooks/types';
+import { CampaignFormData } from '../../../types/campaignTypes';
+import { generateCsvTemplate } from './utils/csvFileOperations';
 
 interface CsvImportProps {
   formData: CampaignFormData;
-  setFormData: React.Dispatch<React.SetStateAction<CampaignFormData>>;
+  setFormData: (data: CampaignFormData | ((prev: CampaignFormData) => CampaignFormData)) => void;
+  onLeadsImported?: (leads: LeadData[]) => void;
 }
 
-const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData }) => {
-  const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [importedLeads, setImportedLeads] = useState<any[]>([]);
+const CsvImport: React.FC<CsvImportProps> = ({ formData, setFormData, onLeadsImported }) => {
   const { toast } = useToast();
-  const { generateId } = useLeadImport();
-  const {
-    csvHeaders,
-    setCsvHeaders,
-    csvMapping,
-    setCsvMapping,
-    csvPreview,
-    setCsvPreview,
-    parseCsvFile,
-    processLeadsFromCsv,
-    downloadCsvTemplate,
-    handleMappingChange
-  } = useCsvParser();
-  
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const [csvContent, setCsvContent] = useState<string | null>(null);
+  const [csvResult, setCsvResult] = useState<CsvParseResult | null>(null);
+  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
+  const { parseCsv, processLeads, importStatus } = useCsvParser();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle file selection
+  const handleFileChange = useCallback(async (file: File) => {
     if (!file) return;
     
-    setCsvFile(file);
-    
     try {
-      console.log('Parsing CSV file:', file.name);
-      const { headers, preview, initialMapping } = await parseCsvFile(file);
+      const content = await file.text();
+      setCsvContent(content);
       
-      console.log('Parsed CSV headers:', headers);
-      console.log('CSV preview:', preview);
-      console.log('Initial mapping:', initialMapping);
+      // Parse CSV content
+      const result = await parseCsv(content);
+      setCsvResult(result);
+      setColumnMapping(result.initialMapping);
       
-      setCsvHeaders(headers);
-      setCsvMapping(initialMapping);
-      setCsvPreview(preview);
-    } catch (error) {
-      console.error('Error parsing CSV:', error);
       toast({
-        title: "Error parsing CSV",
-        description: "There was an error parsing the CSV file. Please check the format and try again.",
-        variant: "destructive"
+        title: "CSV File Loaded",
+        description: `Successfully loaded ${file.name}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error Loading CSV",
+        description: (error as Error).message,
+        variant: "destructive",
       });
     }
+  }, [parseCsv, toast]);
+
+  // Handle mapping change
+  const handleMappingChange = (header: string, mappedField: string) => {
+    setColumnMapping(prev => ({
+      ...prev,
+      [header]: mappedField
+    }));
   };
-  
-  const handleCancelFile = () => {
-    setCsvFile(null);
-    setCsvHeaders([]);
-    setCsvMapping({});
-    setCsvPreview([]);
-  };
-  
-  const importCsvLeads = async () => {
-    if (!csvFile) {
-      console.error('No CSV file selected');
+
+  // Handle import button click
+  const handleImport = async () => {
+    if (!csvContent || !csvResult) {
+      toast({
+        title: "Error",
+        description: "No CSV data to import",
+        variant: "destructive",
+      });
       return;
     }
     
     try {
-      console.log('Starting import with formData:', formData);
-      const initialStageId = formData.stages[0]?.id || '';
-      console.log('Initial stage ID:', initialStageId);
-      console.log('CSV mapping to use:', csvMapping);
+      // Process the CSV data with the column mapping
+      const importedLeads = await processLeads(
+        csvContent, 
+        columnMapping, 
+        formData.stages[0]?.id || 'new',
+        formData.stages
+      );
       
-      const newLeads = await processLeadsFromCsv(csvFile, csvMapping, initialStageId, generateId);
-      console.log('Processed new leads:', newLeads);
+      // Add contactPlatforms to leads if specified in the campaign
+      const leadsWithPlatforms = importedLeads.map(lead => ({
+        ...lead,
+        contactPlatforms: formData.contactPlatforms || []
+      }));
       
-      // Add contact platforms to each lead based on campaign settings
-      const leadsWithPlatforms = newLeads.map(lead => {
-        // Initialize contactPlatforms array
-        let leadPlatforms: string[] = [];
-        
-        // Add platforms based on the presence of data
-        if (formData.contactPlatforms && formData.contactPlatforms.length > 0) {
-          formData.contactPlatforms.forEach(platform => {
-            // Check if lead has data for this platform
-            if (
-              (platform === 'email' && lead.email) ||
-              (platform === 'phone' && lead.phone) ||
-              (platform === 'linkedin' && lead.socialProfiles?.linkedin) ||
-              (platform === 'twitter' && lead.socialProfiles?.twitter) ||
-              (platform === 'facebook' && lead.socialProfiles?.facebook) ||
-              (platform === 'instagram' && lead.socialProfiles?.instagram) ||
-              (platform === 'whatsapp' && lead.socialProfiles?.whatsapp)
-            ) {
-              leadPlatforms.push(platform);
-            }
-          });
-        }
-        
+      // Update status names for display
+      const leadsWithStatusNames = leadsWithPlatforms.map(lead => {
+        const stage = formData.stages.find(s => s.id === lead.status);
         return {
           ...lead,
-          contactPlatforms: leadPlatforms
+          status: stage?.id || lead.status,
+          currentStage: stage?.name || lead.currentStage
         };
       });
       
-      console.log('Leads with platforms:', leadsWithPlatforms);
+      // Update form data with imported leads
+      setFormData(prev => ({
+        ...prev,
+        leads: leadsWithStatusNames as LeadData[]
+      }));
       
-      // No validation - Accept all leads
-      const validLeads = leadsWithPlatforms;
-      
-      if (validLeads.length === 0) {
-        toast({
-          title: "Import Error",
-          description: "No leads found in the CSV file.",
-          variant: "destructive"
-        });
-        return;
+      // Invoke callback if provided
+      if (onLeadsImported) {
+        onLeadsImported(leadsWithStatusNames as LeadData[]);
       }
       
-      const leadsWithStages = validLeads.map(lead => {
-        if (lead.statusName) {
-          const stage = formData.stages.find(s => 
-            s.name.toLowerCase() === lead.statusName.toLowerCase()
-          );
-          if (stage) {
-            lead.status = stage.id;
-          }
-          // We'll keep statusName property for display purposes
-        }
-        return lead;
-      });
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       
-      console.log('Final leads to add to formData:', leadsWithStages);
-      
-      setFormData(prev => {
-        const updatedFormData = {
-          ...prev,
-          leads: [...prev.leads, ...leadsWithStages]
-        };
-        console.log('Updated formData:', updatedFormData);
-        return updatedFormData;
-      });
-      
-      setImportedLeads(leadsWithStages);
-      
+      // Show success message
       toast({
-        title: "Leads Imported",
-        description: `Successfully imported ${leadsWithStages.length} leads from CSV.`,
+        title: "Import Successful",
+        description: `${leadsWithStatusNames.length} leads have been imported.`,
       });
-      
-      setCsvPreview([]);
     } catch (error) {
-      console.error('Error importing leads:', error);
       toast({
-        title: "Import Error",
-        description: "There was an error importing the leads. Please try again.",
-        variant: "destructive"
+        title: "Import Failed",
+        description: (error as Error).message,
+        variant: "destructive",
       });
     }
   };
 
-  // Generate CSV template with all selected contact platforms
+  // Download CSV template
   const handleDownloadTemplate = () => {
-    downloadCsvTemplate(formData.contactPlatforms);
+    generateCsvTemplate(formData.contactPlatforms);
+    toast({
+      title: "Template Downloaded",
+      description: "CSV template has been downloaded to your device.",
+    });
   };
 
   return (
     <div className="space-y-6">
-      <FileUpload 
-        csvFile={csvFile}
-        handleFileChange={handleFileChange}
-        handleCancelFile={handleCancelFile}
-        downloadTemplate={handleDownloadTemplate}
+      <div>
+        <h3 className="text-lg font-medium mb-2">Import Leads from CSV</h3>
+        <p className="text-sm text-muted-foreground">
+          Upload a CSV file with lead data or download our template to get started.
+        </p>
+        <div className="flex gap-2 mt-4">
+          <Button
+            variant="outline"
+            onClick={handleDownloadTemplate}
+          >
+            Download Template
+          </Button>
+        </div>
+      </div>
+      
+      {/* File Upload Section */}
+      <FileUploader 
+        ref={fileInputRef}
+        onFileSelected={handleFileChange}
+        isLoading={importStatus.loading}
       />
       
-      {csvFile && (
-        <div className="space-y-6">
-          {csvHeaders.length > 0 && (
-            <CsvMapping 
-              csvHeaders={csvHeaders}
-              csvMapping={csvMapping}
-              onMappingChange={handleMappingChange}
-              contactPlatforms={formData.contactPlatforms}
-            />
-          )}
+      {/* Mapping Configuration */}
+      {csvResult && csvResult.headers.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-base font-medium">Column Mapping</h3>
+          <p className="text-sm text-muted-foreground mb-2">
+            Map CSV columns to lead properties.
+          </p>
           
-          {csvPreview.length > 0 && (
-            <CsvPreview 
-              csvHeaders={csvHeaders}
-              csvPreview={csvPreview}
-            />
-          )}
+          <CsvColumnMapper 
+            headers={csvResult.headers}
+            mapping={columnMapping}
+            onMappingChange={handleMappingChange}
+          />
           
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={handleCancelFile}
-              className="px-4 py-2 border border-border rounded-lg hover:bg-muted/20 transition-colors"
+          {/* Preview Table */}
+          <div className="mt-4">
+            <h3 className="text-base font-medium">Preview</h3>
+            <MappingTable 
+              headers={csvResult.headers}
+              mapping={columnMapping}
+              preview={csvResult.preview}
+            />
+          </div>
+          
+          {/* Import Button */}
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleImport}
+              disabled={importStatus.loading || !csvContent}
             >
-              Cancel
-            </button>
-            <button
-              onClick={importCsvLeads}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
-            >
-              Import Leads
-            </button>
+              {importStatus.loading ? 'Importing...' : 'Import Leads'}
+            </Button>
           </div>
         </div>
       )}
-      
-      <ImportedLeadsTable leads={importedLeads.length > 0 ? importedLeads : formData.leads} />
     </div>
   );
 };

@@ -68,7 +68,7 @@ const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
       onUpdateLead({
         ...lead,
         lastContact: today,
-        lastContacted: today // Keep for compatibility
+        lastContacted: today 
       });
     }
   };

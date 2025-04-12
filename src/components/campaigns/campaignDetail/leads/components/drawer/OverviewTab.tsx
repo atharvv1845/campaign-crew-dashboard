@@ -66,7 +66,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium">Recent Interactions</h3>
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="sm" 
             className="text-primary"
             onClick={onViewAllInteractions}

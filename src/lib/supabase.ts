@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { UserRole } from '@/contexts/AuthContext';
 
@@ -121,7 +120,6 @@ export interface UserData {
 }
 
 export const getAllTeamMembers = async (): Promise<UserData[]> => {
-  // Get all users from auth.users through RLS policies (requires admin role)
   const { data, error } = await supabase
     .from('user_roles')
     .select(`
@@ -146,15 +144,54 @@ export const getAllTeamMembers = async (): Promise<UserData[]> => {
   }));
 };
 
-export const inviteTeamMember = async (email: string, role: UserRole = 'viewer'): Promise<boolean> => {
+export const createAdminUser = async (email: string, password: string): Promise<boolean> => {
   try {
-    // Check if email contains "sikander" and force role to admin if it does
-    if (email.toLowerCase().includes('sikander')) {
-      role = 'admin';
-      console.log('Setting admin role for Sikander');
+    // Create user in Supabase Auth
+    const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+      email: email,
+      password: password,
+      email_confirm: true, 
+    });
+    
+    if (userError) {
+      console.error('Error creating admin user:', userError);
+      return false;
     }
     
-    // Create user with temporary password in Supabase
+    // Set admin role if user was created successfully
+    if (userData.user) {
+      const success = await setUserRole(userData.user.id, 'admin');
+      if (!success) {
+        console.error('Failed to set admin role for user:', email);
+        return false;
+      }
+      
+      console.log(`Admin access created for ${email}`);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error in createAdminUser:', error);
+    return false;
+  }
+};
+
+export const inviteTeamMember = async (email: string, role: UserRole = 'viewer'): Promise<boolean> => {
+  try {
+    // Ensure specific emails get admin role
+    const adminEmails = [
+      'atharv@leveragedgrowth.co', 
+      'sikander@leveragedgrowth.co'
+    ];
+    
+    // Check if email should be an admin
+    if (adminEmails.includes(email.toLowerCase()) || email.toLowerCase().includes('sikander')) {
+      role = 'admin';
+      console.log(`Setting admin role for ${email}`);
+    }
+    
+    // Create user with password in Supabase
     const password = 'TemporaryPassword123!'; // In a real app, this would be randomly generated
     const { data: userData, error: userError } = await supabase.auth.admin.createUser({
       email: email,
@@ -185,5 +222,36 @@ export const inviteTeamMember = async (email: string, role: UserRole = 'viewer')
   } catch (error) {
     console.error('Error inviting team member:', error);
     return false;
+  }
+};
+
+export const initializeAdminUsers = async () => {
+  const adminUsers = [
+    { email: 'atharv@leveragedgrowth.co', password: 'leveragedgrowth123' },
+    { email: 'sikander@leveragedgrowth.co', password: 'leveragedgrowth123' }
+  ];
+  
+  for (const user of adminUsers) {
+    try {
+      // Check if user already exists
+      const { data } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: user.password,
+      });
+      
+      if (!data.user) {
+        // User doesn't exist, create them
+        await createAdminUser(user.email, user.password);
+        console.log(`Created admin user: ${user.email}`);
+      } else {
+        // Ensure they have admin role
+        await setUserRole(data.user.id, 'admin');
+        console.log(`Ensured admin role for existing user: ${user.email}`);
+      }
+    } catch (error) {
+      // User doesn't exist or other error
+      await createAdminUser(user.email, user.password);
+      console.log(`Created admin user after error check: ${user.email}`);
+    }
   }
 };

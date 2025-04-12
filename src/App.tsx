@@ -15,6 +15,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AdminInitializer } from './components/auth/AdminInitializer';
 
 // Create Tanstack query client
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <AdminInitializer />
         <Router>
           <Routes>
             <Route path="/" element={<Index />} />
